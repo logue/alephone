@@ -8,9 +8,7 @@ resources/button_l.bmp \
 resources/button_l_p.bmp \
 resources/button_r.bmp \
 resources/button_r_p.bmp \
-resources/DejaVuLGCSansCondensed-BoldBold.ttf \
-resources/DejaVuLGCSansCondensed-BoldOblique.ttf \
-resources/DejaVuLGCSansCondensed-Bold.ttf \
+resources/AlephJPSansMono-Bold.ttf \
 resources/frame_b.bmp \
 resources/frame_bl.bmp \
 resources/frame_br.bmp \
@@ -32,8 +30,8 @@ resources/slider.bmp \
 resources/slider_c.bmp \
 resources/slider_l.bmp \
 resources/slider_r.bmp \
-resources/Squarish_Sans_CT_Medium.ttf \
-resources/SquarishSansCT.README \
+resources/KikaiChokokuJIS-Md.ttf \
+resources/KikaiChokokuJIS-Md.README \
 resources/theme2.mml \
 resources/thumb_b.bmp \
 resources/thumb_bc.bmp \
