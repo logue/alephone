@@ -1578,9 +1578,9 @@ _fixed find_line_intersection(
 	if (!(denominator>>= 8)) denominator= 1;
 	t= numerator/denominator;
 	
-	intersection->x= p0->x + FIXED_INTEGERAL_PART(t*dx);
-	intersection->y= p0->y + FIXED_INTEGERAL_PART(t*dy);
-	intersection->z= p0->z + FIXED_INTEGERAL_PART(t*dz);
+	intersection->x = p0->x + FIXED_INTEGERAL_PART(int32(1LL*t*dx));
+	intersection->y = p0->y + FIXED_INTEGERAL_PART(int32(1LL*t*dy));
+	intersection->z = p0->z + FIXED_INTEGERAL_PART(int32(1LL*t*dz));
 	
 	return t;
 }
@@ -1669,6 +1669,8 @@ void find_center_of_polygon(
 		x+= p->x, y+= p->y;
 	}
 	
+    // polygon->vertex_count could possibly be zero, unsure of what to do here
+    // making a note.
 	center->x= x/polygon->vertex_count;
 	center->y= y/polygon->vertex_count;
 }

@@ -220,19 +220,19 @@ bool network_gather(bool inResumingGame)
 						char message[1024];
 						if (e.code() == MetaserverClient::LoginDeniedException::BadUserOrPassword)
 						{
-							strncpy(message, "ƒƒOƒCƒ“‹‘”ÛFƒ†[ƒU[–¼‚à‚µ‚­‚ÍAƒpƒXƒ[ƒh‚ªŠÔˆá‚Á‚Ä‚¢‚Ü‚·BƒCƒ“ƒ^[ƒlƒbƒgã‚ÉƒQ[ƒ€‚Ì•åWL‚ğo‚·‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B", 1024);
+							strncpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãƒ¦ãƒ¼ã‚¶ãƒ¼åã‚‚ã—ãã¯ã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒé–“é•ã£ã¦ã„ã¾ã™ã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã«ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†åºƒå‘Šã‚’å‡ºã™ã“ã¨ãŒã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", 1024);
 						}
 						else if (e.code() == MetaserverClient::LoginDeniedException::UserAlreadyLoggedIn)
 						{
-							strncpy(message, "ƒƒOƒCƒ“‹‘”ÛF‚»‚Ìƒ†[ƒU‚ÍA‚·‚Å‚ÉƒƒOƒCƒ“‚µ‚Ä‚¢‚Ü‚·BƒCƒ“ƒ^[ƒlƒbƒgã‚ÉƒQ[ƒ€‚Ì•åWL‚ğo‚·‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B", 1024);
+							strncpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãã®ãƒ¦ãƒ¼ã‚¶ã¯ã€ã™ã§ã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ã„ã¾ã™ã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã«ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†åºƒå‘Šã‚’å‡ºã™ã“ã¨ãŒã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", 1024);
 						}
 						else if (e.code() == MetaserverClient::LoginDeniedException::AccountAlreadyLoggedIn)
 						{
-							strncpy(message, "ƒƒOƒCƒ“‹‘”ÛF‚»‚ÌƒAƒJƒEƒ“ƒg‚ÍA‚·‚Å‚ÉƒƒOƒCƒ“‚µ‚Ä‚¢‚Ü‚·BƒCƒ“ƒ^[ƒlƒbƒgã‚ÉƒQ[ƒ€‚Ì•åWL‚ğo‚·‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B", 1024);
+							strncpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ã€ã™ã§ã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ã„ã¾ã™ã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã«ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†åºƒå‘Šã‚’å‡ºã™ã“ã¨ãŒã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", 1024);
 						}
 						else if (e.code() == MetaserverClient::LoginDeniedException::RoomFull)
 						{
-							strncpy(message, "ƒƒOƒCƒ“‹‘”ÛFƒ‹[ƒ€‚ª–º‚Å‚·IƒCƒ“ƒ^[ƒlƒbƒgã‚ÉƒQ[ƒ€‚Ì•åWL‚ğo‚·‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B", 1024);
+							strncpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãƒ«ãƒ¼ãƒ ãŒæº€å®¤ã§ã™ï¼ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã«ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†åºƒå‘Šã‚’å‡ºã™ã“ã¨ãŒã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", 1024);
 						}
 						else if (e.code() == MetaserverClient::LoginDeniedException::AccountLocked)
 						{
@@ -240,7 +240,7 @@ bool network_gather(bool inResumingGame)
 						}
 						else
 						{
-							sprintf(message, "ƒƒOƒCƒ“‹‘”ÛF‚»‚ÌƒAƒJƒEƒ“ƒg‚ÍƒƒbƒN‚³‚ê‚Ä‚¢‚Ü‚·BƒCƒ“ƒ^[ƒlƒbƒgã‚ÉƒQ[ƒ€‚Ì•åWL‚ğo‚·‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B", e.what());
+							sprintf(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ã¾ã™ã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã«ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†åºƒå‘Šã‚’å‡ºã™ã“ã¨ãŒã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", e.what());
 						}
 
 						alert_user(message, 0);
@@ -303,8 +303,8 @@ GatherDialog::~GatherDialog()
 bool GatherDialog::GatherNetworkGameByRunning ()
 {
 	vector<string> chat_choice_labels;
-	chat_choice_labels.push_back ("Q‰ÁÒ‚Æ");
-	chat_choice_labels.push_back ("ƒCƒ“ƒ^[ƒlƒbƒg‚ÌƒvƒŒƒCƒ„[‚Æ");
+	chat_choice_labels.push_back ("å‚åŠ è€…ã¨");
+	chat_choice_labels.push_back ("ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨");
 	m_chatChoiceWidget->set_labels (chat_choice_labels);
 
 	m_cancelWidget->set_callback(boost::bind(&GatherDialog::Stop, this, false));
@@ -561,8 +561,8 @@ const int JoinDialog::JoinNetworkGameByRunning ()
 	join_result = kNetworkJoinFailedUnjoined;
 	
 	vector<string> chat_choice_labels;
-	chat_choice_labels.push_back ("Q‰ÁÒ^•åWÒ‚Æ");
-	chat_choice_labels.push_back ("ƒCƒ“ƒ^[ƒlƒbƒg‚ÌƒvƒŒƒCƒ„[‚Æ");
+	chat_choice_labels.push_back ("å‚åŠ è€…ï¼å‹Ÿé›†è€…ã¨");
+	chat_choice_labels.push_back ("ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨");
 	m_chatChoiceWidget->set_labels (chat_choice_labels);
 
 	m_colourWidget->set_labels (kTeamColorsStringSetID);
@@ -776,27 +776,27 @@ void JoinDialog::getJoinAddressFromMetaserver ()
 		char message[1024];
 		if (e.code() == MetaserverClient::LoginDeniedException::BadUserOrPassword)
 		{
-			strcpy(message, "ƒƒOƒCƒ“‹‘”ÛF•s³‚Èƒ†[ƒU–¼‚à‚µ‚­‚ÍAƒpƒXƒ[ƒh‚Å‚·B");
+			strcpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šä¸æ­£ãªãƒ¦ãƒ¼ã‚¶åã‚‚ã—ãã¯ã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã§ã™ã€‚");
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::UserAlreadyLoggedIn)
 		{
-			strcpy(message, "ƒƒOƒCƒ“‹‘”ÛF‚»‚Ìƒ†[ƒU‚ÍA‚·‚Å‚ÉƒƒOƒCƒ“‚µ‚Ä‚¢‚Ü‚·B");
+			strcpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãã®ãƒ¦ãƒ¼ã‚¶ã¯ã€ã™ã§ã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ã„ã¾ã™ã€‚");
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::AccountAlreadyLoggedIn)
 		{
-			strcpy(message, "ƒƒOƒCƒ“‹‘”ÛF‚»‚ÌƒAƒJƒEƒ“ƒg‚ÍA‚·‚Å‚ÉƒƒOƒCƒ“‚µ‚Ä‚¢‚Ü‚·B");
+			strcpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ã€ã™ã§ã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ã„ã¾ã™ã€‚");
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::RoomFull)
 		{
-			strcpy(message, "ƒƒOƒCƒ“‹‘”ÛFƒ‹[ƒ€‚ª–ÈIH");
+			strcpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šãƒ«ãƒ¼ãƒ ãŒæº€å¸­ï¼ï¼Ÿ");
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::AccountLocked)
 		{
-			strcpy(message, "ƒƒOƒCƒ“‹‘”ÛF‚ ‚È‚½‚ÌƒAƒJƒEƒ“ƒg‚ÍƒƒbƒN‚³‚ê‚Ä‚¢‚Ü‚·B");
+			strcpy(message, "ãƒ­ã‚°ã‚¤ãƒ³æ‹’å¦ï¼šã‚ãªãŸã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ã¾ã™ã€‚");
 		}
 		else
 		{
-			sprintf(message, "ƒCƒ“ƒ^[ƒlƒbƒgã‚ÌƒT[ƒo[‚Ö‚ÌÚ‘±‚É–â‘è‚ª”­¶‚µ‚Ü‚µ‚½F%s@‚¨è”‚Å‚·‚ªA‚µ‚Î‚ç‚­‚½‚Á‚Ä‚©‚ç‚à‚¤ˆê“x‚â‚è’¼‚µ‚Ä‚­‚¾‚³‚¢B", e.what());
+			sprintf(message, "ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆä¸Šã®ã‚µãƒ¼ãƒãƒ¼ã¸ã®æ¥ç¶šæ™‚ã«å•é¡ŒãŒç™ºç”Ÿã—ã¾ã—ãŸï¼š%sã€€ãŠæ‰‹æ•°ã§ã™ãŒã€ã—ã°ã‚‰ããŸã£ã¦ã‹ã‚‰ã‚‚ã†ä¸€åº¦ã‚„ã‚Šç›´ã—ã¦ãã ã•ã„ã€‚", e.what());
 		}
 
 		alert_user(message, 0);
@@ -2415,7 +2415,7 @@ public:
 	SdlGatherDialog()
 	{
 		vertical_placer *placer = new vertical_placer;
-		placer->dual_add(new w_title("ƒlƒbƒgƒ[ƒNƒQ[ƒ€‚Ì•åW"), m_dialog);
+		placer->dual_add(new w_title("ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚²ãƒ¼ãƒ ã®å‹Ÿé›†"), m_dialog);
 		placer->add(new w_spacer());
 	
 		// m_dialog.add(new w_static_text("Players on Network"));
@@ -2425,7 +2425,7 @@ public:
 	
 		horizontal_placer *autogather_placer = new horizontal_placer(get_theme_space(ITEM_WIDGET), true);
 		w_toggle* autogather_w = new w_toggle(false);
-		autogather_placer->dual_add(autogather_w->label("©“®•åW"), m_dialog);
+		autogather_placer->dual_add(autogather_w->label("è‡ªå‹•å‹Ÿé›†"), m_dialog);
 		autogather_placer->dual_add(autogather_w, m_dialog);
 
 		placer->add(autogather_placer, true);
@@ -2435,17 +2435,17 @@ public:
 		placer->dual_add(players_w, m_dialog);
 
 		horizontal_placer *button_placer = new horizontal_placer;
-		w_button* play_button_w = new w_button("ƒvƒŒƒC");
+		w_button* play_button_w = new w_button("ãƒ—ãƒ¬ã‚¤");
 		button_placer->dual_add(play_button_w, m_dialog);
 
-		w_button* cancel_w = new w_button("ƒLƒƒƒ“ƒZƒ‹");
+		w_button* cancel_w = new w_button("ã‚­ãƒ£ãƒ³ã‚»ãƒ«");
 		button_placer->dual_add(cancel_w, m_dialog);
 
 		placer->add(button_placer, true);
 
 		horizontal_placer *chat_choice_placer = new horizontal_placer;
 		w_select_popup* chat_choice_w = new w_select_popup();
-		chat_choice_placer->dual_add(chat_choice_w->label("ƒ`ƒƒƒbƒgF"), m_dialog);
+		chat_choice_placer->dual_add(chat_choice_w->label("ãƒãƒ£ãƒƒãƒˆï¼š"), m_dialog);
 		chat_choice_placer->dual_add(chat_choice_w, m_dialog);
 		placer->add(chat_choice_placer, true);
 
@@ -2456,7 +2456,7 @@ public:
 		chatentry_w->enable_mac_roman_input();
 
 		horizontal_placer *say_placer = new horizontal_placer;
-		say_placer->dual_add(chatentry_w->label("”­Œ¾:"), m_dialog);
+		say_placer->dual_add(chatentry_w->label("ç™ºè¨€:"), m_dialog);
 		say_placer->add_flags(placeable::kFill);
 		say_placer->dual_add(chatentry_w, m_dialog);
 
@@ -2515,7 +2515,7 @@ public:
 		if ((m & KMOD_ALT) || (m & KMOD_GUI)) skipToMetaserver = !skipToMetaserver;
 
 		vertical_placer *placer = new vertical_placer;
-		placer->dual_add(new w_title("ƒlƒbƒgƒ[ƒNƒQ[ƒ€‚ÉQ‰Á"), m_dialog);
+		placer->dual_add(new w_title("ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚²ãƒ¼ãƒ ã«å‚åŠ "), m_dialog);
 		placer->add(new w_spacer(), true);
 
 		table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
@@ -2523,15 +2523,15 @@ public:
 
 		w_text_entry *name_w = new w_text_entry(PREFERENCES_NAME_LENGTH, "");
 		name_w->enable_mac_roman_input();
-		table->dual_add(name_w->label("–¼‘O"), m_dialog);
+		table->dual_add(name_w->label("åå‰"), m_dialog);
 		table->dual_add(name_w, m_dialog);
 	
 		w_player_color *pcolor_w = new w_player_color(0);
-		table->dual_add(pcolor_w->label("F"), m_dialog);
+		table->dual_add(pcolor_w->label("è‰²"), m_dialog);
 		table->dual_add(pcolor_w, m_dialog);
 
 		w_player_color *tcolor_w = new w_player_color(0);
-		table->dual_add(tcolor_w->label("ƒ`[ƒ€F"), m_dialog);
+		table->dual_add(tcolor_w->label("ãƒãƒ¼ãƒ è‰²"), m_dialog);
 		table->dual_add(tcolor_w, m_dialog);
 
 		placer->add(table, true);
@@ -2545,21 +2545,21 @@ public:
 		
 		prejoin_table->add_row(new w_spacer(), true);
 		
-		w_button* join_by_metaserver_w = new w_button("ƒCƒ“ƒ^[ƒlƒbƒgƒQ[ƒ€‚ğ’T‚·");
+		w_button* join_by_metaserver_w = new w_button("ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã‚²ãƒ¼ãƒ ã‚’æ¢ã™");
 		prejoin_table->dual_add_row(join_by_metaserver_w, m_dialog);
 		prejoin_table->add_row(new w_spacer(), true);
 		
 		w_toggle* hint_w = new w_toggle(false);
-		prejoin_table->dual_add(hint_w->label("ƒAƒhƒŒƒX“ü—Í‚ÅQ‰Á"), m_dialog);
+		prejoin_table->dual_add(hint_w->label("ã‚¢ãƒ‰ãƒ¬ã‚¹å…¥åŠ›ã§å‚åŠ "), m_dialog);
 		prejoin_table->dual_add(hint_w, m_dialog);
 
 		w_text_entry* hint_address_w = new w_text_entry(kJoinHintingAddressLength, "");
-		prejoin_table->dual_add(hint_address_w->label("ƒAƒhƒŒƒX"), m_dialog);
+		prejoin_table->dual_add(hint_address_w->label("ã‚¢ãƒ‰ãƒ¬ã‚¹"), m_dialog);
 		prejoin_table->dual_add(hint_address_w, m_dialog);
 
 		prejoin_table->add_row(new w_spacer(), true);
 
-		w_button* join_w = new w_button("ƒ[ƒJƒ‹ƒQ[ƒ€‚ÉQ‰Á");
+		w_button* join_w = new w_button("ãƒ­ãƒ¼ã‚«ãƒ«ã‚²ãƒ¼ãƒ ã«å‚åŠ ");
 		prejoin_table->dual_add_row(join_w, m_dialog);
 		
 		prejoin_placer->add(prejoin_table, true);
@@ -2581,7 +2581,7 @@ public:
 		horizontal_placer *chat_choice_placer = new horizontal_placer;
 
 		w_select_popup* chat_choice_w = new w_select_popup();
-		chat_choice_placer->dual_add(chat_choice_w->label("ƒ`ƒƒƒbƒg:"), m_dialog);
+		chat_choice_placer->dual_add(chat_choice_w->label("ãƒãƒ£ãƒƒãƒˆ:"), m_dialog);
 		chat_choice_placer->dual_add(chat_choice_w, m_dialog);
 
 		postjoin_placer->add(chat_choice_placer, true);
@@ -2593,7 +2593,7 @@ public:
 		chatentry_w->enable_mac_roman_input();
 
 		horizontal_placer *say_placer = new horizontal_placer;
-		say_placer->dual_add(chatentry_w->label("”­Œ¾:"), m_dialog);
+		say_placer->dual_add(chatentry_w->label("ç™ºè¨€:"), m_dialog);
 		say_placer->add_flags(placeable::kFill);
 		say_placer->dual_add(chatentry_w, m_dialog);
 
@@ -2608,7 +2608,7 @@ public:
 
 		horizontal_placer *button_placer = new horizontal_placer;
 		
-		w_button* cancel_w = new w_button("ƒLƒƒƒ“ƒZƒ‹");
+		w_button* cancel_w = new w_button("ã‚­ãƒ£ãƒ³ã‚»ãƒ«");
 		button_placer->dual_add(cancel_w, m_dialog);
 
 		placer->add(button_placer, true);
@@ -2683,7 +2683,7 @@ public:
 	{
 		vertical_placer *placer = new vertical_placer;
 
-		placer->dual_add(new w_title("ƒlƒbƒgƒ[ƒNƒQ[ƒ€‚ÌƒZƒbƒgƒAƒbƒv"), m_dialog);
+		placer->dual_add(new w_title("ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚²ãƒ¼ãƒ ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—"), m_dialog);
 		placer->add(new w_spacer(), true);
 
 		table_placer *table = new table_placer(2, 10);
@@ -2692,40 +2692,40 @@ public:
 		
 		table_placer *player_table = new table_placer(2, get_theme_space(ITEM_WIDGET));
 		player_table->col_flags(0, placeable::kAlignRight);
-		player_table->dual_add_row(new w_static_text("ŠOŠÏ"), m_dialog);
+		player_table->dual_add_row(new w_static_text("å¤–è¦³"), m_dialog);
 		w_text_entry *name_w = new w_text_entry (PREFERENCES_NAME_LENGTH, "");
 		name_w->enable_mac_roman_input();
 
-		player_table->dual_add(name_w->label("–¼‘O"), m_dialog);
+		player_table->dual_add(name_w->label("åå‰"), m_dialog);
 		player_table->dual_add(name_w, m_dialog);
 
 		w_player_color *pcolor_w = new w_player_color (player_preferences->color);
-		player_table->dual_add(pcolor_w->label("F"), m_dialog);
+		player_table->dual_add(pcolor_w->label("è‰²"), m_dialog);
 		player_table->dual_add(pcolor_w, m_dialog);
 
 		w_player_color *tcolor_w = new w_player_color (player_preferences->team);
-		player_table->dual_add(tcolor_w->label("ƒ`[ƒ€"), m_dialog);
+		player_table->dual_add(tcolor_w->label("ãƒãƒ¼ãƒ "), m_dialog);
 		player_table->dual_add(tcolor_w, m_dialog);
 
-		right_placer->dual_add(new w_static_text("ƒlƒbƒgƒ[ƒN"), m_dialog);
+		right_placer->dual_add(new w_static_text("ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯"), m_dialog);
 		table_placer *network_table = new table_placer(2, get_theme_space(ITEM_WIDGET));
 		network_table->col_flags(1, placeable::kAlignLeft);
 
 		w_toggle *advertise_on_metaserver_w = new w_toggle (sAdvertiseGameOnMetaserver);
 		network_table->dual_add(advertise_on_metaserver_w, m_dialog);
-		network_table->dual_add(advertise_on_metaserver_w->label("ƒCƒ“ƒ^[ƒlƒbƒg‚ÉƒQ[ƒ€•åW‚ğ•\\¦"), m_dialog);
+		network_table->dual_add(advertise_on_metaserver_w->label("ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã«ã‚²ãƒ¼ãƒ å‹Ÿé›†ã‚’è¡¨ç¤º"), m_dialog);
 
 		w_toggle *use_upnp_w = new w_toggle (true);
 		network_table->dual_add(use_upnp_w, m_dialog);
-		network_table->dual_add(use_upnp_w->label("UPnPƒ‹[ƒ^[‚Ìİ’è"), m_dialog);
+		network_table->dual_add(use_upnp_w->label("UPnPãƒ«ãƒ¼ã‚¿ãƒ¼ã®è¨­å®š"), m_dialog);
 
 		w_toggle* realtime_audio_w = new w_toggle(network_preferences->allow_microphone);
 		network_table->dual_add(realtime_audio_w, m_dialog);
-		network_table->dual_add(realtime_audio_w->label("ƒ}ƒCƒN‚ğ—LŒø‰»"), m_dialog);
+		network_table->dual_add(realtime_audio_w->label("ãƒã‚¤ã‚¯ã‚’æœ‰åŠ¹åŒ–"), m_dialog);
 
 		w_select_popup *latency_tolerance_w = new w_select_popup();
 		horizontal_placer *latency_placer = new horizontal_placer(get_theme_space(ITEM_WIDGET));
-		latency_placer->dual_add(latency_tolerance_w->label("‹–—e’x‰„Œë·"), m_dialog);
+		latency_placer->dual_add(latency_tolerance_w->label("è¨±å®¹é…å»¶èª¤å·®"), m_dialog);
 		latency_placer->dual_add(latency_tolerance_w, m_dialog);
 		
 		network_table->add(new w_spacer(), true);
@@ -2734,41 +2734,41 @@ public:
 		right_placer->add(network_table, true);
 
 		player_table->add_row(new w_spacer(), true);
-		player_table->dual_add_row(new w_static_text("ƒQ[ƒ€"), m_dialog);
+		player_table->dual_add_row(new w_static_text("ã‚²ãƒ¼ãƒ "), m_dialog);
 
 		// Could eventually store this path in network_preferences somewhere, so to have separate map file
 		// prefs for single- and multi-player.
-		w_file_chooser* map_w = new w_file_chooser ("ƒ}ƒbƒv‘I‘ğ", _typecode_scenario);
+		w_file_chooser* map_w = new w_file_chooser ("ãƒãƒƒãƒ—é¸æŠ", _typecode_scenario);
 #ifndef MAC_APP_STORE
-		player_table->dual_add(map_w->label("ƒ}ƒbƒv"), m_dialog);
+		player_table->dual_add(map_w->label("ãƒãƒƒãƒ—"), m_dialog);
 		player_table->dual_add(map_w, m_dialog);
 #endif
 
 		w_select_popup* entry_point_w = new w_select_popup ();
-		player_table->dual_add(entry_point_w->label("ƒŒƒxƒ‹"), m_dialog);
+		player_table->dual_add(entry_point_w->label("ãƒ¬ãƒ™ãƒ«"), m_dialog);
 		player_table->dual_add(entry_point_w, m_dialog);
 
 		w_select_popup* game_type_w = new w_select_popup ();
-		player_table->dual_add(game_type_w->label("ƒQ[ƒ€‚Ìí—Ş"), m_dialog);
+		player_table->dual_add(game_type_w->label("ã‚²ãƒ¼ãƒ ã®ç¨®é¡"), m_dialog);
 		player_table->dual_add(game_type_w, m_dialog);
 
 		w_select *diff_w = new w_select(network_preferences->difficulty_level, NULL);
-		player_table->dual_add(diff_w->label("“ïˆÕ“x"), m_dialog);
+		player_table->dual_add(diff_w->label("é›£æ˜“åº¦"), m_dialog);
 		player_table->dual_add(diff_w, m_dialog);
 
 		left_placer->add(player_table, true);
 
 #ifndef MAC_APP_STORE
 		network_table->add_row(new w_spacer(), true);
-		network_table->dual_add_row(new w_static_text("ƒlƒbƒgƒXƒNƒŠƒvƒg"), m_dialog);
+		network_table->dual_add_row(new w_static_text("ãƒãƒƒãƒˆã‚¹ã‚¯ãƒªãƒ—ãƒˆ"), m_dialog);
 #endif
 		w_enabling_toggle* use_netscript_w = new w_enabling_toggle (network_preferences->use_netscript);
 #ifndef MAC_APP_STORE
 		network_table->dual_add(use_netscript_w, m_dialog);
-		network_table->dual_add(use_netscript_w->label("ƒlƒbƒgƒXƒNƒŠƒvƒg‚ğg—p"), m_dialog);
+		network_table->dual_add(use_netscript_w->label("ãƒãƒƒãƒˆã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’ä½¿ç”¨"), m_dialog);
 #endif
 
-		w_file_chooser* choose_script_w = new w_file_chooser ("ƒXƒNƒŠƒvƒg‚ğg—p", _typecode_netscript);
+		w_file_chooser* choose_script_w = new w_file_chooser ("ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’ä½¿ç”¨", _typecode_netscript);
 #ifndef MAC_APP_STORE
 		network_table->add(new w_spacer(), true);
 		network_table->dual_add(choose_script_w, m_dialog);
@@ -2778,82 +2778,82 @@ public:
 		left_placer->add(new w_spacer(), true);
 		table_placer *options_table = new table_placer(2, get_theme_space(ITEM_WIDGET));
 		options_table->col_flags(1, placeable::kAlignLeft);
-		options_table->dual_add_row(new w_static_text("ƒIƒvƒVƒ‡ƒ“"), m_dialog);
+		options_table->dual_add_row(new w_static_text("ã‚ªãƒ—ã‚·ãƒ§ãƒ³"), m_dialog);
 
 		w_toggle *aliens_w = new w_toggle((network_preferences->game_options & _monsters_replenish) != 0);
 		options_table->dual_add(aliens_w, m_dialog);
-		options_table->dual_add(aliens_w->label("ƒGƒCƒŠƒAƒ“"), m_dialog);
+		options_table->dual_add(aliens_w->label("ã‚¨ã‚¤ãƒªã‚¢ãƒ³"), m_dialog);
 
 		w_toggle *live_w = new w_toggle((network_preferences->game_options & _live_network_stats) != 0);
 		options_table->dual_add(live_w, m_dialog);
-		options_table->dual_add(live_w->label("ƒ‰ƒCƒu‹sEƒŒƒ|[ƒg"), m_dialog);
+		options_table->dual_add(live_w->label("ãƒ©ã‚¤ãƒ–è™æ®ºãƒ¬ãƒãƒ¼ãƒˆ"), m_dialog);
 
 		w_toggle *teams_w = new w_toggle(!(network_preferences->game_options & _force_unique_teams));
 		options_table->dual_add(teams_w, m_dialog);
-		options_table->dual_add(teams_w->label("ƒ`[ƒ€"), m_dialog);
+		options_table->dual_add(teams_w->label("ãƒãƒ¼ãƒ "), m_dialog);
 
 		w_toggle *drop_w = new w_toggle(!(network_preferences->game_options & _burn_items_on_death));
 		options_table->dual_add(drop_w, m_dialog);
-		options_table->dual_add(drop_w->label("€‚ñ‚¾ƒvƒŒƒCƒ„[‚ÍƒAƒCƒeƒ€‚ğ—‚Æ‚·"), m_dialog);
+		options_table->dual_add(drop_w->label("æ­»ã‚“ã ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¯ã‚¢ã‚¤ãƒ†ãƒ ã‚’è½ã¨ã™"), m_dialog);
 
 		w_toggle *sensor_w = new w_toggle((network_preferences->game_options & _motion_sensor_does_not_work) != 0);
 		options_table->dual_add(sensor_w, m_dialog);
-		options_table->dual_add(sensor_w->label("ƒ‚[ƒVƒ‡ƒ“ƒZƒ“ƒT[‚ğ–³Œø‰»"), m_dialog);
+		options_table->dual_add(sensor_w->label("ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã‚»ãƒ³ã‚µãƒ¼ã‚’ç„¡åŠ¹åŒ–"), m_dialog);
 
 		w_toggle *pen_die_w = new w_toggle((network_preferences->game_options & _dying_is_penalized) != 0);
 		options_table->dual_add(pen_die_w, m_dialog);
-		options_table->dual_add(pen_die_w->label("€–Sƒyƒiƒ‹ƒeƒB(10•b)"), m_dialog);
+		options_table->dual_add(pen_die_w->label("æ­»äº¡ãƒšãƒŠãƒ«ãƒ†ã‚£(10ç§’)"), m_dialog);
 
 		w_toggle *pen_sui_w = new w_toggle((network_preferences->game_options & _suicide_is_penalized) != 0);
 		options_table->dual_add(pen_sui_w, m_dialog);
-		options_table->dual_add(pen_sui_w->label("©Eƒyƒiƒ‹ƒeƒB(15•b)"), m_dialog);
+		options_table->dual_add(pen_sui_w->label("è‡ªæ®ºãƒšãƒŠãƒ«ãƒ†ã‚£(15ç§’)"), m_dialog);
 
 		left_placer->add(options_table, true);
 
 		network_table->add_row(new w_spacer(), true);
-		network_table->dual_add_row(new w_static_text("ƒ`[ƒg^‚»‚Ì‘¼"), m_dialog);
+		network_table->dual_add_row(new w_static_text("ãƒãƒ¼ãƒˆï¼ãã®ä»–"), m_dialog);
 		w_toggle *zoom_w = new w_toggle(true);
 		network_table->dual_add(zoom_w, m_dialog);
-		network_table->dual_add(zoom_w->label("ƒY[ƒ€‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(zoom_w->label("ã‚ºãƒ¼ãƒ ã‚’è¨±å¯"), m_dialog);
 	
 		w_toggle *crosshairs_w = new w_toggle(true);
 		network_table->dual_add(crosshairs_w, m_dialog);
-		network_table->dual_add(crosshairs_w->label("ƒNƒƒXƒwƒA[‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(crosshairs_w->label("ã‚¯ãƒ­ã‚¹ãƒ˜ã‚¢ãƒ¼ã‚’è¨±å¯"), m_dialog);
 	
 		w_toggle *overlay_w = new w_toggle(true);
 		network_table->dual_add(overlay_w, m_dialog);
-		network_table->dual_add(overlay_w->label("ƒI[ƒo[ƒŒƒCƒ}ƒbƒv‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(overlay_w->label("ã‚ªãƒ¼ãƒãƒ¼ãƒ¬ã‚¤ãƒãƒƒãƒ—ã‚’è¨±å¯"), m_dialog);
 		
 		w_toggle *lara_croft_w = new w_toggle(true);
 		network_table->dual_add(lara_croft_w, m_dialog);
-		network_table->dual_add(lara_croft_w->label("’ÇÕƒJƒƒ‰‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(lara_croft_w->label("è¿½è·¡ã‚«ãƒ¡ãƒ©ã‚’è¨±å¯"), m_dialog);
 
 		w_toggle *carnage_messages_w = new w_toggle(true);
 		network_table->dual_add(carnage_messages_w, m_dialog);
-		network_table->dual_add(carnage_messages_w->label("EƒƒbƒZ[ƒW‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(carnage_messages_w->label("æ®ºå‚·ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¨±å¯"), m_dialog);
 
 		w_toggle *saving_level_w = new w_toggle(true);
 #ifndef MAC_APP_STORE
 		network_table->dual_add(saving_level_w, m_dialog);
-		network_table->dual_add(saving_level_w->label("ƒŒƒxƒ‹‚Ì•Û‘¶‚ğ‹–‰Â"), m_dialog);
+		network_table->dual_add(saving_level_w->label("ãƒ¬ãƒ™ãƒ«ã®ä¿å­˜ã‚’è¨±å¯"), m_dialog);
 #endif
 
 		right_placer->add(new w_spacer(), true);
-		right_placer->dual_add(new w_static_text("ŠúŠÔ"), m_dialog);
+		right_placer->dual_add(new w_static_text("æœŸé–“"), m_dialog);
 		table_placer *limits_table = new table_placer(2, get_theme_space(ITEM_WIDGET));
 		limits_table->col_flags(0, placeable::kAlignRight);
 		
 		w_select* endcondition_w = new w_select(kTimeLimit, NULL);
-		limits_table->dual_add(endcondition_w->label("ƒQ[ƒ€‚ÌI—¹ğŒ"), m_dialog);
+		limits_table->dual_add(endcondition_w->label("ã‚²ãƒ¼ãƒ ã®çµ‚äº†æ¡ä»¶"), m_dialog);
 		limits_table->dual_add(endcondition_w, m_dialog);
 
 		w_number_entry*	timelimit_w = new w_number_entry (network_preferences->time_limit);
-		limits_table->dual_add(timelimit_w->label("ŠÔ§ŒÀi•ªj"), m_dialog);
+		limits_table->dual_add(timelimit_w->label("æ™‚é–“åˆ¶é™ï¼ˆåˆ†ï¼‰"), m_dialog);
 		limits_table->dual_add(timelimit_w, m_dialog);
 
 		// The name of this widget (score limit) will be replaced by Kill Limit, Flag Capture Limit, etc.
 		w_number_entry*	scorelimit_w = new w_number_entry (network_preferences->kill_limit);
-		limits_table->dual_add(scorelimit_w->label("EE“_”§ŒÀ"), m_dialog);
+		limits_table->dual_add(scorelimit_w->label("æ®ºå‚·ãƒ»ç‚¹æ•°åˆ¶é™"), m_dialog);
 		limits_table->dual_add(scorelimit_w, m_dialog);
 		right_placer->add(limits_table, true);
 		
@@ -2865,9 +2865,9 @@ public:
 		placer->add(new w_spacer(), true);
 
 		horizontal_placer *button_placer = new horizontal_placer;
-		w_button* ok_w = new w_button ("—¹³");
+		w_button* ok_w = new w_button ("äº†æ‰¿");
 		button_placer->dual_add(ok_w, m_dialog);
-		w_button* cancel_w = new w_button ("ƒLƒƒƒ“ƒZƒ‹");
+		w_button* cancel_w = new w_button ("ã‚­ãƒ£ãƒ³ã‚»ãƒ«");
 		button_placer->dual_add(cancel_w, m_dialog);
 		placer->add(button_placer, true);
 
@@ -3119,13 +3119,13 @@ network_gather(bool) {
 
     dialog d;
 
-    d.add(new w_title("ƒ}ƒCƒN‚ÌƒeƒXƒg"));
+    d.add(new w_title("ãƒã‚¤ã‚¯ã®ãƒ†ã‚¹ãƒˆ"));
 
-    w_toggle*   onoff_w = new w_toggle("ƒAƒNƒeƒBƒu", 0);
+    w_toggle*   onoff_w = new w_toggle("ã‚¢ã‚¯ãƒ†ã‚£ãƒ–", 0);
     onoff_w->set_selection_changed_callback(respond_to_microphone_toggle);
     d.add(onoff_w);
 
-    d.add(new w_button("Š®—¹", dialog_ok, &d));
+    d.add(new w_button("å®Œäº†", dialog_ok, &d));
 
     d.run();
 

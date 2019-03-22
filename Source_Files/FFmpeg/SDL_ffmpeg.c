@@ -120,6 +120,7 @@ struct SwsContext* getContext( SDL_ffmpegConversionContext **context, int inWidt
     else
     {
         ctx = *context = ( struct SDL_ffmpegConversionContext* ) malloc( sizeof( SDL_ffmpegConversionContext ) );
+        // TODO handle the case where ctx is still null due to malloc failure
     }
 
     /* fill context with correct information */
@@ -761,10 +762,13 @@ int SDL_ffmpegAddAudioFrame( SDL_ffmpegFile *file, SDL_ffmpegAudioFrame *frame )
 */
 SDL_ffmpegAudioFrame* SDL_ffmpegCreateAudioFrame( SDL_ffmpegFile *file, uint32_t bytes )
 {
+	if (!file) {
+		return 0;
+	}
     /* when accesing audio/video stream, streamMutex should be locked */
     SDL_LockMutex( file->streamMutex );
 
-    if ( !file || !file->audioStream || ( !bytes && file->type == SDL_ffmpegInputStream ) )
+    if (!file->audioStream || ( !bytes && file->type == SDL_ffmpegInputStream ) )
     {
         SDL_UnlockMutex( file->streamMutex );
         return 0;
@@ -803,7 +807,7 @@ SDL_ffmpegAudioFrame* SDL_ffmpegCreateAudioFrame( SDL_ffmpegFile *file, uint32_t
 SDL_ffmpegVideoFrame* SDL_ffmpegCreateVideoFrame()
 {
     SDL_ffmpegVideoFrame *frame = ( SDL_ffmpegVideoFrame* )malloc( sizeof( SDL_ffmpegVideoFrame ) );
-
+    // TODO return failure if frame could not be allocated, unsure how that should look
     memset( frame, 0, sizeof( SDL_ffmpegVideoFrame ) );
 
     return frame;
@@ -820,6 +824,9 @@ SDL_ffmpegVideoFrame* SDL_ffmpegCreateVideoFrame()
 */
 int SDL_ffmpegGetVideoFrame( SDL_ffmpegFile* file, SDL_ffmpegVideoFrame *frame )
 {
+	if (!file) {
+		return 0;
+	}
     /* when accesing audio/video stream, streamMutex should be locked */
     SDL_LockMutex( file->streamMutex );
 
@@ -1901,6 +1908,7 @@ int SDL_ffmpegGetPacket( SDL_ffmpegFile *file )
         {
             /* prepare packet */
             SDL_ffmpegPacket *temp = ( SDL_ffmpegPacket* )malloc( sizeof( SDL_ffmpegPacket ) );
+            // TODO check and handle the case where temp failed to malloc
             temp->data = pack;
             temp->next = 0;
 
@@ -1993,7 +2001,7 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
     int in_bps = av_get_bytes_per_sample(in_fmt);
     enum AVSampleFormat out_fmt = AV_SAMPLE_FMT_S16;
     int out_bps = av_get_bytes_per_sample(out_fmt);
-	int in_samples;
+
     /* check if there is still data in the buffer */
     if ( file->audioStream->sampleBufferSize )
     {
@@ -2004,7 +2012,7 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
         int fs = frame->capacity - frame->size;
 
         /* check the amount of data which needs to be copied */
-        /*int*/ in_samples = file->audioStream->sampleBufferSize / (channels * in_bps);
+        int in_samples = file->audioStream->sampleBufferSize / (channels * in_bps);
         int out_samples = fs / (channels * out_bps);
         
         if (out_samples < in_samples)
@@ -2058,10 +2066,10 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
         /* Decode the packet */
         AVCodecContext *avctx = file->audioStream->_ffmpeg->codec;
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
-	AVFrame *dframe = avcodec_alloc_frame();
+		AVFrame *dframe = avcodec_alloc_frame();
         avcodec_get_frame_defaults(dframe);
 #else
-	AVFrame *dframe = av_frame_alloc();
+		AVFrame *dframe = av_frame_alloc();
 #endif
         int got_frame = 0;
         int len = avcodec_decode_audio4( avctx, dframe, &got_frame, pack );
@@ -2069,8 +2077,6 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
         if (len < 0 || !got_frame)
         {
             SDL_ffmpegSetError( "error decoding audio frame" );
-			av_frame_unref(dframe);
-			av_frame_free(dframe);
             break;
         }
         
@@ -2080,8 +2086,6 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
         if ( data_size > 10000 )
         {
             SDL_ffmpegSetError( "too much data in decoded audio frame" );
-			av_frame_unref(dframe);
-			av_frame_free(dframe);
             break;
         }
         memcpy( file->audioStream->sampleBuffer, dframe->extended_data[0], plane_size );
@@ -2101,8 +2105,6 @@ int SDL_ffmpegDecodeAudioFrame( SDL_ffmpegFile *file, AVPacket *pack, SDL_ffmpeg
         /* change pointers */
         data += len;
         size -= len;
-		av_frame_unref(dframe);
-		av_frame_free(dframe);
     }
 
     {
