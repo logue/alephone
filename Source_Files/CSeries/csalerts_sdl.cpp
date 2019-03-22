@@ -146,14 +146,14 @@ void system_launch_url_in_browser(const char *url)
 #endif
 
 const int MAX_ALERT_WIDTH = 320;
-#include "converter.h"
+
 extern void update_game_window(void);
 extern bool MainScreenVisible(void);
 
 void alert_user(const char *message, short severity) 
 {
   if (!MainScreenVisible()) {
-    SDL_ShowSimpleMessageBox(severity == infoError ? SDL_MESSAGEBOX_WARNING : SDL_MESSAGEBOX_ERROR, severity == infoError ? "Warning" : "Error", sjis2utf8(message, strlen(message)), NULL);
+	SDL_ShowSimpleMessageBox(severity == infoError ? SDL_MESSAGEBOX_WARNING : SDL_MESSAGEBOX_ERROR, severity == infoError ? "Warning" : "Error", message, NULL);
   } else {
     dialog d;
     vertical_placer *placer = new vertical_placer;
@@ -173,9 +173,6 @@ void alert_user(const char *message, short severity)
 	width = text_width(t, i, font, style);
 	if (t[i] == ' ')
 	  last = i;
-	else if( isJChar( t[i] ) && is2ndJChar( t[i+1] ) ) {
-	  last = i-1;
-	}
 	i++;
       }
       if (i != strlen(t))

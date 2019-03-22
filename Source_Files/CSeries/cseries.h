@@ -50,6 +50,13 @@
 #endif
 
 
+constexpr bool PlatformIsLittleEndian() noexcept {
+#ifdef ALEPHONE_LITTLE_ENDIAN
+	return true;
+#else
+	return false;
+#endif // end ALEPHONE_LITTLE_ENDIAN
+}
 /*
  *  Data types with specific bit width
  */
@@ -102,5 +109,6 @@ const int kFontIDCourier = 22;
 #include "cspaths.h"
 #include "csmisc.h"
 
+#include "converter.h"
 
 #endif

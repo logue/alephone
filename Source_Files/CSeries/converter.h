@@ -7,10 +7,12 @@
  *
  *  Modified by Logue on 12/05/23
  */
+#ifndef _CSERIES_CONVERTER_
+#define _CSERIES_CONVERTER_
+
 #include <stdlib.h>
 #include <string.h>
 #include <iconv.h>
-
 
 char* sjis2utf8(const char* str, size_t len);
 char* utf82sjis(const char* str, size_t len);
@@ -25,3 +27,4 @@ int unicodeChar( const char* input, uint16* ret);
 
 bool isJChar(unsigned char text);
 bool is2ndJChar(unsigned char text);
+#endif

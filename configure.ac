@@ -94,7 +94,7 @@ AX_BOOST_FILESYSTEM
 AS_IF([ test "x$BOOST_FILESYSTEM_LIB" != "x" ],
       [ LIBS="$BOOST_FILESYSTEM_LIB $LIBS" ],
       [AC_MSG_ERROR([You need the Boost::Filesystem library to run Aleph One.])])
-      
+
 AC_DEFUN([AX_CHECK_BOOST_HEADER],
          [ AC_LANG_PUSH(C++)
            AC_CHECK_HEADER([$1], , [AC_MSG_ERROR([You need $1 from the Boost library to build Aleph One.])])
@@ -134,7 +134,7 @@ dnl AX_CHECK_BOOST_HEADER([boost/uuid/uuid_generators.hpp])
 dnl AX_CHECK_BOOST_HEADER([boost/uuid/uuid_io.hpp])
 
 dnl Check for library functions.
-AC_CHECK_FUNCS([snprintf vsnprintf], , AC_MSG_ERROR([You need snprintf and vsnprintf to run Aleph One.]))     
+AC_CHECK_FUNCS([snprintf vsnprintf], , AC_MSG_ERROR([You need snprintf and vsnprintf to run Aleph One.]))
 AC_CHECK_FUNCS([sysconf sysctlbyname])
 AC_CHECK_FUNC([mkstemp],
               [AC_DEFINE([LUA_USE_MKSTEMP], [1], [mkstemp() available])])
@@ -149,6 +149,13 @@ AC_SEARCH_LIBS([socket], [socket],
                              [-lsocket])])
 
 dnl Check for libraries.
+
+dnl On some systems iconv is in a separate library, and may actually be named
+dnl libiconv.
+AC_CHECK_LIB(iconv, libiconv)
+if test $ac_cv_lib_iconv_libiconv = no; then
+	AC_CHECK_LIB(iconv, iconv , AC_MSG_ERROR([You need iconv to run Aleph One JP.]))
+fi
 
 dnl AX_REQUIRE_PKG(desc, define, modules)
 AC_DEFUN([AX_REQUIRE_PKG],
@@ -243,7 +250,7 @@ AC_DEFUN([AX_CHECK_FEATURE_PKG],
                                        AC_DEFINE([HAVE_$2], [1], [${desc_$1} enabled]) ],
                                      [AS_IF([test "x${with_$1}" = "xyes"],
                                             [AC_MSG_ERROR([${desc_$1} requested but not available])])])
-           
+
                  ])
             AM_CONDITIONAL([HAVE_$2], [test "x${have_$1}" = "xtrue"])
           ])
