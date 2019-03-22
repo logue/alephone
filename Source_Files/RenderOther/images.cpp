@@ -215,11 +215,11 @@ static int uncompress_rle16(const uint8 *src, int row_bytes, uint8 *dst, int dst
 
 static void copy_component_into_surface(const uint8 *src, uint8 *dst, int count, int component)
 {
-#ifdef ALEPHONE_LITTLE_ENDIAN
-	dst += 2 - component;
-#else
-	dst += component + 1;
-#endif
+	if (PlatformIsLittleEndian()) {
+		dst += 2 - component;
+	} else {
+		dst += component + 1;
+	}
 	while (count--) {
 		*dst = *src++;
 		dst += 4;
@@ -413,7 +413,8 @@ SDL_Surface *picture_to_surface(LoadedResource &rsrc)
 {
 	if (!rsrc.IsLoaded())
 		return NULL;
-	// base surface
+
+	SDL_Surface *s = NULL;
 
 	// Open stream to picture resource
 	SDL_RWops *p = SDL_RWFromMem(rsrc.GetPointer(), (int)rsrc.GetLength());
@@ -422,8 +423,6 @@ SDL_Surface *picture_to_surface(LoadedResource &rsrc)
 	SDL_RWseek(p, 6, SEEK_CUR);		// picSize/top/left
 	int pic_height = SDL_ReadBE16(p);
 	int pic_width = SDL_ReadBE16(p);
-	SDL_Surface* s = SDL_CreateRGBSurface(SDL_SWSURFACE, pic_width, pic_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
-	SDL_SetSurfaceBlendMode(s,SDL_BLENDMODE_NONE);
 	//printf("pic_width %d, pic_height %d\n", pic_width, pic_height);
 
 	// Read and parse picture opcodes
@@ -528,17 +527,6 @@ SDL_Surface *picture_to_surface(LoadedResource &rsrc)
 				uint16 left = SDL_ReadBE16(p);
 				uint16 height = SDL_ReadBE16(p) - top;
 				uint16 width = SDL_ReadBE16(p) - left;
-				if( pic_height < height+top || pic_width < width+left ) {
-					// resize
-					pic_height = height+top;
-					pic_width = width+left;
-					SDL_Surface* s2 = SDL_CreateRGBSurface(SDL_SWSURFACE, pic_width, pic_height,  32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
-					SDL_SetSurfaceBlendMode(s2,SDL_BLENDMODE_NONE);
-					SDL_BlitSurface(s, NULL, s2, NULL);
-					SDL_FreeSurface(s);
-					s = s2;
-						
-				}
 				uint16 pack_type, pixel_size;
 				if (is_pixmap) {
 					SDL_RWseek(p, 2, SEEK_CUR);			// pmVersion
@@ -629,13 +617,10 @@ SDL_Surface *picture_to_surface(LoadedResource &rsrc)
 				// (actually, we could have skipped this entire opcode, but the
 				// only way to do this is to decode the image data).
 				// So we only draw the first image we encounter.
-				if (s) {
-					SDL_Rect dst = { left, top, bm->w, bm->h };
-					SDL_BlitSurface(bm, NULL, s, &dst);
+				if (s)
 					SDL_FreeSurface(bm);
-				} else {
+				else
 					s = bm;
-				}
 				break;
 			}
 
@@ -727,7 +712,7 @@ SDL_Surface *picture_to_surface(LoadedResource &rsrc)
 				break;
 		}
 	}
-	
+
 	// Close stream, return surface
 	SDL_RWclose(p);
 	return s;
@@ -1288,12 +1273,12 @@ static void create_m1_menu_surfaces(void)
     if (m1_menu_unpressed || m1_menu_pressed)
         return;
     
-    SDL_Surface *s;
-#ifdef ALEPHONE_LITTLE_ENDIAN
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0);
-#else
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0);
-#endif
+    SDL_Surface *s = nullptr;
+	if (PlatformIsLittleEndian()) {
+    	s = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0);
+	} else {
+    	s = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0);
+	}
     if (!s)
         return;
 

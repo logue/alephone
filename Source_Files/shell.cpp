@@ -254,6 +254,9 @@ bool handle_open_document(const std::string& filename)
 
 int main(int argc, char **argv)
 {
+#if defined(__WIN32__)
+	SetConsoleOutputCP(CP_UTF8);
+#endif
 	// Print banner (don't bother if this doesn't appear when started from a GUI)
 	char app_name_version[256];
 	expand_app_variables(app_name_version, "Aleph One $appLongVersion$");
@@ -263,7 +266,7 @@ int main(int argc, char **argv)
 	  "TCP/IP ネットワーク by Woody Zenfell\n"
 	  "Expat XMLライブラリ by James Clark\n"
 	  "SDLポート by Christian Bauer <Christian.Bauer@uni-mainz.de>\n"
-	  "日本語化 by saiten <http://www.isidesystem.net/>, ookawa_mi, Logue <http://logue.be/>, marathon.\n" 
+	  "日本語化 by saiten <http://www.isidesystem.net/>, ookawa_mi, Logue <https://logue.be/>, marathon, pfhore.\n" 
 #if defined(__MACH__) && defined(__APPLE__)
 	  "Mac OS X/SDLバージョンは、Chris Lovell, Alexander Strange, and Woody Zenfell氏らによって作られました。\n"
 #endif

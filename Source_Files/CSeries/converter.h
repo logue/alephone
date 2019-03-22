@@ -27,4 +27,7 @@ int unicodeChar( const char* input, uint16* ret);
 
 bool isJChar(unsigned char text);
 bool is2ndJChar(unsigned char text);
+
+#define _SJIS(str) utf82sjis(str, strlen(str))
+#define _UTF16(str) utf82utf16(str, strlen(str))
 #endif

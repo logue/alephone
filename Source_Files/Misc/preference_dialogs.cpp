@@ -611,7 +611,7 @@ public:
 
 		horizontal_placer *button_placer = new horizontal_placer;
 //		w_button* ok_w = new w_button("ACCEPT");
-		w_button* ok_w = new w_button("了承");
+		w_button* ok_w = new w_button("OK");
 		button_placer->dual_add(ok_w, m_dialog);
 		
 //		w_button* cancel_w = new w_button("CANCEL");

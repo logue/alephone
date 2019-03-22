@@ -167,8 +167,8 @@ void widget::place(const SDL_Rect &r, placement_flags flags)
 // ZZZ change: copy the given string instead of just pointing to it.  Much easier for messages that change.
 w_static_text::w_static_text(const char *t, int _theme_type) : widget(_theme_type), theme_type(_theme_type)
 {
-        text = strdup(t);
-	rect.w = text_width(text, font, style);
+	text = strdup(t);
+	rect.w = text_width(_SJIS(text), font, style);
 	rect.h = font->get_line_height();
 	saved_min_height = rect.h;
 	saved_min_width = rect.w;
@@ -179,7 +179,7 @@ void w_static_text::draw(SDL_Surface *s) const
 	uint32 pixel;
 	pixel = get_theme_color(theme_type, DEFAULT_STATE, 0);
 
-	draw_text(s, text, rect.x, rect.y + font->get_ascent(), pixel, font, style);
+	draw_text(s, _SJIS(text), rect.x, rect.y + font->get_ascent(), pixel, font, style);
 }
 
 void w_label::click(int x, int y)
@@ -193,14 +193,14 @@ void w_label::draw(SDL_Surface *s) const
 {
 	int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 	uint16 style = 0;
-	draw_text(s, text, rect.x, rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2, get_theme_color(LABEL_WIDGET, state, FOREGROUND_COLOR), font, style);
+	draw_text(s, _SJIS(text), rect.x, rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2, get_theme_color(LABEL_WIDGET, state, FOREGROUND_COLOR), font, style);
 }
 
 // ZZZ addition: change text.
 void
 w_static_text::set_text(const char* t) {
     free(text);
-    text = strdup(t);
+	text = strdup(_SJIS(t));
     dirty = true;
 }
 
@@ -233,7 +233,7 @@ void w_slider_text::draw(SDL_Surface *s) const
 {
 	int state = associated_slider->enabled ? (associated_slider->active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 	uint16 style = 0;
-	draw_text(s, text, rect.x, rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2, get_theme_color(LABEL_WIDGET, state, FOREGROUND_COLOR), font, style);
+	draw_text(s, _SJIS(text), rect.x, rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2, get_theme_color(LABEL_WIDGET, state, FOREGROUND_COLOR), font, style);
 }
 
 /*
@@ -272,7 +272,8 @@ void w_pict::draw(SDL_Surface *s) const
 
 w_button_base::w_button_base(const char *t, action_proc p, void *a, int _type) : widget(_type), text(t), proc(p), arg(a), down(false), pressed(false), type(_type)
 {
-	rect.w = text_width(text.c_str(), font, style) + get_theme_space(_type, BUTTON_L_SPACE) + get_theme_space(_type, BUTTON_R_SPACE);
+	
+	rect.w = text_width(_SJIS(text.c_str()), font, style) + get_theme_space(_type, BUTTON_L_SPACE) + get_theme_space(_type, BUTTON_R_SPACE);
 	button_c_default = get_theme_image(_type, DEFAULT_STATE, BUTTON_C_IMAGE, rect.w - get_theme_image(_type, DEFAULT_STATE, BUTTON_L_IMAGE)->w - get_theme_image(_type, DEFAULT_STATE, BUTTON_R_IMAGE)->w);
 	button_c_active = get_theme_image(_type, ACTIVE_STATE, BUTTON_C_IMAGE, rect.w - get_theme_image(_type, ACTIVE_STATE, BUTTON_L_IMAGE)->w - get_theme_image(_type, ACTIVE_STATE, BUTTON_R_IMAGE)->w);
 	button_c_disabled = get_theme_image(_type, DISABLED_STATE, BUTTON_C_IMAGE, rect.w - get_theme_image(_type, DISABLED_STATE, BUTTON_L_IMAGE)->w - get_theme_image(_type, DISABLED_STATE, BUTTON_R_IMAGE)->w);
@@ -349,7 +350,7 @@ void w_button_base::draw(SDL_Surface *s) const
 		draw_rectangle(s, &rect, pixel);
 	}
 
-	draw_text(s, text.c_str(), rect.x + get_theme_space(type, BUTTON_L_SPACE),
+	draw_text(s, _SJIS(text.c_str()), rect.x + get_theme_space(type, BUTTON_L_SPACE),
 		  rect.y + get_theme_space(type, BUTTON_T_SPACE) + font->get_ascent(),
 		  get_theme_color(type, state), font, style);
 }
@@ -417,7 +418,7 @@ void w_hyperlink::prochandler(void *arg)
 
 w_hyperlink::w_hyperlink(const char *url, const char *txt) : w_button_base((txt ? txt : url), boost::bind(&w_hyperlink::prochandler, this, _1), const_cast<char *>(url), HYPERLINK_WIDGET)
 {
-	rect.w = text_width(text.c_str(), font, style);
+	rect.w = text_width(_SJIS(text.c_str()), font, style);
 	rect.h = font->get_line_height();
 	saved_min_height = rect.h;
 	saved_min_width = rect.w;
@@ -435,7 +436,7 @@ void w_hyperlink::draw(SDL_Surface *s) const
 	
 	uint32 pixel = get_theme_color(HYPERLINK_WIDGET, state, 0);
 	
-	draw_text(s, text.c_str(), rect.x, rect.y + font->get_ascent(), pixel, font, style);
+	draw_text(s, _SJIS(text.c_str()), rect.x, rect.y + font->get_ascent(), pixel, font, style);
 	
 	// draw_text doesn't support underline, so draw one manually
 	if (style & styleUnderline)
@@ -457,7 +458,7 @@ w_tab::w_tab(const vector<string>& _labels, tab_placer *_placer) : widget(TAB_WI
 	{
 		int l_space = (it == labels.begin()) ? get_theme_space(TAB_WIDGET, BUTTON_L_SPACE) : get_theme_space(TAB_WIDGET, TAB_LC_SPACE);
 		int r_space = (it == labels.end() - 1) ? get_theme_space(TAB_WIDGET, BUTTON_R_SPACE) : get_theme_space(TAB_WIDGET, TAB_RC_SPACE);
-		int width = l_space + r_space + font->text_width(it->c_str(), style);
+		int width = l_space + r_space + font->text_width(_SJIS(it->c_str()), style);
 		widths.push_back(width);
 		saved_min_width += width;
 
@@ -533,8 +534,9 @@ void w_tab::draw(SDL_Surface *s) const
 		}
 
 		int c_space;
+		char* str = _SJIS(labels[i].c_str());
 		SDL_Surface *c_image = images[state][i];
-		c_space = font->text_width(labels[i].c_str(), style);
+		c_space = font->text_width(str, style);
 
 		if (use_theme_images(TAB_WIDGET))
 		{
@@ -559,7 +561,7 @@ void w_tab::draw(SDL_Surface *s) const
 			}
 		}
 
-		font->draw_text(s, labels[i].c_str(), labels[i].size(), x + l_space, rect.y + get_theme_space(TAB_WIDGET, BUTTON_T_SPACE) + font->get_ascent(), get_theme_color(TAB_WIDGET, state, FOREGROUND_COLOR), style);
+		font->draw_text(s, str, labels[i].size(), x + l_space, rect.y + get_theme_space(TAB_WIDGET, BUTTON_T_SPACE) + font->get_ascent(), get_theme_color(TAB_WIDGET, state, FOREGROUND_COLOR), style);
 
 		x += l_space + c_space + r_space;
 	}
@@ -717,7 +719,7 @@ void w_select_button::draw(SDL_Surface *s) const
 	
 	int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 	
-	draw_text(s, selection, rect.x + selection_x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
+	draw_text(s, _SJIS(selection), rect.x + selection_x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
 	set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);
 	
 	// Cursor
@@ -771,7 +773,7 @@ void w_select_button::place(const SDL_Rect &r, placement_flags flags)
 // if no valid labels, returns -1 when asked for selection
 // draw(), get_selection() check num_labels directly instead of trying to keep selection set at -1
 
-static const char* sNoValidOptionsString = "(no valid options)"; // XXX should be moved outside compiled code e.g. to MML
+static const char* sNoValidOptionsString = "（無効な選択）"; // XXX should be moved outside compiled code e.g. to MML
 
 w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), we_own_labels(false), selection(s), selection_changed_callback(NULL), utf8(false)
 {
@@ -811,7 +813,7 @@ void w_select::draw(SDL_Surface *s) const
 	int y = rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2;
 
 	// Selection (ZZZ: different color for disabled)
-	const char *str = (num_labels > 0 ? labels[selection] : sNoValidOptionsString);
+	const char *str = _SJIS(num_labels > 0 ? labels[selection] : sNoValidOptionsString);
 
     int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
@@ -964,14 +966,14 @@ void w_select::selection_changed(void)
 uint16 w_select::get_largest_label_width() {
     uint16 max_label_width = 0;
     for (size_t i=0; i<num_labels; i++) {
-            uint16 width = text_width(labels[i], font, style, utf8);
+            uint16 width = text_width(_SJIS(labels[i]), font, style, utf8);
             if (width > max_label_width)
                     max_label_width = width;
     }
 
     // ZZZ: account for "no valid options" string
     if(num_labels <= 0)
-	    max_label_width = text_width(sNoValidOptionsString, font, style, utf8);
+	    max_label_width = text_width(_SJIS(sNoValidOptionsString), font, style, utf8);
     
     return max_label_width;
 }
@@ -999,7 +1001,7 @@ w_toggle::w_toggle(bool selection, const char **labels) : w_select(selection, la
 void w_toggle::draw(SDL_Surface *s) const
 {
 	// Selection (ZZZ: different color for disabled)
-	const char *str = (num_labels > 0 ? labels[selection] : sNoValidOptionsString);
+	const char *str = _SJIS(num_labels > 0 ? labels[selection] : sNoValidOptionsString);
 
 	int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
@@ -1081,7 +1083,7 @@ void w_player_color::draw(SDL_Surface *s) const
 	} else {
 		int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
-		draw_text(s, "<unknown>", rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s, _SJIS("<不明>"), rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	}
 
 	// Cursor
@@ -1115,7 +1117,7 @@ void w_color_picker::click(int, int)
 	dialog d;
 	
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title("CHOOSE A COLOR"), d);
+	placer->dual_add(new w_title("色を選択"), d);
 	placer->add(new w_spacer(), true);
 
 	w_color_block *color_block = new w_color_block(&m_color);
@@ -1125,22 +1127,22 @@ void w_color_picker::click(int, int)
 	table->col_flags(0, placeable::kAlignRight);
 
 	w_percentage_slider *red_w = new w_percentage_slider(16, m_color.red >> 12);
-	table->dual_add(red_w->label("Red"), d);
+	table->dual_add(red_w->label("赤"), d);
 	table->dual_add(red_w, d);
 
 	w_percentage_slider *green_w = new w_percentage_slider(16, m_color.green >> 12);
-	table->dual_add(green_w->label("Green"), d);
+	table->dual_add(green_w->label("緑"), d);
 	table->dual_add(green_w, d);
 
 	w_percentage_slider *blue_w = new w_percentage_slider(16, m_color.blue >> 12);
-	table->dual_add(blue_w->label("Blue"), d);
+	table->dual_add(blue_w->label("青"), d);
 	table->dual_add(blue_w, d);
 
 	placer->add(table, true);
 	placer->add(new w_spacer(), true);
 	
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 	button_placer->dual_add(new w_button("OK", dialog_ok, &d), d);
 	
 	placer->add(button_placer, true);
@@ -1214,20 +1216,21 @@ void w_text_entry::draw(SDL_Surface *s) const
   int16 theTextX = text_x;
   
   // Text
+  char *str = _SJIS(buf);
   int16 x = theRectX + theTextX;
-  uint16 width = text_width(buf, font, style);
+  uint16 width = text_width(str, font, style);
   if (width > max_text_width)
     x -= width - max_text_width;
   set_drawing_clip_rectangle(0, theRectX + theTextX, static_cast<uint16>(s->h), theRectX + theRectW);
   
   int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
   
-  draw_text(s, buf, x, y, get_theme_color(TEXT_ENTRY_WIDGET, state), font, style);
+  draw_text(s, str, x, y, get_theme_color(TEXT_ENTRY_WIDGET, state), font, style);
   set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);
   
   // Cursor
   if (active) {
-	  width = text_width(buf, cursor_position, font, style);
+	  width = text_width(str, cursor_position, font, style);
 	  SDL_Rect r = {x + width - (width ? 1 : 0), rect.y, 1, rect.h};
 	  SDL_FillRect(s, &r, get_theme_color(TEXT_ENTRY_WIDGET, CURSOR_STATE));
   }
@@ -1508,14 +1511,14 @@ void w_password_entry::draw(SDL_Surface *s) const
  *  Key name widget
  */
 
-static const std::vector<std::string> WAITING_TEXT = { "waiting for key", "waiting for button", "waiting for button" };
-static const std::vector<std::string> UNBOUND_TEXT = { "none", "none", "none" };
+static const std::vector<std::string> WAITING_TEXT = { "キー入力待ち", "ボタン入力待ち", "ボタン入力待ち" };
+static const std::vector<std::string> UNBOUND_TEXT = { "なし", "なし", "なし" };
 
 w_key::w_key(SDL_Scancode key, w_key::Type event_type) : widget(LABEL_WIDGET), binding(false), event_type(event_type)
 {
 	set_key(key);
 
-	saved_min_width = text_width(WAITING_TEXT[event_type].c_str(), font, style);
+	saved_min_width = text_width(_SJIS(WAITING_TEXT[event_type].c_str()), font, style);
 	saved_min_height = font->get_line_height();
 }
 
@@ -1531,20 +1534,20 @@ void w_key::place(const SDL_Rect& r, placement_flags flags)
 		
 // ZZZ: we provide phony key names for the phony keys used for mouse buttons.
 static const char* sMouseButtonKeyName[NUM_SDL_MOUSE_BUTTONS] = {
-        "Mouse Left",
-        "Mouse Middle",
-        "Mouse Right",
-        "Mouse X1",
-        "Mouse X2",
-        "Mouse Scroll Up",
-        "Mouse Scroll Down"
+        "左クリック",
+        "中央クリック",
+        "右クリック",
+        "進むボタン",
+        "戻るボタン",
+        "ホイールアップ",
+        "ホイールダウン"
 };
 
 static const char* sJoystickButtonKeyName[NUM_SDL_JOYSTICK_BUTTONS] = {
-	"A", "B", "X", "Y", "Back", "Guide", "Start",
-	"LS", "RS", "LB", "RB", "Up", "Down", "Left", "Right",
-	"LS Right", "LS Down", "RS Right", "RS Down", "LT", "RT",
-	"LS Left", "LS Up", "RS Left", "RS Up", "LT Neg", "RT Neg"
+	"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
+	"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
+	"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
+	"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
 };
 
 // ZZZ: this injects our phony key names but passes along the rest.
@@ -1565,13 +1568,13 @@ void w_key::draw(SDL_Surface *s) const
 	// Key
 	int16 x = rect.x + key_x;
 	if (binding) {
-		draw_text(s, WAITING_TEXT[event_type].c_str(), x, y, get_theme_color(ITEM_WIDGET, ACTIVE_STATE), font, style);
+		draw_text(s, _SJIS(WAITING_TEXT[event_type].c_str()), x, y, get_theme_color(ITEM_WIDGET, ACTIVE_STATE), font, style);
 	} else if (key == SDL_SCANCODE_UNKNOWN) {
 		int state = enabled ? (active ? ACTIVE_STATE : DISABLED_STATE) : DISABLED_STATE;
-		draw_text(s, UNBOUND_TEXT[event_type].c_str(), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s, _SJIS(UNBOUND_TEXT[event_type].c_str()), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	} else {
         int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
-		draw_text(s, GetSDLKeyName(key), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s,_SJIS( GetSDLKeyName(key)), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	}
 }
 
@@ -2276,7 +2279,7 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
         sprintf(str, "%s", i->level_name);
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
-	draw_text(s, str, x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
+	draw_text(s, _SJIS(str), x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
 	set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);
 }
 
@@ -2301,7 +2304,7 @@ void w_string_list::draw_item(vector<string>::const_iterator i, SDL_Surface *s, 
 	sprintf(str, "%s", i->c_str ());
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
-	draw_text(s, str, x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
+	draw_text(s, _SJIS(str), x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
 	set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);
 }
 
@@ -2327,7 +2330,7 @@ void w_select_popup::set_labels(const vector<string>& inLabels)
 	saved_min_width = 0;
 	for (vector<string>::iterator it = labels.begin(); it != labels.end(); ++it)
 	{
-		uint16 width = text_width(it->c_str(), font, style);
+		uint16 width = text_width(_SJIS(it->c_str()), font, style);
 		if (width > saved_min_width)
 			saved_min_width = width;
 	}
@@ -2366,7 +2369,7 @@ void w_select_popup::gotSelected ()
 }
 
 
-static const char* const sFileChooserInvalidFileString = "(no valid selection)";
+static const char* const sFileChooserInvalidFileString = "（無効な選択）";
 
 w_file_chooser::w_file_chooser(const char* inDialogPrompt, Typecode inTypecode)
 	: w_select_button("", NULL, NULL, true), typecode(inTypecode)
@@ -2485,7 +2488,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		{
 			if (item.minutes_remaining() == 1)
 			{
-				time_or_ping << "~1 Minute";
+				time_or_ping << "~1 分";
 			}
 			else
 			{
@@ -2494,7 +2497,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		}
 		else
 		{
-			time_or_ping << "Untimed";
+			time_or_ping << "無制限";
 		}
 	}
 	else
@@ -2510,7 +2513,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	
 	// draw remaining or ping
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
-	draw_text(s, time_or_ping.str().c_str(), x + width - right_text_width, y, fg, font, game_style);
+	draw_text(s, _SJIS(time_or_ping.str().c_str()), x + width - right_text_width, y, fg, font, game_style);
 
 	y += font->get_line_height();
 
@@ -2543,11 +2546,11 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	{
 		if (item.m_description.m_numPlayers == 1)
 		{
-			game_settings << "1 Player";
+			game_settings << "1 プレイヤー";
 		}
 		else
 		{
-			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " Players";
+			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " プレイヤー";
 		}
 	}
 	else
@@ -2555,22 +2558,22 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_settings << static_cast<uint16>(item.m_description.m_numPlayers)
 			      << "/"
 			      << item.m_description.m_maxPlayers
-			      << " Players";
+			      << " プレイヤー";
 	}
 
 	if (item.m_description.m_timeLimit && !(item.m_description.m_timeLimit == INT32_MAX || item.m_description.m_timeLimit == -1))
 	{
 		game_settings << ", " 
 			      << item.m_description.m_timeLimit / 60 / TICKS_PER_SECOND 
-			      << " Minutes";
+			      << " 分";
 	}
 
 	if (item.m_description.m_teamsAllowed)
 	{
-		game_settings << ", Teams";
+		game_settings << ", チーム";
 	}
 
-	draw_text(s, game_settings.str().c_str(), x, y, fg, font, game_style);
+	draw_text(s, _SJIS(game_settings.str().c_str()), x, y, fg, font, game_style);
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
 	font->draw_styled_text(s, item.m_hostPlayerName, item.m_hostPlayerName.size(), x + width - right_text_width, y, fg, game_style);

@@ -3309,13 +3309,13 @@ size_t should_restore_game_networked(FileSpecifier& file)
         dialog d;
 
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title("RESUME GAME"), d);
+	placer->dual_add(new w_title("ゲーム再開"), d);
 	placer->add(new w_spacer, true);
 
 	horizontal_placer *resume_as_placer = new horizontal_placer;
         w_toggle* theRestoreAsNetgameToggle = new w_toggle(dynamic_world->player_count > 1, 0);
         theRestoreAsNetgameToggle->set_labels_stringset(kSingleOrNetworkStringSetID);
-	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("Resume as"), d);
+	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("以下で再開："), d);
 	resume_as_placer->dual_add(theRestoreAsNetgameToggle, d);
 
 	placer->add(resume_as_placer, true);
@@ -3324,8 +3324,8 @@ size_t should_restore_game_networked(FileSpecifier& file)
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button("RESUME", dialog_ok, &d), d);
-	button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("続ける", dialog_ok, &d), d);
+	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 

@@ -322,7 +322,7 @@ void HUD_Class::update_weapon_panel(bool force_redraw)
 				source.right= definition->weapon_name_end_x;
 			}
 			
-			DrawText(weapon_name, &source, _center_horizontal|_center_vertical|_wrap_text,
+			DrawText(_SJIS(weapon_name), &source, _center_horizontal|_center_vertical|_wrap_text,
 				_weapon_name_font, _inventory_text_color);
 				
 			/* And make sure that the ammo knows it needs to update */
@@ -493,7 +493,7 @@ void HUD_Class::draw_inventory_header(char *text, short offset)
 
 	/* Now draw the text. */	
 	destination.left+= TEXT_INSET;
-	DrawText(text, &destination, _center_vertical, _interface_font,
+	DrawText(_SJIS(text), &destination, _center_vertical, _interface_font,
 		_inventory_text_color);
 }
 
@@ -509,7 +509,7 @@ void HUD_Class::draw_inventory_time(char *text, short offset)
     calculate_inventory_rectangle_from_offset(&destination, offset);
     
     destination.left = destination.right - _text_width(text, _interface_font) - TEXT_INSET;
-    DrawText(text, &destination, _center_vertical, _interface_font, _inventory_text_color);
+    DrawText(_SJIS(text), &destination, _center_vertical, _interface_font, _inventory_text_color);
 }
 
 
@@ -755,13 +755,13 @@ void HUD_Class::draw_inventory_item(char *text, short count,
 	/* Draw the text name.. */
 	text_destination= destination;
 	text_destination.left+= NAME_OFFSET+TEXT_INSET;
-	DrawText(text, &text_destination, _center_vertical, _interface_font, color);
+	DrawText(_SJIS(text), &text_destination, _center_vertical, _interface_font, color);
 
 	/* Draw the text count-> Change the font!! */
 	text_destination= destination;
 	text_destination.left+= TEXT_INSET;
 	sprintf(count_text, "%3d", count);
-	DrawText(count_text, &text_destination, _center_vertical, _interface_item_count_font, color);
+	DrawText(_SJIS(count_text), &text_destination, _center_vertical, _interface_item_count_font, color);
 }
 
 
