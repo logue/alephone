@@ -133,9 +133,9 @@ bool save_game(void)
 	pause_game();
     bool success = create_quick_save();
     if (success)
-        screen_printf("Game saved");
+        screen_printf("ゲームを保存しました。");
     else
-        screen_printf("Save failed");
+        screen_printf("保存に失敗しました。");
 	resume_game();
 
 	return success;

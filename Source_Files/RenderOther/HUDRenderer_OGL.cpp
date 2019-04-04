@@ -247,7 +247,7 @@ void HUD_OGL_Class::DrawText(const char *text, screen_rectangle *dest, short fla
 	FontSpecifier &FontData = get_interface_font(font_id);
 
 	// Draw text
-	FontData.OGL_DrawText(text, *dest, flags);
+	FontData.OGL_DrawText(_SJIS(text), *dest, flags);
 }
 
 

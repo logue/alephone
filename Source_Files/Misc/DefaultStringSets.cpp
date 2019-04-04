@@ -32,7 +32,7 @@ static inline void BuildStringSet(short inStringSetID,
                                   const char** inStrings,
                                   short inNumStrings) {
 	for (int i = 0; i < inNumStrings; i++)
-		TS_PutCString(inStringSetID, i, inStrings[i]);
+		TS_PutCString(inStringSetID, i, _SJIS(inStrings[i]));
 }
 
 #define NUMBER_OF_STRINGS(sa)   (sizeof(sa) / sizeof((sa)[0]))

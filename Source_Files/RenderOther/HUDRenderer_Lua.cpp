@@ -186,6 +186,14 @@ void HUD_Lua_Class::apply_clip(void)
     r.y = m_wr.y + scr->lua_clip_rect.y;
     r.w = MIN(scr->lua_clip_rect.w, m_wr.w - scr->lua_clip_rect.x);
     r.h = MIN(scr->lua_clip_rect.h, m_wr.h - scr->lua_clip_rect.y);
+#ifdef HAVE_OPENGL
+	if (m_opengl)
+	{
+		glEnable(GL_SCISSOR_TEST);
+		scr->scissor_screen_to_rect(r);
+	}
+	else
+#endif
 	if (m_surface)
 	{
 		SDL_SetClipRect(MainScreenSurface(), &r);
@@ -373,6 +381,8 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 	
 	if (!text || !strlen(text))
 		return;
+
+	const char *text_to_draw = _SJIS(text);
 	
 	apply_clip();
 #ifdef HAVE_OPENGL
@@ -383,7 +393,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 		glTranslatef(x, y + (font->Height * scale), 0);
         glScalef(scale, scale, 1.0);
 		glColor4f(r, g, b, a);
-		font->OGL_Render(text);
+		font->OGL_Render(text_to_draw);
 		glColor4f(1, 1, 1, 1);
 		glPopMatrix();
 	}
@@ -394,7 +404,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 		SDL_Rect rect;
 		rect.x = static_cast<Sint16>(x) + m_wr.x;
 		rect.y = static_cast<Sint16>(y) + m_wr.y;
-		rect.w = font->TextWidth(text);
+		rect.w = font->TextWidth(text_to_draw);
 		rect.h = font->LineSpacing;
         
         // FIXME: draw_text doesn't support full RGBA transfer for proper scaling,
@@ -430,7 +440,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 #endif
         {
             SDL_BlitSurface(MainScreenSurface(), &rect, m_surface, &rect);
-            font->Info->draw_text(m_surface, text, strlen(text),
+            font->Info->draw_text(m_surface, text_to_draw, strlen(text_to_draw),
                                   rect.x, rect.y + font->Height,
                                   SDL_MapRGBA(m_surface->format,
                                               static_cast<unsigned char>(r * 255),

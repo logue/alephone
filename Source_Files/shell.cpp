@@ -204,7 +204,7 @@ static void usage(const char *prg_name)
 	  "データディレクトリを指定することができます。\n";
 
 #ifdef __WIN32__
-	MessageBox(NULL, msg, "使用方法", MB_OK | MB_ICONINFORMATION);
+	MessageBox(NULL, _SJIS(msg), _SJIS("使用方法"), MB_OK | MB_ICONINFORMATION);
 #else
 	printf(msg, prg_name);
 #endif
@@ -255,7 +255,7 @@ bool handle_open_document(const std::string& filename)
 int main(int argc, char **argv)
 {
 #if defined(__WIN32__)
-	SetConsoleOutputCP(CP_UTF8);
+	//SetConsoleOutputCP(CP_UTF8);
 #endif
 	// Print banner (don't bother if this doesn't appear when started from a GUI)
 	char app_name_version[256];
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
 	  "TCP/IP ネットワーク by Woody Zenfell\n"
 	  "Expat XMLライブラリ by James Clark\n"
 	  "SDLポート by Christian Bauer <Christian.Bauer@uni-mainz.de>\n"
-	  "日本語化 by saiten <http://www.isidesystem.net/>, ookawa_mi, Logue <https://logue.be/>, marathon, pfhore.\n" 
+	  "日本語化 by saiten <http://www.isidesystem.net/>, pfhore(ookawa_mi), Logue <https://logue.be/>, marathon.\n" 
 #if defined(__MACH__) && defined(__APPLE__)
 	  "Mac OS X/SDLバージョンは、Chris Lovell, Alexander Strange, and Woody Zenfell氏らによって作られました。\n"
 #endif
@@ -649,14 +649,14 @@ bool quit_without_saving(void)
 {
 	dialog d;
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add (new w_static_text("本当にゲームを中断しても"), d);
-	placer->dual_add (new w_static_text("よろしいですか？"), d);
+	placer->dual_add (new w_static_text(_SJIS("本当にゲームを中断しても")), d);
+	placer->dual_add (new w_static_text(_SJIS("よろしいですか？")), d);
 	placer->add (new w_spacer(), true);
 	
 	horizontal_placer *button_placer = new horizontal_placer;
-	w_button *default_button = new w_button("はい", dialog_ok, &d);
+	w_button *default_button = new w_button(_SJIS("はい"), dialog_ok, &d);
 	button_placer->dual_add (default_button, d);
-	button_placer->dual_add (new w_button("いいえ", dialog_cancel, &d), d);
+	button_placer->dual_add (new w_button(_SJIS("いいえ"), dialog_cancel, &d), d);
 	d.activate_widget(default_button);
 	placer->add(button_placer, true);
 	d.set_widget_placer(placer);
@@ -687,7 +687,7 @@ short get_level_number_from_user(void)
 
 		for (size_t i = 0; i < num_lines; i++) {
 			bool message_font_title_color = true;
-			const char *string = TS_GetCString(vidmasterStringSetID, i);
+			const char *string = _SJIS(TS_GetCString(vidmasterStringSetID, i));
 			if (!strncmp(string, "[QUOTE]", 7)) {
 				string = string + 7;
 				message_font_title_color = false;
@@ -702,24 +702,24 @@ short get_level_number_from_user(void)
 
 	} else {
 		// no stringset or no strings in stringset - use default message
-		placer->dual_add(new w_static_text("ここからは、ヴィドマスターの宣誓を誓わないといけないぜ。"), d);
+		placer->dual_add(new w_static_text(_SJIS("ここからは、ヴィドマスターの宣誓を誓わないといけないぜ。")), d);
 
 		placer->add(new w_spacer(), true);
-		placer->dual_add(new w_static_text("『宣誓、"), d);
-		placer->dual_add(new w_static_text("全てのスイッチをこぶしで殴ってオンにし、"), d);
-		placer->dual_add(new w_static_text("グレネードを使える場所でも決して発射せず、"), d);
-		placer->dual_add(new w_static_text("最高難易度「虐殺」以外で遊ばず、"), d);
-		placer->dual_add(new w_static_text("Caps Loockを「走る」キーとしては決して使わず、"), d);
-		placer->dual_add(new w_static_text("そして、一人残らずボブ市民を皆殺しにしま～す。』"), d);
+		placer->dual_add(new w_static_text(_SJIS("『宣誓、")), d);
+		placer->dual_add(new w_static_text(_SJIS("全てのスイッチをこぶしで殴ってオンにし、")), d);
+		placer->dual_add(new w_static_text(_SJIS("グレネードを使える場所でも決して発射せず、")), d);
+		placer->dual_add(new w_static_text(_SJIS("最高難易度「虐殺」以外で遊ばず、")), d);
+		placer->dual_add(new w_static_text(_SJIS("Caps Loockを「走る」キーとしては決して使わず、")), d);
+		placer->dual_add(new w_static_text(_SJIS("そして、一人残らずボブ市民を皆殺しにしま～す。』")), d);
 	}
 
 	placer->add(new w_spacer(), true);
-	placer->dual_add(new w_static_text("開始レベル："), d);
+	placer->dual_add(new w_static_text(_SJIS("開始レベル：")), d);
 
 	w_levels *level_w = new w_levels(levels, &d);
 	placer->dual_add(level_w, d);
 	placer->add(new w_spacer(), true);
-	placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
+	placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &d), d);
 
 	d.activate_widget(level_w);
 	d.set_widget_placer(placer);
