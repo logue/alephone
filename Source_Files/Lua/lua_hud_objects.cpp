@@ -837,7 +837,7 @@ int Lua_Font_Draw_Text(lua_State *L)
 	float a = Lua_HUDColor_Get_A(L, 5);
 	
 	Lua_HUDInstance()->draw_text(Lua_Font::Object(L, 1),
-		_SJIS(str),
+		str,
 															 x, y, r, g, b, a,
 															 Lua_Font::Scale(L, 1));
 	return 0;

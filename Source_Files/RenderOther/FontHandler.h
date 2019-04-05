@@ -46,6 +46,9 @@ Jan 14, 2001 (Loren Petrich):
 
 #include <set>
 
+#include <string>
+#include <boost/unordered_map.hpp>
+
 struct screen_rectangle;
 
 class FontSpecifier;
@@ -135,6 +138,7 @@ public:
 	int GetTxtrSize() {return int(TxtrWidth)*int(TxtrHeight);}
 	GLuint TxtrID;
 	uint32 DispList;
+	boost::unordered_map<std::string, int> textMap;
 	static std::set<FontSpecifier*> *m_font_registry;
 #endif
 };

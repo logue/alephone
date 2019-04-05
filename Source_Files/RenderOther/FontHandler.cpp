@@ -117,16 +117,18 @@ void FontSpecifier::Update()
 		{
 			Spec.font = -1;
 			Spec.normal = "Monaco";
-			Spec.size = Size * 1.34f;
+			//Spec.size = Size * 1.34f;
+			Spec.size = 12;
 		}
 		else if (ID == 22) 
 		{
 			Spec.font = -1;
 			Spec.normal = "Courier Prime";
 			Spec.bold = "Courier Prime Bold";
-			Spec.oblique = "Courier Prime Italic";
-			Spec.bold_oblique = "Courier Prime Bold Italic";
+			//Spec.oblique = "Courier Prime Italic";
+			//Spec.bold_oblique = "Courier Prime Bold Italic";
 			Spec.adjust_height -= Size * 0.084f;
+			Spec.size = 10;
 		}
 	}
 	else
@@ -330,9 +332,9 @@ void FontSpecifier::OGL_Reset(bool IsStarting)
  			Which++;
  		}
  	}
+	
+	textMap.clear();
 }
-
-
 // Renders a C-style string in OpenGL.
 // assumes screen coordinates and that the left baseline point is at (0,0).
 // Alters the modelview matrix so that the next characters will be drawn at the proper place.
@@ -354,17 +356,24 @@ void FontSpecifier::OGL_Render(const char *Text)
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	glBindTexture(GL_TEXTURE_2D,TxtrID);
-	
+	/*
 	size_t Len = MIN(strlen(Text),255);
 	for (size_t k=0; k<Len; k++)
 	{
 		unsigned char c = Text[k];
 		glCallList(DispList+c);
 	}
+	*/
+	const char *p=Text;
+
+	while(*p!='\0'){
+		unsigned char c = *(p++);
+		// TODO: SJISの処理
+		glCallList(DispList+c);
+	}
 	
 	glPopAttrib();
 }
-
 
 // Renders text a la _draw_screen_text() (see screen_drawing.h), with
 // alignment and wrapping. Modelview matrix is unaffected.

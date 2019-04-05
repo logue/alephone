@@ -39,6 +39,8 @@
 
 #include <boost/tokenizer.hpp>
 #include <string>
+#include<fstream>
+#include<iostream>
 
 #ifndef NO_STD_NAMESPACE
 using std::vector;
@@ -48,6 +50,7 @@ using std::map;
 
 #include <boost/tuple/tuple_comparison.hpp>
 #include "preferences.h" // smooth_font
+/*
 #include "AlephSansMono-Bold.h"
 #include "ProFontAO.h"
 
@@ -55,6 +58,11 @@ using std::map;
 #include "CourierPrimeBold.h"
 #include "CourierPrimeItalic.h"
 #include "CourierPrimeBoldItalic.h"
+*/
+#include "jp-fonts/AlephJPSansMono-Bold.h"
+#include "jp-fonts/k8x12L.h"
+#include "jp-fonts/NotoSansMonoSjis.h"
+#include "jp-fonts/NotoSansMonoBoldSjis.h"
 
 // Global variables
 typedef pair<int, int> id_and_size_t;
@@ -81,57 +89,18 @@ typedef struct builtin_font
 } builtin_font_t;
 
 static builtin_font_t builtin_fontspecs[] = {
+/*
 	{ "mono", aleph_sans_mono_bold, sizeof(aleph_sans_mono_bold) },
 	{ "Monaco", pro_font_ao, sizeof(pro_font_ao) },
 	{ "Courier Prime", courier_prime, sizeof(courier_prime) },
 	{ "Courier Prime Bold", courier_prime_bold, sizeof(courier_prime_bold) },
 	{ "Courier Prime Italic", courier_prime_italic, sizeof(courier_prime_italic) },
 	{" Courier Prime Bold Italic", courier_prime_bold_italic, sizeof(courier_prime_bold_italic) }
-};
-
-static const string fontPath[] = {
-	"./Fonts.ttf",
-#if defined(__WIN32__)
-	// Path to the below Windows directory
-	// for Windows 10 (Yu Gothic B)
-	"C:/Windows/WinSxS/amd64_microsoft-windows-f..uetype-yugothicbold_31bf3856ad364e35_10.0.17763.1_none_a01f0b47edff2df8/YuGothB.ttc",
-	// for Windows 7 (Meiryo Bold)
-	"C:/Windows/winsxs/x86_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_cd23f5e0d8f9c6fa/meiryob.ttc",
-	"C:/Windows/winsxs/amd64_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_2942916491573830/meiryob.ttc",
-	// for Windows Vista
-	"C:/Windows/Fonts/meiryob.ttc",
-	// for less than Windows XP (MS Gothic)
-	"C:/Windows/fonts/msgothic.ttc",
-#else
-	// for MacOS (Yu Gothic B)
-	"/Library/Fonts/Yu Gothic Bold.otf",
-	// for MacOS (Hiragino Kaku Gothic Pro W6)
-	"/System/Library/Fonts/ヒラギノ角ゴ Pro W6.otf",
-
-	"/System/Library/Fonts/Hiragino Kaku Gothic Pro W6.otf",
-	"/System/Library/Fonts/Cache/HiraginoKakuGothicProNW6.otf"	// for iOS
-
-	// for Linux
-	"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-	"/usr/share/fonts/truetype/vlgothic/VL-Gothic-Regular.ttf",
-	"/usr/X11R6/lib/X11/fonts/TrueType/VL-Gothic-Regular.ttf",
-	"/usr/X11/lib/X11/fonts/truetype/VL-Gothic-Regular.ttf",
-
-	"/usr/share/fonts/truetype/takao/TakaoExGothic.ttf"
-	"/usr/share/fonts/ja-ipafonts/ipag.ttc",
-
-	"/usr/share/fonts/TrueType/mika.ttf",
-	"/usr/X11R6/lib/X11/fonts/TrueType/mika.ttf",
-	"/usr/X11R6/lib/X11/fonts/truetype/sazanami-gothic.ttf",
-	"/usr/X11/lib/X11/fonts/truetype/sazanami-gothic.ttf",
-	"/usr/share/fonts/TrueType/sazanami-gothic.ttf",
-	"/usr/X11R6/lib/X11/fonts/TrueType/sazanami-gothic.ttf",
-	"/usr/share/fonts/truetype/sazanami-gothic.ttf",
-	"/usr/share/fonts/TrueType/FS-Gothic-gs.ttf",
-	"/usr/X11R6/lib/X11/fonts/TrueType/FS-Gothic.ttf",
-	"/usr/share/fonts/TrueType/gt200001.ttf",
-	"/usr/X11R6/lib/X11/fonts/TrueType/gt200001.ttf",
-#endif
+*/
+	{ "mono", AlephJPSansMonoBold, sizeof(AlephJPSansMonoBold) },
+	{ "Monaco", k8x12L, sizeof(k8x12L) },
+	{ "Courier Prime", NotoSansMonoSjis, sizeof(NotoSansMonoSjis) },
+	{ "Courier Prime Bold", NotoSansMonoBoldSjis, sizeof(NotoSansMonoBoldSjis) },
 };
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)
@@ -291,29 +260,37 @@ static TTF_Font *load_ttf_font(const std::string& path, uint16 style, int16 size
 	}
 	TTF_Init();
 	TTF_Font *font = 0;
-	builtin_fonts_t::iterator j = builtin_fonts.find(path);
-	if (j != builtin_fonts.end())
-	{
-		font = TTF_OpenFontRW(SDL_RWFromConstMem(j->second.data, j->second.size), 0, size);
-		for ( int i=0; i < sizeof(fontPath)/sizeof(fontPath[0]); i++ ) {
-			const char* file = fontPath[i].c_str();
+	bool found = false;
+
+	static const string fontPath[] = { "./Fonts.ttf", "./Fonts.otf" };
+	for ( int i=0; i < sizeof(fontPath)/sizeof(fontPath[0]); i++ ) {
+		const char* file = fontPath[i].c_str();
+		std::ifstream ifs(file);
+		found = ifs.is_open();
+		if (found) {
 			font = TTF_OpenFont(file , size);
-			if ( !font ) { continue; }
-			else { break; }
 		}
 	}
-	else
-	{
-		short SavedType, SavedError = get_game_error(&SavedType);
-
-		FileSpecifier fileSpec(path);
-		OpenedFile file;
-		if (fileSpec.Open(file))
+	
+	if (!found) {
+		builtin_fonts_t::iterator j = builtin_fonts.find(path);
+		if (j != builtin_fonts.end())
 		{
-			font = TTF_OpenFontRW(file.TakeRWops(), 1, size);
+			font = TTF_OpenFontRW(SDL_RWFromConstMem(j->second.data, j->second.size), 0, size);
 		}
+		else
+		{
+			short SavedType, SavedError = get_game_error(&SavedType);
 
-		set_game_error(SavedType, SavedError);
+			FileSpecifier fileSpec(path);
+			OpenedFile file;
+			if (fileSpec.Open(file))
+			{
+				font = TTF_OpenFontRW(file.TakeRWops(), 1, size);
+			}
+
+			set_game_error(SavedType, SavedError);
+		}
 	}
 
 	if (font)
@@ -584,8 +561,7 @@ uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style,
 	}
 	else
 	{
-		//uint16 *temp = process_macroman(text, length);
-		uint16 *temp = sjis2utf16(text, length);
+		uint16 *temp = process_macroman(text, length);
 		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	}
 	
@@ -631,6 +607,7 @@ char *ttf_font_info::process_printable(const char *src, int len) const
 
 uint16 *ttf_font_info::process_macroman(const char *src, int len) const 
 {
+	/*
 	static uint16 dst[1024];
 	if (len > 1023) len = 1023;
 	uint16 *p = dst;
@@ -645,6 +622,8 @@ uint16 *ttf_font_info::process_macroman(const char *src, int len) const
 
 	*p = 0x0;
 	return dst;
+	*/
+	return sjis2utf16(src, len);
 }
 
 uint16 font_info::text_width(const char *text, uint16 style, bool utf8) const

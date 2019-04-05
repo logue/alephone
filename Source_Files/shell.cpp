@@ -255,7 +255,7 @@ bool handle_open_document(const std::string& filename)
 int main(int argc, char **argv)
 {
 #if defined(__WIN32__)
-	//SetConsoleOutputCP(CP_UTF8);
+	SetConsoleOutputCP(CP_UTF8);
 #endif
 	// Print banner (don't bother if this doesn't appear when started from a GUI)
 	char app_name_version[256];
@@ -688,10 +688,10 @@ short get_level_number_from_user(void)
 		for (size_t i = 0; i < num_lines; i++) {
 			bool message_font_title_color = true;
 			const char *string = _SJIS(TS_GetCString(vidmasterStringSetID, i));
-			if (!strncmp(string, "[QUOTE]", 7)) {
-				string = string + 7;
-				message_font_title_color = false;
-			}
+			//if (!strncmp(string, "[QUOTE]", 7)) {
+			//	string = string + 7;
+			//	message_font_title_color = false;
+			//}
 			if (!strlen(string))
 				placer->add(new w_spacer(), true);
 			else if (message_font_title_color)

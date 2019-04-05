@@ -1,19 +1,23 @@
 AlephJPSansMono-Boldは、AlephSansMono-Bold（※Dejavu Sans Mono Boldに
-チェックボックスを追加したもの）および、NotoSansMonoCJKjp-Boldから、
+チェックボックスを追加したもの）および、Mplusフォントから、
 MacのShift_JIS領域をサブセット化したものを組み合わせた書体です。
-
-サブセット化対象文字は、以下より確認できます。
-https://github.com/nakamura001/JIS_CharacterSet/blob/master/SHIFTJIS_custom/SHIFTJIS_custom_mac_utf8.txt
 
 By Logue
 
 ----------------------------------------------------------------------
 
-Noto Sans CJKjp Mono Bold
+M+ FONTS
+Copyright (C) 2002-2017 M+ FONTS PROJECT
 
-Noto is a trademark of Google Inc. Noto fonts are open source. 
-All Noto fonts are published under the SIL Open Font License, Version 1.1.
-Language data and some sample texts are from the Unicode CLDR project.
+-
+These fonts are free software.
+Unlimited permission is granted to use, copy, and distribute them, with
+or without modification, either commercially or noncommercially.
+THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY.
+
+
+http://mplus-fonts.osdn.jp
+
 
 ----------------------------------------------------------------------
 Aleph Sans Mono Bold
