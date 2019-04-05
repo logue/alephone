@@ -41,7 +41,7 @@
 
     <!-- Button -->
     <button top="6" left="16" right="16" height="32">
-      <font file="KikaiChokokuJIS-Md.ttf" size="13" style="0"/>
+      <font file="KikaiChokokuJIS-Md.otf" size="13" style="0"/>
       <color red="0.5" green="0.5" blue="0.5"/>
       <image index="0" file="button_l.bmp" scale="false"/>
       <image index="1" file="button_c.bmp" scale="false"/>
@@ -61,7 +61,7 @@
     </button>
 
     <tiny_button top="2" left="12" right="12" height="20">
-      <font file="KikaiChokokuJIS-Md.ttf" size="12" style="0"/>
+      <font file="KikaiChokokuJIS-Md.otf" size="12" style="0"/>
       <color red="0.5" green="0.5" blue="0.5"/>
       <image index="0" file="tiny_button_l.bmp" scale="false"/>
       <image index="1" file="tiny_button_c.bmp" scale="false"/>
@@ -168,7 +168,7 @@
     </slider>
 
     <tab top="5" left="16" right="16" height="32" inner_left="8" inner_right="8">
-      <font file="KikaiChokokuJIS-Md.ttf" size="14" style="0"/>
+      <font file="KikaiChokokuJIS-Md.otf" size="14" style="0"/>
       <color red="0.5" green="0.5" blue="0.5"/>
       <image index="0" file="button_l.bmp" scale="false"/>
       <image index="1" file="button_c.bmp" scale="false"/>

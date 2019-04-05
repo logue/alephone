@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in 
 
-themedir = $(pkgdatadir)/Plugins/Default_Theme
+themedir = $(pkgdatadir)/plugins/default_theme
 theme_DATA = Plugin.xml \
 resources/button_c.bmp \
 resources/button_c_p.bmp \
@@ -17,7 +17,7 @@ resources/frame_r.bmp \
 resources/frame_t.bmp \
 resources/frame_tl.bmp \
 resources/frame_tr.bmp \
-resources/LICENSE-DejaVu \
+resources/AlephJPSansMonoLicense.txt \
 resources/list_b.bmp \
 resources/list_bl.bmp \
 resources/list_br.bmp \
@@ -30,7 +30,7 @@ resources/slider.bmp \
 resources/slider_c.bmp \
 resources/slider_l.bmp \
 resources/slider_r.bmp \
-resources/KikaiChokokuJIS-Md.ttf \
+resources/KikaiChokokuJIS-Md.otf \
 resources/KikaiChokokuJIS-Md.README \
 resources/theme2.mml \
 resources/thumb_b.bmp \
