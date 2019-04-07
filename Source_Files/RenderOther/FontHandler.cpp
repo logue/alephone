@@ -124,7 +124,7 @@ void FontSpecifier::Update()
 		{
 			Spec.font = -1;
 			Spec.normal = "Monaco";
-			Spec.size = Size * 1.34f;
+			//Spec.size = Size * 1.34f;
 			Spec.size = 12;
 		}
 		else if (ID == 22)
@@ -135,7 +135,7 @@ void FontSpecifier::Update()
 			//Spec.oblique = "Courier Prime Italic";
 			//Spec.bold_oblique = "Courier Prime Bold Italic";
 			Spec.adjust_height -= Size * 0.084f;
-			Spec.size = 10;
+			Spec.size = 11;
 		}
 	}
 	else
@@ -230,7 +230,7 @@ void FontSpecifier::render_text_(int n, const char *str)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, TxtrWidth[n], TxtrHeight[n],
-							 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, OGL_Texture);
+							 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, OGL_Texture[n]);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -384,7 +384,54 @@ void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, sh
 	strncpy(text_to_draw, text, 256);
 	text_to_draw[255] = 0;
 
+	/*
+	// Check for wrapping, and if it occurs, be recursive
+	if (flags & _wrap_text) {
+		int last_non_printing_character = 0, text_width = 0;
+		unsigned count = 0;
+		while (count < strlen(text_to_draw) && text_width < RECTANGLE_WIDTH(&r)) {
+			text_width += CharWidth(text_to_draw[count]);
+			if (text_to_draw[count] == ' ')
+				last_non_printing_character = count;
+			count++;
+		}
+		
+		if( count != strlen(text_to_draw)) {
+			char remaining_text_to_draw[256];
+			
+			// If we ever have to wrap text, we can't also center vertically. Sorry.
+			flags &= ~_center_vertical;
+			flags |= _top_justified;
+			
+			// Pass the rest of it back in, recursively, on the next line
+			memcpy(remaining_text_to_draw, text_to_draw + last_non_printing_character + 1, strlen(text_to_draw + last_non_printing_character + 1) + 1);
+	
+			screen_rectangle new_destination = r;
+			new_destination.top += LineSpacing;
+			OGL_DrawText(remaining_text_to_draw, new_destination, flags);
+	
+			// Now truncate our text to draw
+			text_to_draw[last_non_printing_character] = 0;
+		}
+	}
+
+	// Truncate text if necessary
 	int t_width = TextWidth(text_to_draw);
+	if (t_width > RECTANGLE_WIDTH(&r)) {
+		int width = 0;
+		int num = 0;
+		char c, *p = text_to_draw;
+		while ((c = *p++) != 0) {
+			width += CharWidth(c);
+			if (width > RECTANGLE_WIDTH(&r))
+				break;
+			num++;
+		}
+		text_to_draw[num] = 0;
+		t_width = TextWidth(text_to_draw);
+	}
+	*/
+	int t_width = TextWidth(text_to_draw) / 2;
 
 	// Horizontal positioning
 	int x, y;
