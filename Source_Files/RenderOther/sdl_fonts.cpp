@@ -571,8 +571,9 @@ uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style,
 int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
 {
 	int width;
-	static uint16 temp[1024];
-	mac_roman_to_unicode(text, temp, 1024);
+//	static uint16 temp[1024];
+//	mac_roman_to_unicode(text, temp, 1024);
+	uint16 *temp = sjis2utf16(text, 1024);
 	TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	if (width < max_width) return strlen(text);
 

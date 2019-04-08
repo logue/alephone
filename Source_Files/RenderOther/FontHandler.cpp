@@ -171,20 +171,51 @@ int FontSpecifier::TextWidth(const char *text)
 #ifdef HAVE_OPENGL
 void FontSpecifier::render_text_(int n, const char *str)
 {
-	if (OGL_Texture[n])
+	if (OGL_Texture[n]){
 		return;
-	// Put some padding around each glyph so as to avoid clipping i
+	}
+	
+	// Put some padding around each glyph so as to avoid clipping it
 	const int Pad = 1;
 	int ascent_p = Ascent + Pad, descent_p = Descent + Pad;
-
-	int GlyphHeight = ascent_p + descent_p;
-
+	int widths_p[256];
+	for (int i=0; i<256; i++) {
+	  widths_p[i] = Widths[i] + 2*Pad;
+	}
+	// Now for the totals and dimensions
 	int TotalWidth = TextWidth(str) + Pad * 2;
 	Widths[n] = TotalWidth;
-	TxtrWidth[n] = MAX(64, NextPowerOfTwo(TotalWidth));
+
+	// For an empty font, clear out
+	if (TotalWidth <= 0) return;
+
+	int GlyphHeight = ascent_p + descent_p;
+	
+	int EstDim = int(sqrt(static_cast<float>(TotalWidth*GlyphHeight)) + 0.5);
+	TxtrWidth[n] = MAX(128, NextPowerOfTwo(EstDim));
 
 	// Find the character starting points and counts
-	TxtrHeight[n] = MAX(64, NextPowerOfTwo(GlyphHeight));
+	unsigned char CharStarts[256], CharCounts[256];
+	int LastLine = 0;
+	CharStarts[LastLine] = 0;
+	CharCounts[LastLine] = 0;
+	short Pos = 0;
+	for (int k=0; k<256; k++)
+	{
+		// Over the edge? If so, then start a new line
+		short NewPos = Pos + widths_p[k];
+		if (NewPos > TxtrWidth[n])
+		{
+			LastLine++;
+			CharStarts[LastLine] = k;
+			Pos = widths_p[k];
+			CharCounts[LastLine] = 1;
+		} else {
+			Pos = NewPos;
+			CharCounts[LastLine]++;
+		}
+	}
+	TxtrHeight[n] = MAX(128, NextPowerOfTwo(GlyphHeight*(LastLine+1)));
 
 	// Render the font glyphs into the SDL surface
 	SDL_Surface *FontSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TxtrWidth[n], TxtrHeight[n], 32, 0xff0000, 0x00ff00, 0x0000ff, 0);
@@ -196,9 +227,28 @@ void FontSpecifier::render_text_(int n, const char *str)
 	Uint32 White = SDL_MapRGB(FontSurface->format, 0xFF, 0xFF, 0xFF);
 
 	// Copy to surface
+	/*
+	for (int k = 0; k <= LastLine; k++)
+	{
+		char Which = CharStarts[k];
+		int VPos = (k * GlyphHeight) + ascent_p;
+		int HPos = Pad;
+		for (int m = 0; m < CharCounts[k]; m++)
+		{
+		  
+		  ::draw_text(FontSurface, &Which, 1, HPos, VPos, White, Info, Style);
+		  HPos += widths_p[(unsigned char) (Which++)];
+		}
+	}
+	*/
 	::draw_text(FontSurface, str, strlen(str), 1, ascent_p, White, Info, Style);
+	
 
-	OGL_Texture[n] = new uint8[GetTxtrSize(n) * 2];
+	// Non-MacOS-specific: allocate the texture buffer
+ 	// Its format is LA 88, where L is the luminosity and A is the alpha channel
+ 	// The font value will go into A.
+ 	OGL_Texture[n] = new uint8[2*GetTxtrSize(n)];
+
 	// Copy the SDL surface into the OpenGL texture
 	uint8 *PixBase = (uint8 *)FontSurface->pixels;
 	int Stride = FontSurface->pitch;
@@ -236,7 +286,7 @@ void FontSpecifier::render_text_(int n, const char *str)
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Allocate and create display lists of rendering commands
-
+	// DispList = glGenLists(256);
 	GLfloat TWidNorm = GLfloat(1) / TxtrWidth[n];
 	GLfloat THtNorm = GLfloat(1) / TxtrHeight[n];
 	GLfloat Bottom = (THtNorm * GlyphHeight);

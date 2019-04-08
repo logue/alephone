@@ -128,6 +128,7 @@ void set_about_alephone_rect(int width, int height)
 
 // Copied off of original 'finf' resource
 // static struct interface_font_info interface_fonts = 
+/*
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleBold,  0, "#4"},
@@ -138,7 +139,18 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Courier", 14, styleBold,  0, "#22"},
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
-
+*/
+// HUDのボールドを解除
+static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
+{
+	{"Monaco",   9, styleNormal,  0, "#4"},
+	{"Monaco",   9, styleNormal,  0, "#4"},
+	{"Monaco",   9, styleNormal,  0, "#4"},
+	{"Monaco",   9, styleNormal,0, "#4"},
+	{"Courier", 12, styleNormal,0, "#22"},
+	{"Courier", 14, styleBold,  0, "#22"},
+	{"Monaco",   9, styleNormal,0, "#4"}
+};
 // LP change: hardcoding the interface and player colors,
 // so as to banish the 'clut' resources
 const int NumInterfaceColors = 26;
@@ -653,10 +665,11 @@ void _draw_screen_text(const char *text, screen_rectangle *destination, short fl
 
 	// Truncate text if necessary
 	int t_width = text_width(text_to_draw, font, style);
-	if (t_width > RECTANGLE_WIDTH(destination)) {
-		text_to_draw[trunc_text(text_to_draw, RECTANGLE_WIDTH(destination), font, style)] = 0;
-		t_width = text_width(text_to_draw, font, style);
-	}
+	// 日本語で文字が切れてしまうためコメントアウト
+	//if (t_width > RECTANGLE_WIDTH(destination)) {
+	//	text_to_draw[trunc_text(text_to_draw, RECTANGLE_WIDTH(destination), font, style)] = 0;
+	//	t_width = text_width(text_to_draw, font, style);
+	//}
 
 	// Horizontal positioning
 	if (flags & _center_horizontal)
