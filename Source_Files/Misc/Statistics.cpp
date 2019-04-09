@@ -80,9 +80,9 @@ void StatsManager::Finish()
 	{
 		dialog d;
 		vertical_placer* placer = new vertical_placer;
-		placer->dual_add(new w_static_text("Uploading stats"), d);
+		placer->dual_add(new w_static_text(_SJIS("状況をアップロードしています。")), d);
 		placer->add(new w_spacer, true);
-		w_button *button = new w_button("CANCEL", dialog_cancel, &d);
+		w_button *button = new w_button(_SJIS("キャンセル"), dialog_cancel, &d);
 		placer->dual_add(button, d);
 		d.set_widget_placer(placer);
 		d.activate_widget(button);
