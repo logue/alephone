@@ -1604,7 +1604,7 @@ class w_deadzone_slider : public w_slider
 const int NUM_KEYS = 21;
 
 static const char *action_name[NUM_KEYS] = {
-	_SJIS("前進"), _SJIS("後退"), _SJIS("左を向く"), _SJIS("右を向く"), _SJIS("左にサイドステップ"), _SJIS("右にサイドステップ"),
+	_SJIS("前進"), _SJIS("後退"), _SJIS("左を向く"), _SJIS("右を向く"), _SJIS("左に移動"), _SJIS("右に移動"),
 	_SJIS("左を見る"), _SJIS("右を見る"), _SJIS("上を見る"), _SJIS("下を見る"), _SJIS("正面を見る"),
 	_SJIS("前の武器"), _SJIS("次の武器"), _SJIS("主砲"), _SJIS("副砲"),
 	_SJIS("サイドステップ"), _SJIS("走る／泳ぐ"), _SJIS("見る"),
@@ -2026,7 +2026,7 @@ static void mouse_custom_dialog(void *arg)
 
 	mouse_precision_w = new w_toggle(!input_preferences->extra_mouse_precision);
 	mouse_precision_w->set_selection_changed_callback(update_mouse_feel_details);
-	table->dual_add(mouse_precision_w->label(_SJIS("武器エイミングのスナップ")), d);
+	table->dual_add(mouse_precision_w->label(_SJIS("武器照準のスナップ")), d);
 	table->dual_add(mouse_precision_w, d);
 
 	placer->add(table);
@@ -2130,7 +2130,7 @@ static void controller_details_dialog(void *arg)
 		(int)((joySensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
 
 	w_sens_slider *sens_joy_w = new w_sens_slider(1000, joySliderPosition);
-	table->dual_add(sens_joy_w->label(_SJIS("エイミングの感度")), d);
+	table->dual_add(sens_joy_w->label(_SJIS("照準の感度")), d);
 	table->dual_add(sens_joy_w, d);
 
 	int joyDeadzone = (int)((input_preferences->controller_deadzone / 655.36f) + 0.5f);
@@ -2382,7 +2382,7 @@ static void controls_dialog(void *arg)
 	look_options->col_flags(0, placeable::kAlignRight);
 
 	w_toggle *auto_recenter_w = new w_toggle(!(input_preferences->modifiers & _inputmod_dont_auto_recenter));
-	look_options->dual_add(auto_recenter_w->label(_SJIS("視点の自動リセンター")), d);
+	look_options->dual_add(auto_recenter_w->label(_SJIS("視点の自動中央補正")), d);
 	look_options->dual_add(auto_recenter_w, d);
 
 	look_options->add_row(new w_spacer(), true);
@@ -2415,7 +2415,7 @@ static void controls_dialog(void *arg)
 	w_select_popup *joystick_aiming_w = new w_select_popup();
 	joystick_aiming_w->set_labels(joystick_aiming_labels);
 	joystick_aiming_w->set_selection(input_preferences->controller_analog ? 0 : 1);
-	controller_options->dual_add(joystick_aiming_w->label(_SJIS("コントローラーのエイミング")), d);
+	controller_options->dual_add(joystick_aiming_w->label(_SJIS("コントローラーの照準")), d);
 	controller_options->dual_add(joystick_aiming_w, d);
 
 	controller_options->add_row(new w_spacer(), true);
@@ -2599,9 +2599,9 @@ static void controls_dialog(void *arg)
 		"F10",
 		_SJIS("デバッグ情報"),
 		"F11",
-		_SJIS("明るさを下げる"),
+		_SJIS("暗くする"),
 		"F12",
-		_SJIS("明るさを上げる"),
+		_SJIS("明るくする"),
 #if (defined(__APPLE__) && defined(__MACH__))
 		"Cmd-Return",
 		_SJIS("フルスクリーン切り替え"),
