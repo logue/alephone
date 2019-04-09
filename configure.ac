@@ -63,6 +63,7 @@ AS_CASE([$target],
         [ make_windows=true
           ax_boost_user_system_lib="boost_system-mt"
           ax_boost_user_filesystem_lib="boost_filesystem-mt"
+          ax_boost_user_locale_lib="boost_locale-mt"
           AC_CHECK_TOOL([WINDRES], [windres], [:])
           AC_DEFINE([WIN32_DISABLE_MUSIC], [1], [Win32 music disabled])
           CPPFLAGS="-D__USE_MINGW_ANSI_STDIO $CPPFLAGS"
@@ -94,6 +95,10 @@ AX_BOOST_FILESYSTEM
 AS_IF([ test "x$BOOST_FILESYSTEM_LIB" != "x" ],
       [ LIBS="$BOOST_FILESYSTEM_LIB $LIBS" ],
       [AC_MSG_ERROR([You need the Boost::Filesystem library to run Aleph One.])])
+AX_BOOST_LOCALE
+AS_IF([ test "x$BOOST_LOCALE_LIB" != "x" ],
+      [ LIBS="$BOOST_LOCALE_LIB $LIBS" ],
+      [AC_MSG_ERROR([You need the Boost::Locale library to run Aleph One JP.])])
 
 AC_DEFUN([AX_CHECK_BOOST_HEADER],
          [ AC_LANG_PUSH(C++)

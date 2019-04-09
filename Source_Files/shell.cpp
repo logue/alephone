@@ -687,11 +687,11 @@ short get_level_number_from_user(void)
 
 		for (size_t i = 0; i < num_lines; i++) {
 			bool message_font_title_color = true;
-			const char *string = _SJIS(TS_GetCString(vidmasterStringSetID, i));
-			//if (!strncmp(string, "[QUOTE]", 7)) {
-			//	string = string + 7;
-			//	message_font_title_color = false;
-			//}
+			const char *string = TS_GetCString(vidmasterStringSetID, i);
+			if (!strncmp(string, "[QUOTE]", 7)) {
+				string = string + 7;
+				message_font_title_color = false;
+			}
 			if (!strlen(string))
 				placer->add(new w_spacer(), true);
 			else if (message_font_title_color)

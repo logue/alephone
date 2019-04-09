@@ -12,6 +12,8 @@
 typedef unsigned short uint16;
 #include <string.h>
 #include <stdio.h>
+#include <string>
+#include <boost/locale/encoding.hpp>
 
 #define LIBICONV_PLUG
 
@@ -186,4 +188,23 @@ bool isJChar(unsigned char text) {
 // Detect 2nd charactor of 2-byte char. (for Shift_JIS)
 bool is2ndJChar(unsigned char text) {
 	return (((0x7F != text) && (0x40 <= text)) || ((text >= 0xe0) && (text <= 0xfc))) ? true : false;
+}
+
+std::string utf82sjis(const std::string& input){
+	return !input.empty() ? boost::locale::conv::from_utf(input, "Shift_JIS") : "";
+}
+
+std::string sjis2utf8(const std::string& input)
+{
+	return !input.empty() ?boost::locale::conv::to_utf<char>(input, "Shift_JIS") : "";
+}
+
+std::string utf82utf16(const std::string& input)
+{
+	return !input.empty() ?boost::locale::conv::from_utf<char>(input, "UCS-2LE") : "";
+}
+
+std::string utf162utf8(const std::string& input)
+{
+	return !input.empty() ?boost::locale::conv::to_utf<char>(input, "UCS-2LE") : "";
 }
