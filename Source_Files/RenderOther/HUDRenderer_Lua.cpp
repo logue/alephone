@@ -38,10 +38,6 @@ HUD_RENDERER_LUA.CPP
 
 #include <math.h>
 
-#if defined(__WIN32__) || defined(__MINGW32__)
-#undef DrawText
-#endif
-
 extern bool MotionSensorActive;
 
 
@@ -381,7 +377,6 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 	
 	if (!text || !strlen(text))
 		return;
-
 	const char *text_to_draw = _SJIS(text);
 	
 	apply_clip();

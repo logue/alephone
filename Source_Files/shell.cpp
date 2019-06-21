@@ -109,11 +109,6 @@
 #endif
 #endif
 
-#ifdef __WIN32__
-#include <windows.h>
-#include <shlobj.h>
-#endif
-
 #include "alephversion.h"
 
 #include "Logging.h"
@@ -122,6 +117,12 @@
 #include "Movie.h"
 #include "HTTP.h"
 #include "WadImageCache.h"
+
+#ifdef __WIN32__
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef CreateDirectory
+#endif
 
 // LP addition: whether or not the cheats are active
 // Defined in shell_misc.cpp
@@ -183,23 +184,23 @@ static void usage(const char *prg_name)
 #else
 	  "\n使用方法：%s [オプション] [ディレクトリ] [ファイル]\n"
 #endif
-	  "\t[-h | --help]		このヘルプメッセージを表\示します。\n"
-	  "\t[-v | --version]		ゲームのバージョンを表\示します。\n"
-	  "\t[-d | --debug]		コアダンプを出力するようにします。\n"
-	  "\t						（SDL parachuteを無効化します）\n"
-	  "\t[-f | --fullscreen]	ゲームをフルスクリーンで起動します。\n"
-	  "\t[-w | --windowed]	ゲームをウィンドウモードで起動します。\n"
+	  "\t[-h | --help]          このヘルプメッセージを表\示します。\n"
+	  "\t[-v | --version]       ゲームのバージョンを表\示します。\n"
+	  "\t[-d | --debug]         コアダンプを出力するようにします。\n"
+	  "\t                       （SDL parachuteを無効化します）\n"
+	  "\t[-f | --fullscreen]    ゲームをフルスクリーンで起動します。\n"
+	  "\t[-w | --windowed]      ゲームをウィンドウモードで起動します。\n"
 #ifdef HAVE_OPENGL
-	  "\t[-g | --nogl]		OpenGLを使用せずに起動します。\n"
+	  "\t[-g | --nogl]          OpenGLを使用せずに起動します。\n"
 #endif
-	  "\t[-s | --nosound]		サウンドを無効化します。\n"
-	  "\t[-m | --nogamma]		ガンマエフェクトを無効化します。\n"
-	  "\t						（メニューのフェードなど）\n"
-	  "\t[-j | --nojoystick]	ジョイスティックの初期化を行いません。\n"
+	  "\t[-s | --nosound]       サウンドを無効化します。\n"
+	  "\t[-m | --nogamma]       ガンマエフェクトを無効化します。\n"
+	  "\t                       （メニューのフェードなど）\n"
+	  "\t[-j | --nojoystick]    ジョイスティックの初期化を行いません。\n"
 	  // Documenting this might be a bad idea?
 	  // "\t[-i | --insecure_lua]  Allow Lua netscripts to take over your computer\n"
-	  "\tディレクトリ			データーが含まれているディレクトリ\n"
-	  "\tファイル				保存されたゲームやフィルムの再生\n"
+	  "\tディレクトリ            データーが含まれているディレクトリ\n"
+	  "\tファイル                保存されたゲームやフィルムの再生\n"
 	  "\nこの他にも、環境変数「ALEPHONE_DATA」の値を変更することで、\n"
 	  "データディレクトリを指定することができます。\n";
 
@@ -254,9 +255,6 @@ bool handle_open_document(const std::string& filename)
 
 int main(int argc, char **argv)
 {
-#if defined(__WIN32__)
-	SetConsoleOutputCP(CP_UTF8);
-#endif
 	// Print banner (don't bother if this doesn't appear when started from a GUI)
 	char app_name_version[256];
 	expand_app_variables(app_name_version, "Aleph One $appLongVersion$");
@@ -703,7 +701,7 @@ short get_level_number_from_user(void)
 	} else {
 		// no stringset or no strings in stringset - use default message
 		placer->dual_add(new w_static_text(_SJIS("ここからは、ヴィドマスターの宣誓を誓わないといけないぜ。")), d);
-
+		placer->dual_add(new w_static_text ("must take the oath of the vidmaster:"), d);
 		placer->add(new w_spacer(), true);
 		placer->dual_add(new w_static_text(_SJIS("『宣誓、")), d);
 		placer->dual_add(new w_static_text(_SJIS("全てのスイッチをこぶしで殴ってオンにし、")), d);
