@@ -22,7 +22,7 @@ EXTRA_DIST = INSTALL.MacOSX INSTALL.Unix INSTALL.Windows	\
   PBProjects/SoundsIcon.icns		\
   PBProjects/AlephOne.icns				\
   PBProjects/config.h PBProjects/confpaths.h	\
-  data/AlephSansMono-Bold.ttf data/AlephJPSansMonoLicense.txt		\
+  data/AlephSansMono-Bold.ttf data/Japanese Font/AlephJPSansMonoLicense.txt		\
   docs/alephone.6 examples/lua/Cheats.lua THANKS			\
   data/powered-by-alephone.svg						\
   PBProjects/Info-AlephOne-Xcode4.plist\
