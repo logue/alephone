@@ -317,7 +317,7 @@ protected:
 };
 
 static const char *shape_labels[3] = {
-	"Cross", "Octagon", NULL
+	"十字", "多角形", NULL
 };
 
 enum { kCrosshairWidget };
@@ -429,7 +429,7 @@ static void crosshair_dialog(void *arg)
 	table->dual_add(blue_w, d);
 
 	table->add_row(new w_spacer(), true);
-	table->dual_add_row(new w_static_text("OpenGL Only (no preview)"), d);
+	table->dual_add_row(new w_static_text(_SJIS("OpenGLモード時のみ（プレビューなし）")), d);
 
 	w_slider *opacity_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget opacityWidget(opacity_w);
@@ -948,48 +948,48 @@ static void online_dialog(void *arg)
 
 #ifdef TRUE_COLOR_ONLY
 static const char* depth_labels[3] = {
-	_SJIS("16ビット"), _SJIS("32ビット"), NULL
+	"16ビット", "32ビット", NULL
 };
 #else
 static const char *depth_labels[4] = {
-	_SJIS("8ビット"), _SJIS("16ビット"), _SJIS("32ビット"), NULL
+	"8ビット", "16ビット", "32ビット", NULL
 };
 #endif
 
 static const char *resolution_labels[3] = {
-	_SJIS("低"), _SJIS("高"), NULL
+	"低", "高", NULL
 };
 
 static const char *sw_alpha_blending_labels[4] = {
-	_SJIS("なし"), _SJIS("速度優先"), _SJIS("画質優先"), NULL
+	"なし", "速度優先", "画質優先", NULL
 };
 
 static const char *sw_sdl_driver_labels[5] = {
-	_SJIS("デフォルト"), _SJIS("なし"), "Direct3D", "OpenGL", NULL
+	"デフォルト", "なし", "Direct3D", "OpenGL", NULL
 };
 
 static const char *gamma_labels[9] = {
-	_SJIS("とても暗い"), _SJIS("暗い"), _SJIS("やや暗い"), _SJIS("通常"), _SJIS("やや明るい"), _SJIS("明るい"), _SJIS("より明るい"), _SJIS("とても明るい"), NULL
+	"とても暗い", "暗い", "やや暗い", "通常", "やや明るい", "明るい", "より明るい", "とても明るい", NULL
 };
 
 static const char* renderer_labels[] = {
-	_SJIS("ソフトウェア"), "OpenGL", NULL
+	"ソフトウェア", "OpenGL", NULL
 };
 
 static const char* hud_scale_labels[] = {
-	_SJIS("通常"), _SJIS("２倍"), _SJIS("最大"), NULL
+	"通常", "２倍", "最大", NULL
 };
 
 static const char* term_scale_labels[] = {
-	_SJIS("通常"), _SJIS("２倍"), _SJIS("最大"), NULL
+	"通常", "２倍", "最大", NULL
 };
 
 static const char* mouse_accel_labels[] = {
-	_SJIS("切"), _SJIS("クラシック"), NULL
+	"切", "クラシック", NULL
 };
 
 static const char* max_saves_labels[] = {
-	"20", "100", "500", _SJIS("無制限"), NULL
+	"20", "100", "500", "無制限", NULL
 };
 static const uint32 max_saves_values[] = {
 	20, 100, 500, 0
@@ -1004,7 +1004,7 @@ static const vector<string> build_stringvector_from_cstring_array (const char** 
 {
 	std::vector<std::string> label_vector;
 	for (int i = 0; label_array[i] != NULL; ++i)
-		label_vector.push_back(std::string(label_array[i]));
+		label_vector.push_back(std::string(_SJIS(label_array[i])));
 		
 	return label_vector;
 }
@@ -1389,7 +1389,7 @@ static void sound_dialog(void *arg)
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
 
-	static const char *quality_labels[3] = {_SJIS("8ビット"), _SJIS("16ビット"), NULL};
+	static const char *quality_labels[3] = {"8ビット", "16ビット", NULL};
 	w_toggle *quality_w = new w_toggle(TEST_FLAG(sound_preferences->flags, _16bit_sound_flag), quality_labels);
 	table->dual_add(quality_w->label(_SJIS("音質")), d);
 	table->dual_add(quality_w, d);
@@ -1559,11 +1559,11 @@ public:
 const int NUM_KEYS = 21;
 
 static const char *action_name[NUM_KEYS] = {
-	_SJIS("前進"), _SJIS("後退"), _SJIS("左を向く"), _SJIS("右を向く"), _SJIS("左に移動"), _SJIS("右に移動"),
-	_SJIS("左を見る"), _SJIS("右を見る"), _SJIS("上を見る"), _SJIS("下を見る"), _SJIS("正面を見る"),
-	_SJIS("前の武器"), _SJIS("次の武器"), _SJIS("主砲"), _SJIS("副砲"),
-	_SJIS("サイドステップ"), _SJIS("走る／泳ぐ"), _SJIS("見る"),
-	_SJIS("アクション"), _SJIS("地図"), _SJIS("マイク")
+	"前進", "後退", "左を向く", "右を向く", "左に移動", "右に移動",
+	"左を見る", "右を見る", "上を見る", "下を見る", "正面を見る",
+	"前の武器", "次の武器", "主砲", "副砲",
+	"サイドステップ", "走る／泳ぐ", "見る",
+	"アクション", "地図", "マイク"
 };
 
 static key_binding_map default_key_bindings = {
@@ -1635,7 +1635,7 @@ static key_binding_map default_key_bindings = {
 };
 
 static const char *shell_action_name[NUMBER_OF_SHELL_KEYS] = {
-	_SJIS("前の武器"), _SJIS("次の武器"), _SJIS("主観／客観切り替え"), _SJIS("音量を上げる"), _SJIS("音量を下げる"), _SJIS("マップ拡大"), _SJIS("マップ縮小"), _SJIS("FPS切り替え"), _SJIS("チャット／コンソール"), _SJIS("ネットワーク状況")
+	"前の武器", "次の武器", "主観／客観切り替え", "音量を上げる", "音量を下げる", "マップ拡大", "マップ縮小", "FPS切り替え", "チャット／コンソール", "ネットワーク状況"
 };
 
 static key_binding_map default_shell_key_bindings = {
@@ -2199,7 +2199,7 @@ static void controls_dialog(void *arg)
 	
 	tab_placer* tabs = new tab_placer();
 	
-	std::vector<std::string> labels = { "AIM", "MOVE", "ACTIONS", "INTERFACE", "OTHER" };
+	std::vector<std::string> labels = { _SJIS("照準"), _SJIS("移動"), _SJIS("アクション"), _SJIS("インターフェース"), _SJIS("その他") };
 	w_tab *tab_w = new w_tab(labels, tabs);
 	
 	placer->dual_add(tab_w, d);
@@ -2222,14 +2222,14 @@ static void controls_dialog(void *arg)
 			move_table->add_row(new w_spacer(), true);
 		} else if (*it >= 100) {
 			int i = *it - 100;
-			move_table->dual_add(new w_label(shell_action_name[i]), d);
+			move_table->dual_add(new w_label(_SJIS(shell_action_name[i])), d);
 			auto range = shell_key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				move_table->dual_add(ik->second, d);
 			}
 		} else {
 			int i = *it;
-			move_table->dual_add(new w_label(action_name[i]), d);
+			move_table->dual_add(new w_label(_SJIS(action_name[i])), d);
 			auto range = key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				if ((ik->second->event_type == w_key::MouseButton) &&
@@ -2273,14 +2273,14 @@ static void controls_dialog(void *arg)
 			look_table->add_row(new w_spacer(), true);
 		} else if (*it >= 100) {
 			int i = *it - 100;
-			look_table->dual_add(new w_label(shell_action_name[i]), d);
+			look_table->dual_add(new w_label(_SJIS(shell_action_name[i])), d);
 			auto range = shell_key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				look_table->dual_add(ik->second, d);
 			}
 		} else {
 			int i = *it;
-			look_table->dual_add(new w_label(action_name[i]), d);
+			look_table->dual_add(new w_label(_SJIS(action_name[i])), d);
 			auto range = key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				if (ik->second->event_type == w_key::MouseButton) {
@@ -2379,14 +2379,14 @@ static void controls_dialog(void *arg)
 			actions_table->add_row(new w_spacer(), true);
 		} else if (*it >= 100) {
 			int i = *it - 100;
-			actions_table->dual_add(new w_label(shell_action_name[i]), d);
+			actions_table->dual_add(new w_label(_SJIS(shell_action_name[i])), d);
 			auto range = shell_key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				actions_table->dual_add(ik->second, d);
 			}
 		} else {
 			int i = *it;
-			actions_table->dual_add(new w_label(action_name[i]), d);
+			actions_table->dual_add(new w_label(_SJIS(action_name[i])), d);
 			auto range = key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				actions_table->dual_add(ik->second, d);
@@ -2406,7 +2406,7 @@ static void controls_dialog(void *arg)
 	actions->add(actions_options, true);
 	
 	actions->add(new w_spacer(), true);
-	actions->dual_add(new w_static_text(_SJIS("注意：武器の自動切換えと、視点の自動リセンターは、ネットワークプレイで")), d);
+	actions->dual_add(new w_static_text(_SJIS("注意：武器の自動切換えと視点の自動中央補正は、ネットワークプレイで")), d);
 	actions->dual_add(new w_static_text(_SJIS("自動的にオンになります。シングルプレイヤーモードでどちらかをオフにすると、")), d);
 	actions->dual_add(new w_static_text(_SJIS("映画の録画が自動的に無効化されます。")), d);
 
@@ -2425,7 +2425,7 @@ static void controls_dialog(void *arg)
 	std::vector<int> interface_keys = { 19, 105, 106, -1, 103, 104, -1, 100, 101, -1, 102, 107, 109, -1, -2 };
 	for (auto it = interface_keys.begin(); it != interface_keys.end(); ++it) {
 		if (*it == -2) {
-			interface_table->dual_add(new w_label("Exit Game"), d);
+			interface_table->dual_add(new w_label(_SJIS("ゲーム終了")), d);
 			w_prefs_key *kb = new w_prefs_key(SDL_SCANCODE_ESCAPE, w_key::KeyboardKey);
 			kb->set_enabled(false);
 			interface_table->dual_add(kb, d);
@@ -2437,14 +2437,14 @@ static void controls_dialog(void *arg)
 			interface_table->add_row(new w_spacer(), true);
 		} else if (*it >= 100) {
 			int i = *it - 100;
-			interface_table->dual_add(new w_label(shell_action_name[i]), d);
+			interface_table->dual_add(new w_label(_SJIS(shell_action_name[i])), d);
 			auto range = shell_key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				interface_table->dual_add(ik->second, d);
 			}
 		} else {
 			int i = *it;
-			interface_table->dual_add(new w_label(action_name[i]), d);
+			interface_table->dual_add(new w_label(_SJIS(action_name[i])), d);
 			auto range = key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik) {
 				interface_table->dual_add(ik->second, d);
@@ -2908,7 +2908,7 @@ struct set_latency_tolerance
 struct get_latency_tolerance
 {
 	void operator() (const std::string&) const {
-		screen_printf("latency tolerance is %i", hub_get_minimum_send_period());
+		screen_printf("遅延許容値は %i です。", hub_get_minimum_send_period());
 	}
 };
 

@@ -773,7 +773,7 @@ void w_select_button::place(const SDL_Rect &r, placement_flags flags)
 // if no valid labels, returns -1 when asked for selection
 // draw(), get_selection() check num_labels directly instead of trying to keep selection set at -1
 
-static const char* sNoValidOptionsString = _SJIS("（無効な選択）"); // XXX should be moved outside compiled code e.g. to MML
+static const char* sNoValidOptionsString = "（無効な選択）"; // XXX should be moved outside compiled code e.g. to MML
 
 w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), we_own_labels(false), selection(s), selection_changed_callback(NULL), utf8(false)
 {
@@ -817,7 +817,7 @@ void w_select::draw(SDL_Surface *s) const
 
     int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
-    draw_text(s, str, rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
+    draw_text(s, _SJIS(str), rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
 
 	// Cursor
 	if (active) {
@@ -931,7 +931,7 @@ void w_select::set_labels_stringset(short inStringSetID) {
         
 		for(size_t i = 0; i < num_labels; i++) {
             // shared references should be OK, stringsets ought to be pretty stable.  No need to copy...
-            labels[i] = TS_GetCString(inStringSetID, i);
+			labels[i] = TS_GetCString(inStringSetID, i);
         }
         
         // we allocated; we free.
@@ -1017,7 +1017,7 @@ void w_toggle::draw(SDL_Surface *s) const
 	}
 	else
 	{
-		draw_text(s, str, rect.x, rect.y + font->get_ascent(), get_theme_color(ITEM_WIDGET, state), font, style, utf8);
+		draw_text(s, _SJIS(str), rect.x, rect.y + font->get_ascent(), get_theme_color(ITEM_WIDGET, state), font, style, utf8);
 	}
 	
 	// Cursor
@@ -1392,7 +1392,8 @@ end:			if (cursor_position < num_chars) {
 		}
 	} else if (e.type == SDL_TEXTINPUT) {
 		std::string input_utf8 = e.text.text;
-		std::string input_roman = utf8_to_mac_roman(input_utf8);
+		//std::string input_roman = utf8_to_mac_roman(input_utf8);
+		std::string input_roman = utf82sjis(input_utf8);
 		for (std::string::iterator it = input_roman.begin(); it != input_roman.end(); ++it)
 		{
 			uint16 uc = *it;
@@ -1470,7 +1471,8 @@ void w_number_entry::event(SDL_Event &e)
 {
 	if (e.type == SDL_TEXTINPUT) {
 		std::string input_utf8 = e.text.text;
-		std::string input_roman = utf8_to_mac_roman(input_utf8);
+		//std::string input_roman = utf8_to_mac_roman(input_utf8);
+		std::string input_roman = utf82sjis(input_utf8);
 		for (std::string::iterator it = input_roman.begin(); it != input_roman.end(); ++it)
 		{
 			uint16 uc = *it;
@@ -1534,20 +1536,20 @@ void w_key::place(const SDL_Rect& r, placement_flags flags)
 		
 // ZZZ: we provide phony key names for the phony keys used for mouse buttons.
 static const char* sMouseButtonKeyName[NUM_SDL_MOUSE_BUTTONS] = {
-        _SJIS("左クリック"),
-        _SJIS("中央クリック"),
-        _SJIS("右クリック"),
-        _SJIS("進むボタン"),
-        _SJIS("戻るボタン"),
-        _SJIS("ホイールアップ"),
-        _SJIS("ホイールダウン")
+        "左クリック",
+        "中央クリック",
+        "右クリック",
+        "進むボタン",
+        "戻るボタン",
+        "ホイールアップ",
+        "ホイールダウン"
 };
 
 static const char* sJoystickButtonKeyName[NUM_SDL_JOYSTICK_BUTTONS] = {
-	_SJIS("A（×）"), _SJIS("B（○）"), _SJIS("X（□）"), _SJIS("Y（△）"), _SJIS("Back（Share）"), _SJIS("Guide（PS）"), "Start",
-	_SJIS("左スティック"), _SJIS("右スティック"), _SJIS("Lボタン"), _SJIS("Rボタン"), _SJIS("↑"), _SJIS("↓"), _SJIS("←"), _SJIS("→"),
-	_SJIS("左スティック→"), _SJIS("左スティック↓"), _SJIS("右スティック→"), _SJIS("右スティック↓"), _SJIS("Lトリガー"), _SJIS("Rトリガー"),
-	_SJIS("左スティック←"), _SJIS("左スティック↑"), _SJIS("右スティック←"), _SJIS("右スティック↑"), _SJIS("Lトリガー反転"), _SJIS("Rトリガー反転")
+	"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
+	"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
+	"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
+	"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
 };
 
 // ZZZ: this injects our phony key names but passes along the rest.
@@ -1556,7 +1558,7 @@ GetSDLKeyName(SDL_Scancode inKey) {
 	if (w_key::event_type_for_key(inKey) == w_key::MouseButton)
         return sMouseButtonKeyName[inKey - AO_SCANCODE_BASE_MOUSE_BUTTON];
 	else if (w_key::event_type_for_key(inKey) == w_key::JoystickButton)
-	    return sJoystickButtonKeyName[inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON];
+        return sJoystickButtonKeyName[inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON];
     else
         return SDL_GetScancodeName(inKey);
 }
@@ -1574,7 +1576,7 @@ void w_key::draw(SDL_Surface *s) const
 		draw_text(s, UNBOUND_TEXT[event_type].c_str(), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	} else {
         int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
-		draw_text(s, GetSDLKeyName(key), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s, _SJIS(GetSDLKeyName(key)), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	}
 }
 
@@ -2346,7 +2348,7 @@ void w_select_popup::set_selection (int value)
 	if (selection == -1)
 		w_select_button::set_selection ("");
 	else
-		w_select_button::set_selection (labels[selection].c_str ());
+		w_select_button::set_selection (labels[selection].c_str());
 }
 
 void w_select_popup::gotSelected ()

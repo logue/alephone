@@ -36,5 +36,6 @@ std::string utf82utf16(const std::string& input);
 std::string utf162utf8(const std::string& input);
 
 #define _SJIS(str) utf82sjis(str).c_str()
+#define _UTF8(str) sjis2utf8(str).c_str()
 #define _UTF16(str) utf82utf16(str).c_str()
 #endif

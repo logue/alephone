@@ -282,11 +282,11 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 }
 
 static const char *far_filter_labels[5] = {
-	_SJIS("なし"), _SJIS("リニア"), _SJIS("バイリニア"), _SJIS("トリニア"), NULL
+	"なし", "リニア", "バイリニア", "トリニア", NULL
 };
 
 static const char *near_filter_labels[3] = {
-	_SJIS("なし"), _SJIS("リニア"), NULL
+	"なし", "リニア", NULL
 };
 
 class w_aniso_slider : public w_slider {
