@@ -4,7 +4,7 @@ AlephOne日本語版ではターミナルテキストなどゲーム内で使用
 
 |ID |オリジナル版       |英語版                     |日本語版               |備考
 |---|-------------------|---------------------------|-----------------------|------------------------------------------
-|4  |Monaco             |ProFontAO                  |k8x12                  |HUD向けフォント
+|4  |Monaco             |ProFontAO                  |k8x12L                 |HUD向けフォント
 |22 |Courier            |Courier Prime              |NotoSansMonoCJK        |汎用フォント（ターミナルテキストなどで使用）
 |   |Courier(Bold)      |Courier Prime Bold         |NotoSansMonoBoldCJK    |汎用ボールドフォント
 |   |Courier(Italic)    |Courier Prime Italic       |
