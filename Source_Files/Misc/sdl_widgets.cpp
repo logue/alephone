@@ -817,7 +817,7 @@ void w_select::draw(SDL_Surface *s) const
 
     int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
-    draw_text(s, _SJIS(str), rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
+    draw_text(s, str, rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style, utf8);
 
 	// Cursor
 	if (active) {
@@ -1017,7 +1017,7 @@ void w_toggle::draw(SDL_Surface *s) const
 	}
 	else
 	{
-		draw_text(s, _SJIS(str), rect.x, rect.y + font->get_ascent(), get_theme_color(ITEM_WIDGET, state), font, style, utf8);
+		draw_text(s, str, rect.x, rect.y + font->get_ascent(), get_theme_color(ITEM_WIDGET, state), font, style, utf8);
 	}
 	
 	// Cursor
@@ -1083,7 +1083,7 @@ void w_player_color::draw(SDL_Surface *s) const
 	} else {
 		int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
-		draw_text(s, _SJIS("<不明>"), rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s, "<不明>", rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	}
 
 	// Cursor
@@ -1117,7 +1117,7 @@ void w_color_picker::click(int, int)
 	dialog d;
 	
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title(_SJIS("色を選択")), d);
+	placer->dual_add(new w_title("色を選択"), d);
 	placer->add(new w_spacer(), true);
 
 	w_color_block *color_block = new w_color_block(&m_color);
@@ -1127,22 +1127,22 @@ void w_color_picker::click(int, int)
 	table->col_flags(0, placeable::kAlignRight);
 
 	w_percentage_slider *red_w = new w_percentage_slider(16, m_color.red >> 12);
-	table->dual_add(red_w->label(_SJIS("赤")), d);
+	table->dual_add(red_w->label("赤"), d);
 	table->dual_add(red_w, d);
 
 	w_percentage_slider *green_w = new w_percentage_slider(16, m_color.green >> 12);
-	table->dual_add(green_w->label(_SJIS("緑")), d);
+	table->dual_add(green_w->label("緑"), d);
 	table->dual_add(green_w, d);
 
 	w_percentage_slider *blue_w = new w_percentage_slider(16, m_color.blue >> 12);
-	table->dual_add(blue_w->label(_SJIS("青")), d);
+	table->dual_add(blue_w->label("青"), d);
 	table->dual_add(blue_w, d);
 
 	placer->add(table, true);
 	placer->add(new w_spacer(), true);
 	
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 	button_placer->dual_add(new w_button("OK", dialog_ok, &d), d);
 	
 	placer->add(button_placer, true);
@@ -1392,8 +1392,7 @@ end:			if (cursor_position < num_chars) {
 		}
 	} else if (e.type == SDL_TEXTINPUT) {
 		std::string input_utf8 = e.text.text;
-		//std::string input_roman = utf8_to_mac_roman(input_utf8);
-		std::string input_roman = utf82sjis(input_utf8);
+		std::string input_roman = utf8_to_mac_roman(input_utf8);
 		for (std::string::iterator it = input_roman.begin(); it != input_roman.end(); ++it)
 		{
 			uint16 uc = *it;
@@ -1471,8 +1470,7 @@ void w_number_entry::event(SDL_Event &e)
 {
 	if (e.type == SDL_TEXTINPUT) {
 		std::string input_utf8 = e.text.text;
-		//std::string input_roman = utf8_to_mac_roman(input_utf8);
-		std::string input_roman = utf82sjis(input_utf8);
+		std::string input_roman = utf8_to_mac_roman(input_utf8);
 		for (std::string::iterator it = input_roman.begin(); it != input_roman.end(); ++it)
 		{
 			uint16 uc = *it;
@@ -1513,8 +1511,8 @@ void w_password_entry::draw(SDL_Surface *s) const
  *  Key name widget
  */
 
-static const std::vector<std::string> WAITING_TEXT = { _SJIS("キー入力待ち"), _SJIS("ボタン入力待ち"), _SJIS("ボタン入力待ち") };
-static const std::vector<std::string> UNBOUND_TEXT = { _SJIS("なし"), _SJIS("なし"), _SJIS("なし") };
+static const std::vector<std::string> WAITING_TEXT = { "キー入力待ち", "ボタン入力待ち", "ボタン入力待ち" };
+static const std::vector<std::string> UNBOUND_TEXT = { "なし", "なし", "なし" };
 
 w_key::w_key(SDL_Scancode key, w_key::Type event_type) : widget(LABEL_WIDGET), binding(false), event_type(event_type)
 {
@@ -1576,7 +1574,7 @@ void w_key::draw(SDL_Surface *s) const
 		draw_text(s, UNBOUND_TEXT[event_type].c_str(), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	} else {
         int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
-		draw_text(s, _SJIS(GetSDLKeyName(key)), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
+		draw_text(s, GetSDLKeyName(key), x, y, get_theme_color(ITEM_WIDGET, state), font, style);
 	}
 }
 
@@ -2276,7 +2274,7 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
 	char str[256];
 
     if(show_level_numbers)
-    	sprintf(str, "%d - %s", i->level_number + 1, i->level_name);
+    	sprintf(str, "%d - %s", i->level_number + 1, _UTF8(i->level_name));
     else
         sprintf(str, "%s", i->level_name);
 
@@ -2490,16 +2488,16 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		{
 			if (item.minutes_remaining() == 1)
 			{
-				time_or_ping << _SJIS("１分未満");
+				time_or_ping << "1分未満";
 			}
 			else
 			{
-				time_or_ping << item.minutes_remaining() << " Minutes";
+				time_or_ping << item.minutes_remaining() << "分";
 			}
 		}
 		else
 		{
-			time_or_ping << _SJIS("無制限");
+			time_or_ping << "無制限";
 		}
 	}
 	else
@@ -2526,7 +2524,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_and_map << "|i" << item.m_description.m_scenarioName;
 		if (item.m_description.m_scenarioVersion != "")
 		{
-			game_and_map << ", Version " << item.m_description.m_scenarioVersion;
+			game_and_map << ", バージョン " << item.m_description.m_scenarioVersion;
 		}
 	} 
 	else
@@ -2548,11 +2546,11 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	{
 		if (item.m_description.m_numPlayers == 1)
 		{
-			game_settings << _SJIS("1 プレイヤー");
+			game_settings << "1 プレイヤー";
 		}
 		else
 		{
-			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << _SJIS(" プレイヤー");
+			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " プレイヤー";
 		}
 	}
 	else
@@ -2560,19 +2558,19 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_settings << static_cast<uint16>(item.m_description.m_numPlayers)
 			      << "/"
 			      << item.m_description.m_maxPlayers
-			      << _SJIS(" プレイヤー");
+			      << " プレイヤー";
 	}
 
 	if (item.m_description.m_timeLimit && !(item.m_description.m_timeLimit == INT32_MAX || item.m_description.m_timeLimit == -1))
 	{
 		game_settings << ", " 
 			      << item.m_description.m_timeLimit / 60 / TICKS_PER_SECOND 
-			      << _SJIS(" 分");
+			      << " 分";
 	}
 
 	if (item.m_description.m_teamsAllowed)
 	{
-		game_settings << _SJIS(", チーム");
+		game_settings << ", チーム";
 	}
 
 	draw_text(s, game_settings.str().c_str(), x, y, fg, font, game_style);

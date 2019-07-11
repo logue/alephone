@@ -83,15 +83,15 @@ setupAndConnectClient(MetaserverClient& client)
 			dialog d;
 			vertical_placer *placer = new vertical_placer;
 
-			placer->dual_add(new w_title(_SJIS("更新が利用可能です")), d);
+			placer->dual_add(new w_title("更新が利用可能です"), d);
 			placer->add(new w_spacer(), true);
 
-			placer->dual_add(new w_static_text(expand_app_variables(_SJIS("$appName$のアップデートが利用可能です。")).c_str()), d);
+			placer->dual_add(new w_static_text(expand_app_variables("$appName$のアップデートが利用可能です。").c_str()), d);
 			placer->dual_add(new w_static_text("オンラインで遊ぶ前に"), d);
 #ifdef MAC_APP_STORE
-			placer->dual_add(new w_static_text(_SJIS("App Storeからダウンロードしてください。")), d);
+			placer->dual_add(new w_static_text("App Storeからダウンロードしてください。"), d);
 #else
-			placer->dual_add(new w_static_text(_SJIS("以下のアドレスからダウンロードしてください。")), d);
+			placer->dual_add(new w_static_text("以下のアドレスからダウンロードしてください。"), d);
 			placer->dual_add(new w_hyperlink(A1_HOMEPAGE_URL), d);
 #endif
 			
@@ -121,7 +121,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	description.m_timeLimit = (info.time_limit > 7 * 24 * 3600 * TICKS_PER_SECOND) ? -1 : info.time_limit;
 	description.m_difficulty = info.difficulty_level;
 	description.m_mapName = string(info.level_name);
-	description.m_name = gMetaserverClient->playerName() + "'s Game";
+	description.m_name = gMetaserverClient->playerName() + "のゲーム";
 	description.m_teamsAllowed = !(info.game_options & _force_unique_teams);
 	
 	// description's constructor gets scenario info, aleph one's protocol ID for us
@@ -141,7 +141,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	}
 	else if (HasLua)
 	{
-		description.m_netScript = "Embedded";
+		description.m_netScript = "埋め込み";
 	} // else constructor's blank string is desirable
 
 	description.m_hasGameOptions = true;
@@ -151,7 +151,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 
 	if (HasPhysics)
 	{
-		description.m_physicsName = "Embedded";
+		description.m_physicsName = "埋め込み";
 	}
 	else
 	{

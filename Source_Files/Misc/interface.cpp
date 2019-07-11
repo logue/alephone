@@ -1708,9 +1708,9 @@ static void display_about_dialog()
 
 	vertical_placer* placer = new vertical_placer;
 	std::vector<std::string> labels;
-	labels.push_back(_SJIS("AlephOneについて"));
-	labels.push_back(_SJIS("制作"));
-	labels.push_back(_SJIS("日本語化"));
+	labels.push_back("AlephOneについて");
+	labels.push_back("制作");
+	labels.push_back("日本語化");
 	w_tab *tab_w = new w_tab(labels, tabs);
 	
 	placer->dual_add(new w_title("ALEPH ONE"), d);
@@ -1733,26 +1733,26 @@ static void display_about_dialog()
 
 	about_placer->add(new w_spacer(2 * get_theme_space(SPACER_WIDGET)), true);
 	
-	about_placer->dual_add(new w_static_text(_SJIS(expand_app_variables("Aleph Oneは、無料ですが無保証です。").c_str())), d);
-	about_placer->dual_add(new w_static_text(_SJIS("以下のライセンス下で再配布することを歓迎します。")), d);
+	about_placer->dual_add(new w_static_text(expand_app_variables("Aleph Oneは、無料ですが無保証です。").c_str()), d);
+	about_placer->dual_add(new w_static_text("以下のライセンス下で再配布することを歓迎します。"), d);
 	about_placer->dual_add(new w_hyperlink("http://www.gnu.org/licenses/gpl-3.0.html"), d);
 
 	about_placer->add(new w_spacer, true);
 
-	about_placer->dual_add(new w_static_text(_SJIS("このライセンスにはゲームのコンテンツは含まれません。")), d);
+	about_placer->dual_add(new w_static_text("このライセンスにはゲームのコンテンツは含まれません。"), d);
 
 	about_placer->add(new w_spacer, true);
 
-	about_placer->dual_add(new w_static_text(_SJIS(expand_app_variables("読み込まれているシナリオ：$scenarioName$ $scenarioVersion$").c_str())), d);
+	about_placer->dual_add(new w_static_text(expand_app_variables("読み込まれているシナリオ：$scenarioName$ $scenarioVersion$").c_str()), d);
 
 	vertical_placer *authors_placer = new vertical_placer();
 	
-	authors_placer->dual_add(new w_static_text(_SJIS("Aleph Oneは、Bungie SoftwareのMarathon 2及びMarathon Infiniyの")), d);
-	authors_placer->dual_add(new w_static_text(_SJIS("ソースコードをベースに作られています。")), d);
+	authors_placer->dual_add(new w_static_text("Aleph Oneは、Bungie SoftwareのMarathon 2及びMarathon Infiniyの"), d);
+	authors_placer->dual_add(new w_static_text("ソースコードをベースに作られています。"), d);
 	authors_placer->add(new w_spacer, true);
 	
-	authors_placer->dual_add(new w_static_text(_SJIS("AlephOneを構成するMarathon 2およびMarathon Infinityの機能強化")), d);
-	authors_placer->dual_add(new w_static_text(_SJIS("および拡張は以下のスタッフによって成し遂げられました：")), d);
+	authors_placer->dual_add(new w_static_text("AlephOneを構成するMarathon 2およびMarathon Infinityの機能強化"), d);
+	authors_placer->dual_add(new w_static_text("および拡張は以下のスタッフによって成し遂げられました："), d);
 
 	authors_placer->add(new w_spacer, true);
 
@@ -1807,11 +1807,11 @@ static void display_about_dialog()
 	authors_placer->dual_add(authors_w, d);
 	
 	vertical_placer *jp_stuff_placer = new vertical_placer();
-	jp_stuff_placer->dual_add(new w_static_text(_SJIS("Aleph One日本語版")), d);
+	jp_stuff_placer->dual_add(new w_static_text("Aleph One日本語版"), d);
 	jp_stuff_placer->add(new w_spacer, true);
 	jp_stuff_placer->dual_add(new w_hyperlink("https://osdn.jp/projects/marathon/"), d);
 	jp_stuff_placer->add(new w_spacer(2 * get_theme_space(SPACER_WIDGET)), true);
-	jp_stuff_placer->dual_add(new w_static_text(_SJIS("AlephOne日本語化スタッフ")), d);
+	jp_stuff_placer->dual_add(new w_static_text("AlephOne日本語化スタッフ"), d);
 	
 	std::vector<std::string> jp_staffs;
 	jp_staffs.push_back("Logue Takayama");
@@ -3328,13 +3328,13 @@ size_t should_restore_game_networked(FileSpecifier& file)
         dialog d;
 
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title(_SJIS("ゲーム再開")), d);
+	placer->dual_add(new w_title("ゲーム再開"), d);
 	placer->add(new w_spacer, true);
 
 	horizontal_placer *resume_as_placer = new horizontal_placer;
         w_toggle* theRestoreAsNetgameToggle = new w_toggle(dynamic_world->player_count > 1, 0);
         theRestoreAsNetgameToggle->set_labels_stringset(kSingleOrNetworkStringSetID);
-	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label(_SJIS("以下で再開：")), d);
+	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("以下で再開："), d);
 	resume_as_placer->dual_add(theRestoreAsNetgameToggle, d);
 
 	placer->add(resume_as_placer, true);
@@ -3343,8 +3343,8 @@ size_t should_restore_game_networked(FileSpecifier& file)
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button(_SJIS("続ける"), dialog_ok, &d), d);
-	button_placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("続ける", dialog_ok, &d), d);
+	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 

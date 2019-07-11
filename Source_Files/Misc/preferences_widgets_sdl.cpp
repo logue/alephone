@@ -87,7 +87,7 @@ void w_env_select::select_item(dialog *parent)
 	w_env_list *list_w = new w_env_list(items, item.GetPath(), &d);
 	placer->dual_add(list_w, d);
 	placer->add(new w_spacer(), true);
-	placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &d), d);
+	placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 
 	d.activate_widget(list_w);
 	d.set_widget_placer(placer);
@@ -200,14 +200,14 @@ void w_plugins::draw_item(Plugins::iterator it, SDL_Surface* s, int16 x, int16 y
 		enabled = " 無効";
 	}
 
-	int right_text_width = text_width(_SJIS(enabled.c_str()), font, style);
+	int right_text_width = text_width(enabled.c_str(), font, style);
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width - right_text_width);
 	std::string name_and_version = it->name + " " + it->version;
-	draw_text(s, _SJIS(name_and_version.c_str()), x, y, color, font, style);
+	draw_text(s, name_and_version.c_str(), x, y, color, font, style);
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
-	draw_text(s, _SJIS(enabled.c_str()), x + width - right_text_width, y, color, font, style);
+	draw_text(s, enabled.c_str(), x + width - right_text_width, y, color, font, style);
 
 	y += font->get_ascent() + 1;
 	std::string types;
@@ -230,15 +230,15 @@ void w_plugins::draw_item(Plugins::iterator it, SDL_Surface* s, int16 x, int16 y
 		types += ", ステータス";
 	}
 	types.erase(0, 2);
-	right_text_width = text_width(_SJIS(types.c_str()), font, style | styleItalic);
+	right_text_width = text_width(types.c_str(), font, style | styleItalic);
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
-	draw_text(s, _SJIS(types.c_str()), x + width - right_text_width, y, color, font, style | styleItalic);
+	draw_text(s, types.c_str(), x + width - right_text_width, y, color, font, style | styleItalic);
 	
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width - right_text_width);
 	if (it->description.size()) {
-		draw_text(s, _SJIS(it->description.c_str()), x, y, color, font, style);
+		draw_text(s, it->description.c_str(), x, y, color, font, style);
 	} else {
-		draw_text(s, _SJIS("説明無し"), x, y, color, font, style);
+		draw_text(s, "説明無し", x, y, color, font, style);
 	}
 	
 	set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);

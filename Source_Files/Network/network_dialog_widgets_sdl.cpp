@@ -943,7 +943,7 @@ w_entry_point_selector::validateEntryPoint() {
 
     if(mEntryPoints.size() <= 0) {
         mEntryPoint.level_number = NONE;
-        strncpy(mEntryPoint.level_name, "(no valid options)", 66);
+        strncpy(mEntryPoint.level_name, "（無効なオプション）", 66);
         mCurrentIndex = NONE;
     }
     else {
@@ -978,7 +978,7 @@ w_entry_point_selector::gotSelected() {
         dialog theDialog;
 
 	vertical_placer *placer = new vertical_placer;
-        placer->dual_add(new w_title("SELECT LEVEL"), theDialog);
+        placer->dual_add(new w_title("レベル選択"), theDialog);
 
 	placer->add(new w_spacer(), true);
 
@@ -1003,7 +1003,7 @@ w_entry_point_selector::gotSelected() {
 
         placer->add(new w_spacer(), true);
 
-        placer->dual_add(new w_button("CANCEL", dialog_cancel, &theDialog), theDialog);
+        placer->dual_add(new w_button("キャンセル", dialog_cancel, &theDialog), theDialog);
 
 	theDialog.set_widget_placer(placer);
 

@@ -921,7 +921,7 @@ public:
 		if(i->is_directory)
 		{
 			string theName = i->name + "/";
-			draw_text(s, _SJIS(theName.c_str()), x, y, selected ? get_theme_color (ITEM_WIDGET, ACTIVE_STATE) : get_theme_color (ITEM_WIDGET, DEFAULT_STATE), font, style, true);
+			draw_text(s, theName.c_str(), x, y, selected ? get_theme_color (ITEM_WIDGET, ACTIVE_STATE) : get_theme_color (ITEM_WIDGET, DEFAULT_STATE), font, style, true);
 		}
 		else
 		{
@@ -1050,8 +1050,8 @@ private:
 };
 
 const char* sort_by_labels[] = {
-	_SJIS("名前"),
-	_SJIS("日付"),
+	"名前",
+	"日付",
 	0
 };
 
@@ -1079,7 +1079,7 @@ protected:
 	void Init(const FileSpecifier& dir, w_directory_browsing_list::SortOrder default_order, std::string filename) {
 		m_sort_by_w = new w_select(static_cast<size_t>(default_order), sort_by_labels);
 		m_sort_by_w->set_selection_changed_callback(boost::bind(&FileDialog::on_change_sort_order, this));
-		m_up_button_w = new w_button(_SJIS("上の階層"), boost::bind(&FileDialog::on_up, this));
+		m_up_button_w = new w_button("上の階層", boost::bind(&FileDialog::on_up, this));
 		if (filename.empty()) 
 		{
 			m_list_w = new w_directory_browsing_list(dir, &m_dialog);
@@ -1135,13 +1135,13 @@ public:
 			switch(type) 
 			{
 			case _typecode_savegame:
-				m_prompt = _SJIS("ゲーム再開");
+				m_prompt = "ゲーム再開";
 				break;
 			case _typecode_film:
-				m_prompt = _SJIS("映画をリプレイ");
+				m_prompt = "映画をリプレイ";
 				break;
 			default:
-				m_prompt = _SJIS("ファイルを開く");
+				m_prompt = "ファイルを開く";
 				break;
 			}
 		}
@@ -1190,7 +1190,7 @@ public:
 
 		horizontal_placer* top_row_placer = new horizontal_placer;
 
-		top_row_placer->dual_add(m_sort_by_w->label(_SJIS("ソート順：")), m_dialog);
+		top_row_placer->dual_add(m_sort_by_w->label("ソート順："), m_dialog);
 		top_row_placer->dual_add(m_sort_by_w, m_dialog);
 		top_row_placer->add_flags(placeable::kFill);
 		top_row_placer->add(new w_spacer, true);
@@ -1207,7 +1207,7 @@ public:
 		placer->add(new w_spacer, true);
 
 		horizontal_placer* button_placer = new horizontal_placer;
-		button_placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &m_dialog), m_dialog);
+		button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &m_dialog), m_dialog);
 		
 		placer->add(button_placer, true);
 		
@@ -1268,16 +1268,16 @@ public:
 			switch (type)
 			{
 			case _typecode_savegame:
-				m_prompt = _SJIS("ゲーム保存");
+				m_prompt = "ゲーム保存";
 				break;
 			case _typecode_film:
-				m_prompt = _SJIS("映画を保存");
+				m_prompt = "映画を保存";
 				break;
 			case _typecode_movie:
-				m_prompt = _SJIS("映画をエクスポート");
+				m_prompt = "映画をエクスポート";
 				break;
 			default:
-				m_prompt = _SJIS("ファイル保存");
+				m_prompt = "ファイル保存";
 				break;
 			}
 		}
@@ -1340,7 +1340,7 @@ public:
 
 		horizontal_placer* top_row_placer = new horizontal_placer;
 
-		top_row_placer->dual_add(m_sort_by_w->label(_SJIS("ソート順：")), m_dialog);
+		top_row_placer->dual_add(m_sort_by_w->label("ソート順："), m_dialog);
 		top_row_placer->dual_add(m_sort_by_w, m_dialog);
 		top_row_placer->add_flags(placeable::kFill);
 		top_row_placer->add(new w_spacer, true);
@@ -1361,9 +1361,9 @@ public:
 		horizontal_placer* file_name_placer = new horizontal_placer;
 		m_name_w = new w_file_name(&m_dialog, m_default_name.c_str());
 #ifdef MAC_APP_STORE
-		file_name_placer->dual_add(m_name_w->label(_SJIS("名前：")), m_dialog);
+		file_name_placer->dual_add(m_name_w->label("名前："), m_dialog);
 #else
-		file_name_placer->dual_add(m_name_w->label(_SJIS("ファイル名：")), m_dialog);
+		file_name_placer->dual_add(m_name_w->label("ファイル名："), m_dialog);
 #endif
 		file_name_placer->add_flags(placeable::kFill);
 		file_name_placer->dual_add(m_name_w, m_dialog);
@@ -1375,7 +1375,7 @@ public:
 
 		horizontal_placer* button_placer = new horizontal_placer;
 		button_placer->dual_add(new w_button("OK", dialog_ok, &m_dialog), m_dialog);
-		button_placer->dual_add(new w_button(_SJIS("キャンセル"), dialog_cancel, &m_dialog), m_dialog);
+		button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &m_dialog), m_dialog);
 		
 		placer->add(button_placer, true);
 		
@@ -1468,14 +1468,14 @@ static bool confirm_save_choice(FileSpecifier & file)
 	// Create dialog
 	dialog d;
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_static_text(_SJIS(message)), d);
-	placer->dual_add(new w_static_text(_SJIS("上書きしてもよろしいですか？")), d);
+	placer->dual_add(new w_static_text(message), d);
+	placer->dual_add(new w_static_text("上書きしてもよろしいですか？"), d);
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	w_button *default_button = new w_button(_SJIS("はい"), dialog_ok, &d);
+	w_button *default_button = new w_button("はい", dialog_ok, &d);
 	button_placer->dual_add(default_button, d);
-	button_placer->dual_add(new w_button(_SJIS("いいえ"), dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("いいえ", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 
