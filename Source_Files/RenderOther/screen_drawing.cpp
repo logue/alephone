@@ -140,7 +140,7 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
 */
-// HUDのボールドを解除
+// HUD�̃{�[���h������
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleNormal,  0, "#4"},
@@ -533,7 +533,7 @@ int sdl_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, i
 		MainScreenUpdateRect(x, y - ascent, text_width(text, style, false), rect_height);
 	return width;
 }
-
+#include "converter.h"
 int ttf_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, int x, int y, uint32 pixel, uint16 style, bool utf8) const
 {
 	int clip_top, clip_bottom, clip_left, clip_right;
@@ -552,6 +552,7 @@ int ttf_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, i
 	SDL_GetRGB(pixel, s->format, &c.r, &c.g, &c.b);
 	c.a = 0xff;
 	SDL_Surface *text_surface = 0;
+	/*
 	if (utf8) 
 	{
 		char *temp = process_printable(text, length);
@@ -562,13 +563,17 @@ int ttf_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, i
 	}
 	else
 	{
-		//uint16 *temp = process_macroman(text, length);
-		uint16 *temp = sjis2utf16(text, length);
+		uint16 *temp = process_macroman(text, length);
 		if (environment_preferences->smooth_text)
 			text_surface = TTF_RenderUNICODE_Blended(get_ttf(style), temp, c);
 		else
 			text_surface = TTF_RenderUNICODE_Solid(get_ttf(style), temp, c);
 	}
+	*/
+	if (environment_preferences->smooth_text)
+		text_surface = TTF_RenderUTF8_Blended(get_ttf(style), text, c);	
+	else
+		text_surface = TTF_RenderUTF8_Solid(get_ttf(style), text, c);
 	if (!text_surface) return 0;
 	
 	SDL_Rect dst_rect;
@@ -665,11 +670,10 @@ void _draw_screen_text(const char *text, screen_rectangle *destination, short fl
 
 	// Truncate text if necessary
 	int t_width = text_width(text_to_draw, font, style);
-	// 日本語で文字が切れてしまうためコメントアウト
-	//if (t_width > RECTANGLE_WIDTH(destination)) {
-	//	text_to_draw[trunc_text(text_to_draw, RECTANGLE_WIDTH(destination), font, style)] = 0;
-	//	t_width = text_width(text_to_draw, font, style);
-	//}
+	if (t_width > RECTANGLE_WIDTH(destination)) {
+		text_to_draw[trunc_text(text_to_draw, RECTANGLE_WIDTH(destination), font, style)] = 0;
+		t_width = text_width(text_to_draw, font, style);
+	}
 
 	// Horizontal positioning
 	if (flags & _center_horizontal)
@@ -1250,4 +1254,3 @@ static void load_interface_rectangles(void)
 static void load_screen_interface_colors(void)
 {
 }
-

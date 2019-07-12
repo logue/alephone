@@ -377,7 +377,6 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 	
 	if (!text || !strlen(text))
 		return;
-	const char *text_to_draw = _SJIS(text);
 	
 	apply_clip();
 #ifdef HAVE_OPENGL
@@ -388,7 +387,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 		glTranslatef(x, y + (font->Height * scale), 0);
         glScalef(scale, scale, 1.0);
 		glColor4f(r, g, b, a);
-		font->OGL_Render(text_to_draw);
+		font->OGL_Render(text);
 		glColor4f(1, 1, 1, 1);
 		glPopMatrix();
 	}
@@ -399,7 +398,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 		SDL_Rect rect;
 		rect.x = static_cast<Sint16>(x) + m_wr.x;
 		rect.y = static_cast<Sint16>(y) + m_wr.y;
-		rect.w = font->TextWidth(text_to_draw);
+		rect.w = font->TextWidth(text);
 		rect.h = font->LineSpacing;
         
         // FIXME: draw_text doesn't support full RGBA transfer for proper scaling,
@@ -435,7 +434,7 @@ void HUD_Lua_Class::draw_text(FontSpecifier *font, const char *text,
 #endif
         {
             SDL_BlitSurface(MainScreenSurface(), &rect, m_surface, &rect);
-            font->Info->draw_text(m_surface, text_to_draw, strlen(text_to_draw),
+            font->Info->draw_text(m_surface, text, strlen(text),
                                   rect.x, rect.y + font->Height,
                                   SDL_MapRGBA(m_surface->format,
                                               static_cast<unsigned char>(r * 255),

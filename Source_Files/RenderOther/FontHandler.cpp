@@ -91,12 +91,6 @@ void FontSpecifier::Init()
 {
 	Info = NULL;
 	Update();
-#ifdef HAVE_OPENGL
-	for (int n = 0; n < 256; ++n)
-	{
-		OGL_Texture[n] = NULL;
-	}
-#endif
 }
 
 void FontSpecifier::Update()
@@ -111,10 +105,10 @@ void FontSpecifier::Update()
 	TextSpec Spec;
 	Spec.size = Size;
 	Spec.style = Style;
-	Spec.adjust_height = AdjustLineHeight;
+	Spec.adjust_height = -4;
 
 	// Simply implements format "#<value>"; may want to generalize this
-	if (File[0] == '#')
+	if (File[0] == '#') 
 	{
 		short ID;
 		sscanf(File.c_str() + 1, "%hd", &ID);
@@ -153,10 +147,7 @@ void FontSpecifier::Update()
 		Leading = Info->get_leading();
 		Height = Ascent + Leading;
 		LineSpacing = Ascent + Descent + Leading;
-		for (int k = 0; k < 256; k++)
-			Widths[k] = char_width(k, Info, Style);
-	}
-	else
+	} else
 		Ascent = Descent = Leading = Height = LineSpacing = 0;
 }
 
@@ -168,16 +159,18 @@ int FontSpecifier::TextWidth(const char *text)
 	// Japaneese font(assume text is shiftjis)
 	return Info->text_width(text, 0, false);
 }
-#ifdef HAVE_OPENGL
-void FontSpecifier::render_text_(int n, const char *str)
+void FontSpecifier::render_text_(const char* str)
 {
+	/*
 	if (OGL_Texture[n]){
 		return;
 	}
+	*/
 	
 	// Put some padding around each glyph so as to avoid clipping it
 	const int Pad = 1;
 	int ascent_p = Ascent + Pad, descent_p = Descent + Pad;
+	/*
 	int widths_p[256];
 	for (int i=0; i<256; i++) {
 	  widths_p[i] = Widths[i] + 2*Pad;
@@ -188,13 +181,19 @@ void FontSpecifier::render_text_(int n, const char *str)
 
 	// For an empty font, clear out
 	if (TotalWidth <= 0) return;
-
+	*/
 	int GlyphHeight = ascent_p + descent_p;
 	
+	/*
 	int EstDim = int(sqrt(static_cast<float>(TotalWidth*GlyphHeight)) + 0.5);
 	TxtrWidth[n] = MAX(128, NextPowerOfTwo(EstDim));
+	*/
+	int TotalWidth = TextWidth(str)+Pad*2;
+	int Width = TotalWidth;
+	int TxtrWidth = MAX(64, NextPowerOfTwo(TotalWidth));
 
 	// Find the character starting points and counts
+	/*
 	unsigned char CharStarts[256], CharCounts[256];
 	int LastLine = 0;
 	CharStarts[LastLine] = 0;
@@ -216,9 +215,12 @@ void FontSpecifier::render_text_(int n, const char *str)
 		}
 	}
 	TxtrHeight[n] = MAX(128, NextPowerOfTwo(GlyphHeight*(LastLine+1)));
+	*/
+	int TxtrHeight = MAX(64, NextPowerOfTwo(GlyphHeight));
 
 	// Render the font glyphs into the SDL surface
-	SDL_Surface *FontSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TxtrWidth[n], TxtrHeight[n], 32, 0xff0000, 0x00ff00, 0x0000ff, 0);
+	//SDL_Surface *FontSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TxtrWidth[n], TxtrHeight[n], 32, 0xff0000, 0x00ff00, 0x0000ff, 0);
+	SDL_Surface *FontSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TxtrWidth, TxtrHeight, 32, 0xff0000, 0x00ff00, 0x0000ff, 0);
 	if (FontSurface == NULL)
 		return;
 
@@ -247,17 +249,18 @@ void FontSpecifier::render_text_(int n, const char *str)
 	// Non-MacOS-specific: allocate the texture buffer
  	// Its format is LA 88, where L is the luminosity and A is the alpha channel
  	// The font value will go into A.
- 	OGL_Texture[n] = new uint8[2*GetTxtrSize(n)];
+ 	//OGL_Texture[n] = new uint8[2*GetTxtrSize(n)];
+	uint8* OGL_Texture = new uint8[TxtrWidth*TxtrHeight*2];
 
 	// Copy the SDL surface into the OpenGL texture
 	uint8 *PixBase = (uint8 *)FontSurface->pixels;
 	int Stride = FontSurface->pitch;
 
-	for (int k = 0; k < TxtrHeight[n]; k++)
+	for (int k = 0; k < TxtrHeight; k++)
 	{
 		uint8 *SrcPxl = PixBase + k * Stride + 1; // Use one of the middle channels (red or green or blue)
-		uint8 *DstPxl = OGL_Texture[n] + 2 * k * TxtrWidth[n];
-		for (int m = 0; m < TxtrWidth[n]; m++)
+		uint8 *DstPxl = OGL_Texture + 2 * k * TxtrWidth;
+		for (int m = 0; m < TxtrWidth; m++)
 		{
 			*(DstPxl++) = 0xff; // Base color: white (will be modified with glColorxxx())
 			*(DstPxl++) = *SrcPxl;
@@ -270,28 +273,29 @@ void FontSpecifier::render_text_(int n, const char *str)
 
 	// OpenGL stuff starts here
 	// Load texture
-	glGenTextures(1, &TxtrID[n]);
-	glBindTexture(GL_TEXTURE_2D, TxtrID[n]);
-	OGL_Register(this);
+	GLuint n;
+	glGenTextures(1, &n);
+	glBindTexture(GL_TEXTURE_2D, n);
+	//OGL_Register(this);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, TxtrWidth[n], TxtrHeight[n],
-							 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, OGL_Texture[n]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, TxtrWidth, TxtrHeight,
+							 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, OGL_Texture);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Allocate and create display lists of rendering commands
 	// DispList = glGenLists(256);
-	GLfloat TWidNorm = GLfloat(1) / TxtrWidth[n];
-	GLfloat THtNorm = GLfloat(1) / TxtrHeight[n];
+	GLfloat TWidNorm = GLfloat(1) / TxtrWidth;
+	GLfloat THtNorm = GLfloat(1) / TxtrHeight;
 	GLfloat Bottom = (THtNorm * GlyphHeight);
-	GLfloat Right = TWidNorm * Widths[n];
-	glNewList(DispList + n, GL_COMPILE);
+	GLfloat Right = TWidNorm * Width;
+	//glNewList(DispList + n, GL_COMPILE);
 
 	// Move to the current glyph's (padded) position
 	glTranslatef(-Pad, 0, 0);
@@ -302,22 +306,28 @@ void FontSpecifier::render_text_(int n, const char *str)
 	glTexCoord2f(0, 0);
 	glVertex2d(0, -ascent_p);
 	glTexCoord2f(Right, 0);
-	glVertex2d(Widths[n], -ascent_p);
+	glVertex2d(Width, -ascent_p);
 	glTexCoord2f(Right, Bottom);
-	glVertex2d(Widths[n], descent_p);
+	glVertex2d(Width, descent_p);
 	glTexCoord2f(0, Bottom);
-	glVertex2d(0, descent_p);
+	//glVertex2d(0, descent_p);
 	glEnd();
 
 	// Move to the next glyph's position
-	glTranslated(Widths[n] - Pad, 0, 0);
+	glTranslated(Width - Pad, 0, 0);
 
-	glEndList();
+	// glEndList();
+	glDeleteTextures(1, &n);
+	delete [] OGL_Texture;
 }
+
+#ifdef HAVE_OPENGL
 // Reset the OpenGL fonts; its arg indicates whether this is for starting an OpenGL session
 // (this is to avoid texture and display-list memory leaks and other such things)
 void FontSpecifier::OGL_Reset(bool IsStarting)
 {
+	// do nothing
+	/*
 	// Don't delete these if there is no valid texture;
 	// that indicates that there are no valid texture and display-list ID's.
 	if (!IsStarting && OGL_Texture[1])
@@ -348,15 +358,26 @@ void FontSpecifier::OGL_Reset(bool IsStarting)
 		char str[] = {n, 0};
 		render_text_(n, str);
 	}
+	*/
 }
+
 // Renders a C-style string in OpenGL.
 // assumes screen coordinates and that the left baseline point is at (0,0).
 // Alters the modelview matrix so that the next characters will be drawn at the proper place.
 // One can surround it with glPushMatrix() and glPopMatrix() to remember the original.
 void FontSpecifier::OGL_Render(const char *Text)
 {
-	const char *tp = Text;
+	//const char *tp = Text;
+	std::string cv = "";
+	for(auto it = utf8_iter(Text); ! it.end(); ++it ) {
+		if( it.code() == MAC_LINE_END ) {
+			cv += ' ';
+		} else {
+			cv += it.utf8();
+		}
+	}
 
+	/*
 	// Bug out if no texture to render
 	if (!OGL_Texture[33])
 	{
@@ -364,6 +385,7 @@ void FontSpecifier::OGL_Render(const char *Text)
 		if (!OGL_Texture[33])
 			return;
 	}
+	*/
 	glPushAttrib(GL_ENABLE_BIT);
 
 	glEnable(GL_TEXTURE_2D);
@@ -371,6 +393,8 @@ void FontSpecifier::OGL_Render(const char *Text)
 	glEnable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	render_text_(cv.c_str());
+	/*
 	while (*tp)
 	{
 		if ((unsigned char)*tp < 128)
@@ -422,6 +446,7 @@ void FontSpecifier::OGL_Render(const char *Text)
 			}
 		}
 	}
+	*/
 	glPopAttrib();
 }
 
@@ -430,11 +455,11 @@ void FontSpecifier::OGL_Render(const char *Text)
 void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, short flags)
 {
 	// Copy the text to draw
+	/*
 	char text_to_draw[256];
 	strncpy(text_to_draw, text, 256);
 	text_to_draw[255] = 0;
 
-	/*
 	// Check for wrapping, and if it occurs, be recursive
 	if (flags & _wrap_text) {
 		int last_non_printing_character = 0, text_width = 0;
@@ -481,7 +506,8 @@ void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, sh
 		t_width = TextWidth(text_to_draw);
 	}
 	*/
-	int t_width = TextWidth(text_to_draw) / 2;
+	std::string text_to_draw(text);
+	int t_width = TextWidth(text_to_draw.c_str());
 
 	// Horizontal positioning
 	int x, y;
@@ -518,7 +544,7 @@ void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, sh
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glTranslated(x, y, 0);
-	OGL_Render(text_to_draw);
+	OGL_Render(text_to_draw.c_str());
 	glPopMatrix();
 }
 
@@ -560,6 +586,7 @@ void FontSpecifier::OGL_Deregister(FontSpecifier *F)
 
 #endif // def HAVE_OPENGL
 
+#include <stdio.h>
 // Draw text without worrying about OpenGL vs. SDL mode.
 int FontSpecifier::DrawText(SDL_Surface *s, const char *text, int x, int y, uint32 pixel, bool utf8)
 {

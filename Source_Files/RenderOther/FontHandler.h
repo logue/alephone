@@ -70,7 +70,7 @@ public:
 	short Height;			// How tall is it?
 	short LineSpacing;		// From same positions in each line
 	short Ascent, Descent, Leading;
-	short Widths[256];
+	//short Widths[256];
 	
 	font_info *Info;
 	
@@ -86,7 +86,7 @@ public:
 	int TextWidth(const char *Text);
 
 	// Get width of one character
-	int CharWidth(char c) const { return Widths[static_cast<int>(c)]; }
+	//int CharWidth(char c) const { return Widths[static_cast<int>(c)]; }
 	
 #ifdef HAVE_OPENGL	
 	// Reset the OpenGL fonts; its arg indicates whether this is for starting an OpenGL session
@@ -133,6 +133,7 @@ public:
 #ifdef HAVE_OPENGL
 	// Stuff for OpenGL font rendering: the font texture and a display list for font rendering;
 	// if OGL_Texture is NULL, then there is no OpenGL font texture to render.
+	/*
 	void render_text_(int n, const char* str);
 	uint8 *OGL_Texture[256];
 	short TxtrWidth[256], TxtrHeight[256];
@@ -140,6 +141,8 @@ public:
 	GLuint TxtrID[256];
 	uint32 DispList;
 	boost::unordered_map<std::string, int> textMap;
+	*/
+	void render_text_(const char* str);
 	static std::set<FontSpecifier*> *m_font_registry;
 #endif
 };

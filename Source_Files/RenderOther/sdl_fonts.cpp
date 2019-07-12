@@ -554,26 +554,15 @@ uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) con
 uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style, bool utf8) const
 {
 	int width = 0;
-	if (utf8)
-	{
-		char *temp = process_printable(text, length);
-		TTF_SizeUTF8(get_ttf(style), temp, &width, 0);
-	}
-	else
-	{
-		uint16 *temp = process_macroman(text, length);
-		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
-	}
-	
+	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
 	return width;
 }
 
 int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
 {
 	int width;
-//	static uint16 temp[1024];
-//	mac_roman_to_unicode(text, temp, 1024);
-	uint16 *temp = sjis2utf16(text, 1024);
+	static uint16 temp[1024];
+	mac_roman_to_unicode(text, temp, 1024);
 	TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	if (width < max_width) return strlen(text);
 
@@ -624,7 +613,7 @@ uint16 *ttf_font_info::process_macroman(const char *src, int len) const
 	*p = 0x0;
 	return dst;
 	*/
-	return sjis2utf16(src, len);
+	return reinterpret_cast<uint16*>((char*)src);
 }
 
 uint16 font_info::text_width(const char *text, uint16 style, bool utf8) const

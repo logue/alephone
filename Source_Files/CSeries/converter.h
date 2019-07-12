@@ -14,7 +14,7 @@
 #include <string>
 #include "SDL_ttf.h"
 
-#define MAC_LINE_END 12
+#define MAC_LINE_END 13
 #define _SJIS(str) utf82sjis(str).c_str()
 #define _UTF8(str) sjis2utf8(str).c_str()
 
@@ -33,13 +33,13 @@ inline int utf8_len(const char *t)
 // Detect 2-byte char. (for Shift_JIS)
 inline bool isJChar(unsigned char text)
 {
-    return ((text >= 0x81) && (text <= 0x9f)) || ((text >= 0xe0) && (text <= 0xfc));
+    return (((text >= 0x81) && (text <= 0x9f)) || ((text >= 0xe0) && (text <= 0xfc))) ? true : false;
 }
 
 // Detect 2nd charactor of 2-byte char. (for Shift_JIS)
 inline bool is2ndJChar(unsigned char text)
 {
-    return ((0x7F != text) && (0x40 <= text)) || ((text >= 0xe0) && (text <= 0xfc));
+    return (((0x7F != text) && (0x40 <= text)) || ((text >= 0xe0) && (text <= 0xfc))) ? true : false;
 }
 
 class utf8_iter
@@ -97,6 +97,8 @@ std::string utf82sjis(const std::string &input);
 std::string sjis2utf8(const std::string &input);
 std::string utf82utf16(const std::string &input);
 std::string utf162utf8(const std::string &input);
+
+std::string sjis2utf8(const char *str, size_t len);
 
 typedef unsigned short uint16;
 uint16 sjisChar(char *in, int *step);

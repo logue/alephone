@@ -126,7 +126,7 @@ void parse_mml_stringset(const InfoTree& root)
 		//char cbuf[256];
 		//DeUTF8_C(val.c_str(), val.size(), cbuf, 255);
 		//StringSetRoot[index][cindex] = std::string(cbuf);
-		StringSetRoot[index][cindex] = _SJIS(val.c_str());
+		StringSetRoot[index][cindex] = val.c_str();
 	}
 }
 

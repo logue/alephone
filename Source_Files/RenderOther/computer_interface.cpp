@@ -139,7 +139,7 @@ namespace io = boost::iostreams;
 #define BORDER_INSET 9
 #define FUDGE_FACTOR 1
 
-#define MAC_LINE_END 13
+//#define MAC_LINE_END 13
 
 enum {
 	_reading_terminal,
@@ -324,7 +324,8 @@ static void	set_text_face(struct text_face_data *text_face);
 static void draw_line(char *base_text, short start_index, short end_index, Rect *bounds,
 	terminal_text_t *terminal_text, short *text_face_start_index,
 	short line_number);
-static bool calculate_line(char *base_text, short width, short start_index, 
+static bool calculate_line(terminal_text_t *terminal_text,
+						   char *base_text, short width, short start_index, 
 	short text_end_index, short *end_index);
 static void handle_reading_terminal_keys(short player_index, int32 action_flags);
 static void calculate_bounds_for_object(short flags, Rect *bounds, Rect *source);
@@ -332,7 +333,7 @@ static void display_picture(short picture_id, Rect *frame, short flags);
 static void display_shape(short shape, Rect* frame);
 static void display_picture_with_text(struct player_terminal_data *terminal_data, 
 	Rect *bounds, terminal_text_t *terminal_text, short current_lien);
-static short count_total_lines(char *base_text, short width, short start_index, short end_index);
+static short count_total_lines(terminal_text_t *terminal_text, char *base_text, short width, short start_index, short end_index);
 static void calculate_bounds_for_text_box(short flags, Rect *bounds);
 static void goto_terminal_group(short player_index, terminal_text_t *terminal_text, 
 	short new_group_index);
@@ -416,8 +417,41 @@ static void	set_text_face(struct text_face_data *text_face)
 	current_pixel = SDL_MapRGB(/*world_pixels*/draw_surface->format, color.r, color.g, color.b);
 }
 
+static uint16 get_face(struct text_face_data *text_face)
+{
+	uint16 current_style = styleNormal;
 
-static bool calculate_line(char *base_text, short width, short start_index, short text_end_index, short *end_index)
+	// Set style
+	if (text_face->face & _bold_text)
+		current_style |= styleBold;
+	if (text_face->face & _italic_text)
+		current_style |= styleItalic;
+	if (text_face->face & _underline_text)
+		current_style |= styleUnderline;
+	return current_style;
+
+}
+static struct text_face_data *get_font_changes_for_index(
+	terminal_text_t *data,
+	short index)
+{
+	if( data->font_changes.empty() ) {
+		return NULL;
+	}
+
+	struct text_face_data* face_data = &data->font_changes.back();
+	for( unsigned int i = 0; i < data->font_changes.size(); ++i ) {
+		if( data->font_changes[i].index < index ) {
+			face_data = &data->font_changes[i];
+		} else {
+			break;
+		}
+	}
+	return face_data;
+}
+
+static bool calculate_line(terminal_text_t *terminal_text,
+						   char *base_text, short width, short start_index, short text_end_index, short *end_index)
 {
 	bool done = false;
 
@@ -426,11 +460,23 @@ static bool calculate_line(char *base_text, short width, short start_index, shor
 		
 		// terminal_font no longer a global, since it may change
 		font_info *terminal_font = GetInterfaceFont(_computer_interface_font);
-		TTF_Font* font = ((ttf_font_info*)terminal_font)->m_styles[current_style];
+		// TTF_Font* font = ((ttf_font_info*)terminal_font)->m_styles[current_style];
+		std::string tmp;
+		tmp.reserve(text_end_index - index);
 		while (running_width < width && base_text[index] && base_text[index] != MAC_LINE_END) {
 			int advance;
-			uint16 c = sjisChar(base_text + index, &index);
-			TTF_GlyphMetrics(font, c, NULL, NULL, NULL, NULL, &advance );
+			//uint16 c = sjisChar(base_text + index, &index);
+			//TTF_GlyphMetrics(font, c, NULL, NULL, NULL, NULL, &advance );
+			uint16 style = current_style;
+			char next[4] = {0};
+			sjisChar(base_text + index, &index, next);
+			struct text_face_data *face_data = get_font_changes_for_index(terminal_text, index);
+			if( face_data ) {
+				style = get_face(face_data);
+			}
+			TTF_Font* font = ((ttf_font_info*)terminal_font)->m_styles[style];
+			TTF_SizeUTF8(font, next, &advance, NULL);
+			tmp += next;
 			running_width += advance;
 		}
 		
@@ -557,7 +603,7 @@ void enter_computer_interface(
 	next_terminal_group(player_index, terminal_text);
 }
 
-/*  Assumes ¶t==1 tick */
+/*  Assumes ï¿½t==1 tick */
 void update_player_for_terminal_mode(
 	short player_index)
 {
@@ -866,7 +912,7 @@ static void _draw_computer_text(
 	for(index= 0; index<current_line; ++index)
 	{
 		/* Calculate one line.. */
-		if(!calculate_line(base_text, RECTANGLE_WIDTH(bounds), start_index, current_group->start_index+current_group->length, 
+		if(!calculate_line(terminal_text, base_text, RECTANGLE_WIDTH(bounds), start_index, current_group->start_index+current_group->length, 
 			&end_index))
 		{
 			if(end_index>current_group->start_index+current_group->length)
@@ -928,7 +974,7 @@ static void _draw_computer_text(
 		{
 			//dprintf("calculating the line");
 			/* Calculate one line.. */
-			if(!calculate_line(base_text, RECTANGLE_WIDTH(bounds), start_index, current_group->start_index+current_group->length, &end_index))
+			if(!calculate_line(terminal_text, base_text, RECTANGLE_WIDTH(bounds), start_index, current_group->start_index+current_group->length, &end_index))
 			{
 				//dprintf("draw calculate line: %d start: %d end: %d text: %x length: %d lti: %d", index, start_index, end_index, base_text, current_group->length, last_text_index);
 				if(end_index>current_group->start_index+current_group->length)
@@ -952,6 +998,7 @@ static void _draw_computer_text(
 }
 
 static short count_total_lines(
+	terminal_text_t *terminal_text,
 	char *base_text,
 	short width,
 	short start_index,
@@ -964,7 +1011,7 @@ static short count_total_lines(
 	current_style = GetInterfaceStyle(_computer_interface_font);
 	// current_style = _get_font_spec(_computer_interface_font)->style;
 
-	while(!calculate_line(base_text, width, start_index, text_end_index, &end_index))
+	while(!calculate_line(terminal_text, base_text, width, start_index, text_end_index, &end_index))
 	{
 		total_line_count++;
 		start_index= end_index;
@@ -1027,8 +1074,11 @@ static void draw_line(
 				(*text_face_start_index)= text_index;
 			}
 		}
-
-		xpos += draw_text(/*world_pixels*/ draw_surface, base_text + current_start, current_end - current_start,
+		std::string p = sjis2utf8(base_text + current_start, current_end - current_start);
+		//xpos += draw_text(/*world_pixels*/ draw_surface, base_text + current_start, current_end - current_start,
+		//                  xpos, bounds->top + line_height * (line_number + FUDGE_FACTOR),
+		//                  current_pixel, terminal_font, current_style);
+		xpos += draw_text(/*world_pixels*/ draw_surface, p.c_str(), p.size(),
 		                  xpos, bounds->top + line_height * (line_number + FUDGE_FACTOR),
 		                  current_pixel, terminal_font, current_style);
 		if(current_end!=end_index)
@@ -1174,7 +1224,7 @@ static void display_picture(
 
 		int pict_header_width = get_pict_header_width(PictRsrc);
 		bool cinemascopeHack = false;
-		if (bounds.right != pict_header_width)
+		if (bounds.right == 614 && pict_header_width == 307)
 		{
 			cinemascopeHack = true;
 			bounds.right = pict_header_width;
@@ -1668,7 +1718,7 @@ static void goto_terminal_group(
 	
 				/* The only thing we care about is the width. */
 				calculate_bounds_for_text_box(current_group->flags, &text_bounds);
-				terminal_data->maximum_line= count_total_lines(get_text_base(terminal_text),
+				terminal_data->maximum_line= count_total_lines(terminal_text,get_text_base(terminal_text),
 					RECTANGLE_WIDTH(&text_bounds), current_group->start_index, 
 					current_group->start_index+current_group->length);
 			}
@@ -1683,7 +1733,7 @@ static void goto_terminal_group(
 			} else {
 				/* Calculate this for ourselves. */
                 Rect bounds= get_term_rectangle(_terminal_full_text_rect);
-				terminal_data->maximum_line= count_total_lines(get_text_base(terminal_text),
+				terminal_data->maximum_line= count_total_lines(terminal_text,get_text_base(terminal_text),
 					RECTANGLE_WIDTH(&bounds), current_group->start_index,
 					current_group->start_index+current_group->length);
 			}
@@ -2018,7 +2068,8 @@ static void calculate_bounds_for_object(
 
 #define MAXIMUM_GROUPS_PER_TERMINAL 15
 
-static void calculate_maximum_lines_for_groups(struct terminal_groupings *groups, 
+static void calculate_maximum_lines_for_groups(terminal_text_t *terminal_text,
+											   struct terminal_groupings *groups, 
 	short group_count, char *text_base);
 
 class MarathonTerminalCompiler
@@ -2127,7 +2178,7 @@ terminal_text_t* MarathonTerminalCompiler::Compile()
 	terminal->text = out;
 
 	terminal->lines_per_page = calculate_lines_per_page();
-	calculate_maximum_lines_for_groups(&terminal->groupings[0], terminal->groupings.size(), reinterpret_cast<char*>(terminal->text.data()));
+	calculate_maximum_lines_for_groups(&*terminal,&terminal->groupings[0], terminal->groupings.size(), reinterpret_cast<char*>(terminal->text.data()));
 
 	return terminal.release();
 }
@@ -2409,6 +2460,7 @@ void MarathonTerminalCompiler::BuildFailureGroup()
 }
 
 static void calculate_maximum_lines_for_groups(
+	terminal_text_t *terminal_text,
 	struct terminal_groupings *groups,
 	short group_count,
 	char *text_base)
@@ -2446,7 +2498,7 @@ static void calculate_maximum_lines_for_groups(
 		
 					/* The only thing we care about is the width. */
 					calculate_bounds_for_text_box(groups[index].flags, &text_bounds);
-					groups[index].maximum_line_count= count_total_lines(text_base,
+					groups[index].maximum_line_count= count_total_lines(terminal_text,text_base,
 						RECTANGLE_WIDTH(&text_bounds), groups[index].start_index, 
 						groups[index].start_index+groups[index].length);
 				}
@@ -2456,7 +2508,7 @@ static void calculate_maximum_lines_for_groups(
 				{
 					Rect text_bounds= get_term_rectangle(_terminal_full_text_rect);
 		
-					groups[index].maximum_line_count= count_total_lines(text_base,
+					groups[index].maximum_line_count= count_total_lines(terminal_text,text_base,
 						RECTANGLE_WIDTH(&text_bounds), groups[index].start_index, 
 						groups[index].start_index+groups[index].length);
 				}
@@ -2487,6 +2539,7 @@ static struct text_face_data *get_indexed_font_changes(
 
 	return &data->font_changes[index];
 }
+// 0 13 22 29
 
 static char *get_text_base(
 	terminal_text_t *data)
