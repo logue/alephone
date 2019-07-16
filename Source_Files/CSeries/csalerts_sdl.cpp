@@ -155,11 +155,11 @@ extern bool MainScreenVisible(void);
 void alert_user(const char *message, short severity) 
 {
   if (!MainScreenVisible()) {
-	SDL_ShowSimpleMessageBox(severity == infoError ? SDL_MESSAGEBOX_WARNING : SDL_MESSAGEBOX_ERROR, severity == infoError ? "Warning" : "Error", message, NULL);
+	SDL_ShowSimpleMessageBox(severity == infoError ? SDL_MESSAGEBOX_WARNING : SDL_MESSAGEBOX_ERROR, severity == infoError ? "警告" : "エラー", message, NULL);
   } else {
     dialog d;
     vertical_placer *placer = new vertical_placer;
-    placer->dual_add(new w_title(severity == infoError ? "WARNING" : "ERROR"), d);
+    placer->dual_add(new w_title(severity == infoError ? "警告" : "エラー"), d);
     placer->add(new w_spacer, true);
     
     // Wrap lines
@@ -187,7 +187,7 @@ void alert_user(const char *message, short severity)
     }
     free(p);
     placer->add(new w_spacer, true);
-    w_button *button = new w_button(severity == infoError ? "OK" : "QUIT", dialog_ok, &d);
+    w_button *button = new w_button(severity == infoError ? "OK" : "終了", dialog_ok, &d);
     placer->dual_add (button, d);
     d.set_widget_placer(placer);
 

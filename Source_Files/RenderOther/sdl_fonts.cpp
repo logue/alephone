@@ -542,7 +542,7 @@ int sdl_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 int8 ttf_font_info::char_width(uint8 c, uint16 style) const
 {
 	int advance;
-	TTF_GlyphMetrics(get_ttf(style), mac_roman_to_unicode(static_cast<char>(c)), 0, 0, 0, 0, &advance);
+	TTF_GlyphMetrics(get_ttf(style), static_cast<char>(c), 0, 0, 0, 0, &advance);
 
 	return advance;
 }
@@ -554,6 +554,20 @@ uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) con
 uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style, bool utf8) const
 {
 	int width = 0;
+	/*
+	if (utf8)
+	{
+		char *temp = process_printable(text, length);
+		TTF_SizeUTF8(get_ttf(style), temp, &width, 0);
+		
+	}
+	else
+	{
+		uint16 *temp = process_macroman(text, length);
+		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	}
+	*/
+	// AlephOne JP does not use Unicode
 	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
 	return width;
 }

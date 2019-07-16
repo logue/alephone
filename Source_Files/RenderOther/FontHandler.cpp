@@ -105,7 +105,7 @@ void FontSpecifier::Update()
 	TextSpec Spec;
 	Spec.size = Size;
 	Spec.style = Style;
-	Spec.adjust_height = -4;
+	Spec.adjust_height = AdjustLineHeight;
 
 	// Simply implements format "#<value>"; may want to generalize this
 	if (File[0] == '#') 
@@ -188,7 +188,7 @@ void FontSpecifier::render_text_(const char* str)
 	int EstDim = int(sqrt(static_cast<float>(TotalWidth*GlyphHeight)) + 0.5);
 	TxtrWidth[n] = MAX(128, NextPowerOfTwo(EstDim));
 	*/
-	int TotalWidth = TextWidth(str)+Pad*2;
+	int TotalWidth = TextWidth(str) + Pad * 2;
 	int Width = TotalWidth;
 	int TxtrWidth = MAX(64, NextPowerOfTwo(TotalWidth));
 
@@ -250,7 +250,7 @@ void FontSpecifier::render_text_(const char* str)
  	// Its format is LA 88, where L is the luminosity and A is the alpha channel
  	// The font value will go into A.
  	//OGL_Texture[n] = new uint8[2*GetTxtrSize(n)];
-	uint8* OGL_Texture = new uint8[TxtrWidth*TxtrHeight*2];
+	uint8* OGL_Texture = new uint8[TxtrWidth * TxtrHeight * 2];
 
 	// Copy the SDL surface into the OpenGL texture
 	uint8 *PixBase = (uint8 *)FontSurface->pixels;
@@ -310,7 +310,7 @@ void FontSpecifier::render_text_(const char* str)
 	glTexCoord2f(Right, Bottom);
 	glVertex2d(Width, descent_p);
 	glTexCoord2f(0, Bottom);
-	//glVertex2d(0, descent_p);
+	glVertex2d(0, descent_p);
 	glEnd();
 
 	// Move to the next glyph's position
@@ -506,6 +506,7 @@ void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, sh
 		t_width = TextWidth(text_to_draw);
 	}
 	*/
+	// Copy the text to draw
 	std::string text_to_draw(text);
 	int t_width = TextWidth(text_to_draw.c_str());
 
@@ -596,7 +597,6 @@ int FontSpecifier::DrawText(SDL_Surface *s, const char *text, int x, int y, uint
 		return draw_text(s, text, x, y, pixel, this->Info, this->Style, utf8);
 
 #ifdef HAVE_OPENGL
-
 	uint8 r, g, b;
 	SDL_GetRGB(pixel, s->format, &r, &g, &b);
 	glColor4ub(r, g, b, 255);
