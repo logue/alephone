@@ -2,14 +2,14 @@
 
 AlephOne日本語版ではターミナルテキストなどゲーム内で使用するフォントは、以下のように日本語対応のフォントに差し替えて実装しています。
 
-|ID |オリジナル版       |英語版                     |日本語版               |備考
-|---|-------------------|---------------------------|-----------------------|------------------------------------------
-|4  |Monaco             |ProFontAO                  |k8x12L                 |HUD向けフォント
-|22 |Courier            |Courier Prime              |NotoSansMonoCJK        |汎用フォント（ターミナルテキストなどで使用）
-|   |Courier(Bold)      |Courier Prime Bold         |NotoSansMonoBoldCJK    |汎用ボールドフォント
-|   |Courier(Italic)    |Courier Prime Italic       |
-|   |Courier(BoldItalic)|Courier Prime BoldItalic   |
-|   |mono               |AlephSansMono-Bold         |AlephJPSansMono-Bold   |ダイアログ表示用フォント
+|ID |オリジナル版       |英語版                     |日本語版                   |備考
+|---|-------------------|---------------------------|---------------------------|------------------------------------------
+|4  |Monaco             |ProFontAO                  |k8x12L                     |HUD向けフォント
+|22 |Courier            |Courier Prime              |源ノ等幅                   |汎用フォント（ターミナルテキストなどで使用）
+|   |Courier(Bold)      |Courier Prime Bold         |源ノ等幅ボールド           |汎用ボールドフォント
+|   |Courier(Italic)    |Courier Prime Italic       |源ノ等幅イタリック
+|   |Courier(BoldItalic)|Courier Prime BoldItalic   |源ノ等幅イタリックボールド
+|   |mono               |AlephSansMono-Bold         |AlephJPSansMono-Bold       |ダイアログ表示用フォント
 
 AlephOne JPで使用できる文字は、Shift JISに含まれる文字のみです。このため、配布されているフォントをそのまま使用するのではなく、
 [サブセットフォントメーカー](https://opentype.jp/subsetfontmk.htm)などで使用しない文字を削除して`bin2h`などのツールでttfをヘッダーファイル化します。これにより、フォントの容量が書体あたり1.6M程度になります。
@@ -22,7 +22,9 @@ AlephOne JPで使用できる文字は、Shift JISに含まれる文字のみで
 
 英語版では、HUDのテキストはボールドになっていますが、日本語版では文字のスペースの都合上、ボールドは解除しています。
 
-また、NotoSansMonoBoldCJKのボールドフォントとボールドイタリックフォントはないため、SDL_Fontの機能でこれらを実装しています。
+また、ターミナルテキストなどで使われる源ノ等幅フォントには日本語の部分にイタリックがないため、FontForgeで15度傾けて再現しています。
+
+英語圏向けシナリオを読み込ませたときのターミナルテキストの文字のレイアウトは概ね等しくなっています。
 
 ## AlephJPSansMono-Boldについて
 
@@ -51,7 +53,7 @@ bin2h.exe -cz SourceHanMonoRegular <SourceHanMono-Regular-subset.otf> SourceHanM
 
 * フォント
   * [M+ Font](https://mplus-fonts.osdn.jp/)
-  * [NotoCJK](https://github.com/googlefonts/noto-cjk)
+  * [源ノ等幅](https://github.com/adobe-fonts/source-han-mono)
   * [k8x12](http://littlelimit.net/k8x12.htm)
 * ツール
   * [FontForge](https://fontforge.sf.net/)
