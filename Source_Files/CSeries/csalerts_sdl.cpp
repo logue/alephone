@@ -63,9 +63,9 @@ void system_alert_user(const char* message, short severity)
 	} else {
 		type = MB_ICONERROR|MB_OK;
 	}
-	MessageBox(NULL, message, severity == infoError ? "Warning" : "Error", type);
+	MessageBox(NULL, message, severity == infoError ? "警告" : "エラー", type);
 #else
-	fprintf(stderr, "%s: %s\n", severity == infoError ? "INFO" : "FATAL", message);
+	fprintf(stderr, "%s: %s\n", severity == infoError ? "情報" : "致命的エラー", message);
 #endif	
 }
 

@@ -289,7 +289,7 @@ void w_saves::draw_item(QuickSaves::iterator it, SDL_Surface *s, int16 x, int16 
     std::string game_time = it->formatted_ticks;
     if (it->players > 1)
     {
-        game_time += " (Cooperative Play)";
+        game_time += "（協力プレイ）";
     }
     draw_text(s, game_time.c_str(), x, y, color, font, style);
 
@@ -340,16 +340,16 @@ static void dialog_rename(void *arg)
     horizontal_placer *name_placer = new horizontal_placer;
     w_text_entry *rename_w = new w_save_name(&rd, utf8_to_mac_roman(sel.name).c_str());
     rename_w->enable_mac_roman_input();
-    name_placer->dual_add(rename_w->label("Name: "), rd);
+    name_placer->dual_add(rename_w->label("名前："), rd);
     name_placer->dual_add(rename_w, rd);
     placer->add(name_placer, true);
 
     placer->add(new w_spacer(), true);
 
     horizontal_placer *button_placer = new horizontal_placer;
-    w_button *accept_w = new w_button("RENAME", dialog_ok, &rd);
+    w_button *accept_w = new w_button("リネーム", dialog_ok, &rd);
     button_placer->dual_add(accept_w, rd);
-    w_button *cancel_w = new w_button("CANCEL", dialog_cancel, &rd);
+    w_button *cancel_w = new w_button("キャンセル", dialog_cancel, &rd);
     button_placer->dual_add(cancel_w, rd);
     placer->add(button_placer, true);
 
@@ -371,7 +371,7 @@ static void dialog_delete(void *arg)
     dialog rd;
     vertical_placer *placer = new vertical_placer;
     placer->add(new w_spacer, true);
-    placer->dual_add(new w_static_text("Delete this save?"), rd);
+    placer->dual_add(new w_static_text("このセーブを削除してもよろしいですか？"), rd);
     placer->add(new w_spacer, true);
 
     std::vector<QuickSave> saves;
@@ -381,9 +381,9 @@ static void dialog_delete(void *arg)
     placer->add(new w_spacer, true);
 
     horizontal_placer *button_placer = new horizontal_placer;
-    w_button *accept_w = new w_button("DELETE", dialog_ok, &rd);
+    w_button *accept_w = new w_button("削除", dialog_ok, &rd);
     button_placer->dual_add(accept_w, rd);
-    w_button *cancel_w = new w_button("CANCEL", dialog_cancel, &rd);
+    w_button *cancel_w = new w_button("キャンセル", dialog_cancel, &rd);
     button_placer->dual_add(cancel_w, rd);
     placer->add(button_placer, true);
     rd.set_widget_placer(placer);
@@ -444,20 +444,20 @@ bool load_quick_save_dialog(FileSpecifier &saved_game)
 
     dialog d;
     vertical_placer *placer = new vertical_placer;
-    w_title *w_header = new w_title(_SJIS("ゲームを再開する"));
+    w_title *w_header = new w_title("ゲームを再開する");
     placer->dual_add(w_header, d);
     placer->add(new w_spacer, true);
 
     horizontal_placer *mini_button_placer = new horizontal_placer;
-    w_tiny_button *rename_w = new w_tiny_button(_SJIS("リネーム"), dialog_rename, &d);
+    w_tiny_button *rename_w = new w_tiny_button("リネーム", dialog_rename, &d);
     rename_w->set_identifier(iDIALOG_RENAME_W);
     mini_button_placer->dual_add(rename_w, d);
 #ifndef MAC_APP_STORE
-    w_tiny_button *export_w = new w_tiny_button(_SJIS("エクスポート"), dialog_export, &d);
+    w_tiny_button *export_w = new w_tiny_button("エクスポート", dialog_export, &d);
     export_w->set_identifier(iDIALOG_EXPORT_W);
     mini_button_placer->dual_add(export_w, d);
 #endif
-    w_tiny_button *delete_w = new w_tiny_button(_SJIS("削除"), dialog_delete, &d);
+    w_tiny_button *delete_w = new w_tiny_button("削除", dialog_delete, &d);
     delete_w->set_identifier(iDIALOG_DELETE_W);
     mini_button_placer->dual_add(delete_w, d);
 
@@ -472,13 +472,13 @@ bool load_quick_save_dialog(FileSpecifier &saved_game)
 
     horizontal_placer *button_placer = new horizontal_placer;
 #ifndef MAC_APP_STORE
-    w_button *other_w = new w_button(_SJIS("他を読み込む"), dialog_exit_other, &d);
+    w_button *other_w = new w_button("他を読み込む", dialog_exit_other, &d);
     button_placer->dual_add(other_w, d);
 #endif
-    w_button *accept_w = new w_button(_SJIS("読み込む"), dialog_ok, &d);
+    w_button *accept_w = new w_button("読み込む", dialog_ok, &d);
     accept_w->set_identifier(iDIALOG_ACCEPT_W);
     button_placer->dual_add(accept_w, d);
-    w_button *cancel_w = new w_button(_SJIS("キャンセル"), dialog_cancel, &d);
+    w_button *cancel_w = new w_button("キャンセル", dialog_cancel, &d);
     button_placer->dual_add(cancel_w, d);
 
     placer->add(button_placer, true);

@@ -61,9 +61,10 @@ using std::map;
 */
 #include "jp-fonts/AlephJPSansMono-Bold.h"
 #include "jp-fonts/k8x12L.h"
-#include "jp-fonts/NotoSansMonoSjis.h"
-#include "jp-fonts/NotoSansMonoBoldSjis.h"
-
+#include "jp-fonts/SourceHanMono-Regular.h"
+#include "jp-fonts/SourceHanMono-RegularIt.h"
+#include "jp-fonts/SourceHanMono-Bold.h"
+#include "jp-fonts/SourceHanMono-BoldIt.h"
 // Global variables
 typedef pair<int, int> id_and_size_t;
 typedef map<id_and_size_t, sdl_font_info *> font_list_t;
@@ -99,8 +100,10 @@ static builtin_font_t builtin_fontspecs[] = {
 */
 	{ "mono", AlephJPSansMonoBold, sizeof(AlephJPSansMonoBold) },
 	{ "Monaco", k8x12L, sizeof(k8x12L) },
-	{ "Courier Prime", NotoSansMonoSjis, sizeof(NotoSansMonoSjis) },
-	{ "Courier Prime Bold", NotoSansMonoBoldSjis, sizeof(NotoSansMonoBoldSjis) },
+	{ "Courier Prime", SourceHanMonoRegular, sizeof(SourceHanMonoRegular) },
+	{ "Courier Prime Bold", SourceHanMonoBold, sizeof(SourceHanMonoBold) },
+	{ "Courier Prime Italic", SourceHanMonoRegularIt, sizeof(SourceHanMonoRegularIt) },
+	{" Courier Prime Bold Italic", SourceHanMonoBoldIt, sizeof(SourceHanMonoBoldIt) }
 };
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)

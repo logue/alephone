@@ -80,9 +80,9 @@ void StatsManager::Finish()
 	{
 		dialog d;
 		vertical_placer* placer = new vertical_placer;
-		placer->dual_add(new w_static_text(_SJIS("ó‹µ‚ðƒAƒbƒvƒ[ƒh‚µ‚Ä‚¢‚Ü‚·B")), d);
+		placer->dual_add(new w_static_text("çŠ¶æ³ã‚’ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã—ã¦ã„ã¾ã™ã€‚"), d);
 		placer->add(new w_spacer, true);
-		w_button *button = new w_button(_SJIS("ƒLƒƒƒ“ƒZƒ‹"), dialog_cancel, &d);
+		w_button *button = new w_button("ã‚­ãƒ£ãƒ³ã‚»ãƒ«", dialog_cancel, &d);
 		placer->dual_add(button, d);
 		d.set_widget_placer(placer);
 		d.activate_widget(button);
