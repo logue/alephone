@@ -129,7 +129,7 @@ void FontSpecifier::Update()
 			Spec.oblique = "Courier Prime Italic";
 			Spec.bold_oblique = "Courier Prime Bold Italic";
 			//Spec.adjust_height -= Size * 0.084f;
-			Spec.size = 10;
+			Spec.size = 11;
 			Spec.adjust_height = -3.8;
 		}
 	}
