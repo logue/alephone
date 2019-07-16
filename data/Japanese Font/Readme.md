@@ -40,6 +40,13 @@ AlephOneJPで使用できる文字は、原則的にはShift_JISの範囲のみ�
 
 このテキストファイルを[サブセットフォントメーカー](https://opentype.jp/subsetfontmk.htm)に読み込ませて必要な書体のみを抽出して使用します。
 
+## ヘッダーファイル化
+
+```
+bin2h.exe -cz [変数名] <[対象ファイル名]> [出力先ファイル名].h
+bin2h.exe -cz SourceHanMonoRegular <SourceHanMono-Regular-subset.otf> SourceHanMono-Regular.h
+```
+
 ## リンク
 
 * フォント
