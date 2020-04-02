@@ -4,7 +4,7 @@
 family = "AlephJPSansMono"
 
 
-Open("mplus-1mn-bold.ttf")
+Open("mplus-1mn-bold.otf")
 
 # IPAゴシックの高さをDejaVu Sans Monoに揃える
 ScaleToEm(2048)
