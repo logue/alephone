@@ -1545,7 +1545,7 @@ static const char* sMouseButtonKeyName[NUM_SDL_MOUSE_BUTTONS] = {
 
 static const char* sJoystickButtonKeyName[NUM_SDL_JOYSTICK_BUTTONS] = {
 	"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
-	"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
+	"左スティックボタン", "右スティックボタン", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
 	"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
 	"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
 };

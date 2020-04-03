@@ -303,8 +303,8 @@ GatherDialog::~GatherDialog()
 bool GatherDialog::GatherNetworkGameByRunning ()
 {
 	vector<string> chat_choice_labels;
-	chat_choice_labels.push_back ("参加者と");
-	chat_choice_labels.push_back ("インターネットのプレイヤーと");
+	chat_choice_labels.push_back ("参加者");
+	chat_choice_labels.push_back ("ネット上のプレイヤー");
 	m_chatChoiceWidget->set_labels (chat_choice_labels);
 
 	m_cancelWidget->set_callback(boost::bind(&GatherDialog::Stop, this, false));
@@ -561,8 +561,8 @@ const int JoinDialog::JoinNetworkGameByRunning ()
 	join_result = kNetworkJoinFailedUnjoined;
 	
 	vector<string> chat_choice_labels;
-	chat_choice_labels.push_back ("参加者／募集者と");
-	chat_choice_labels.push_back ("インターネットのプレイヤーと");
+	chat_choice_labels.push_back ("参加者／募集者");
+	chat_choice_labels.push_back ("ネット上のプレイヤー");
 	m_chatChoiceWidget->set_labels (chat_choice_labels);
 
 	m_colourWidget->set_labels (kTeamColorsStringSetID);
@@ -2353,7 +2353,7 @@ void display_net_game_stats(void)
     dialog d;
     
     vertical_placer *placer = new vertical_placer;
-    placer->dual_add(new w_title("POSTGAME CARNAGE REPORT"), d);
+    placer->dual_add(new w_title("殺戮レポート"), d);
     
     horizontal_placer *graph_type_placer = new horizontal_placer;
     w_select* graph_type_w = new w_select(0, NULL);
@@ -2377,11 +2377,11 @@ void display_net_game_stats(void)
 
     carnage_placer->add_flags((placeable::placement_flags) ((int) placeable::kAlignLeft | (int) placeable::kFill));
     // (total kills) and (total deaths) will be replaced by update_carnage_summary() or set to "".
-    w_static_text*  total_kills_w = new w_static_text("(total kills)");
+    w_static_text*  total_kills_w = new w_static_text("（総殺傷数）");
     total_kills_w->set_identifier(iTOTAL_KILLS);
     carnage_placer->dual_add(total_kills_w, d);
 
-    w_static_text*  total_deaths_w = new w_static_text("(total deaths)");
+    w_static_text*  total_deaths_w = new w_static_text("（総死傷数）");
     total_deaths_w->set_identifier(iTOTAL_DEATHS);
     carnage_placer->dual_add(total_deaths_w, d);
     

@@ -551,6 +551,7 @@ int8 ttf_font_info::char_width(uint8 c, uint16 style) const
 }
 uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) const
 {
+	// TODO:ここの処理でクラッシュする
 	return _text_width(text, strlen(text), style, utf8);
 }
 
@@ -570,7 +571,7 @@ uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style,
 		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	}
 	*/
-	// AlephOne JP does not use Unicode
+	// AlephOne JPは常にUTF-8で処理をする。
 	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
 	return width;
 }
@@ -579,8 +580,10 @@ int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 {
 	int width;
 	static uint16 temp[1024];
-	mac_roman_to_unicode(text, temp, 1024);
-	TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	//mac_roman_to_unicode(text, temp, 1024);
+	//TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
+
 	if (width < max_width) return strlen(text);
 
 	int num = strlen(text) - 1;

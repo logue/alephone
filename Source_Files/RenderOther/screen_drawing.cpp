@@ -148,7 +148,7 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Monaco",   9, styleNormal,  0, "#4"},
 	{"Monaco",   9, styleNormal,0, "#4"},
 	{"Courier", 12, styleNormal,0, "#22"},
-	{"Courier", 14, styleBold,  0, "#22"},
+	{"Courier", 12, styleBold,  0, "#22"},
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
 // LP change: hardcoding the interface and player colors,

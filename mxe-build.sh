@@ -3,7 +3,7 @@
 MINGW_ROOT=/home/$USER/mxe
 # And don't touch anything below this for now.
 MINGW_PREFIX=$MINGW_ROOT/usr
-MINGW_TARGET=x86_64-w64-mingw32.static
+MINGW_TARGET=i686-w64-mingw32.static
 MINGW_PATH="$MINGW_PREFIX/$MINGW_TARGET/bin:$MINGW_PREFIX/bin"
 STD_PATH="/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/X11/bin" # Get the path for the user you are compiling this under and put it here.
  

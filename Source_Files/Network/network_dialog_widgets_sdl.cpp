@@ -161,7 +161,7 @@ w_found_players::callback_on_all_items() {
 
 void
 w_found_players::draw_item(vector<prospective_joiner_info>::const_iterator i, SDL_Surface *s, int16 x, int16 y, uint16 width, bool selected) const {
-	auto text = std::string(i->name) + (i->gathering ? " (gathering)" : "");
+	auto text = std::string(i->name) + (i->gathering ? "（募集中）" : "");
 	int computed_x = x + (width - text_width(text.c_str(), font, style)) / 2;
 	int computed_y = y + font->get_ascent();
 	int text_state = i->gathering ? DISABLED_STATE : selected ? ACTIVE_STATE : DEFAULT_STATE;
