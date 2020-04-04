@@ -140,16 +140,16 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
 */
-// HUDÇÃÉ{Å[ÉãÉhÇâèú
+// HUD„ÅÆ„Éú„Éº„É´„Éâ„ÇíËß£Èô§
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleNormal,  0, "#4"},
 	{"Monaco",   9, styleNormal,  0, "#4"},
 	{"Monaco",   9, styleNormal,  0, "#4"},
-	{"Monaco",   9, styleNormal,0, "#4"},
-	{"Courier", 12, styleNormal,0, "#22"},
-	{"Courier", 12, styleBold,  0, "#22"},
-	{"Monaco",   9, styleNormal,0, "#4"}
+	{"Monaco",   9, styleNormal,  0, "#4"},
+	{"Courier", 12, styleNormal,  0, "#22"},
+	{"Courier", 14, styleBold,    0, "#22"},
+	{"Monaco",   9, styleNormal,  0, "#4"}
 };
 // LP change: hardcoding the interface and player colors,
 // so as to banish the 'clut' resources

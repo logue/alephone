@@ -7,7 +7,8 @@ SUBDIRS += Expat
 endif
 
 if MAKE_WINDOWS
-bin_PROGRAMS = AlephOne Marathon Marathon2 MarathonInfinity
+# bin_PROGRAMS = AlephOne Marathon Marathon2 MarathonInfinity
+bin_PROGRAMS = AlephOne
 else
 bin_PROGRAMS = alephone
 endif
