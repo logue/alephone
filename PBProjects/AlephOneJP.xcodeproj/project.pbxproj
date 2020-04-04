@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,9 +74,9 @@
 		2748BDD71CC405130082F0E1 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; };
 		2748BDD81CC405140082F0E1 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; };
 		2748BDD91CC405140082F0E1 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; };
-		2748BDDD1CC4052B0082F0E1 /* SDL2_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2748BDDD1CC4052B0082F0E1 /* SDL2_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2748BDDE1CC4052B0082F0E1 /* SDL2_net.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5C1BD2DA0C00A95619 /* SDL2_net.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		2748BDDF1CC4052B0082F0E1 /* SDL2_ttf.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5D1BD2DA0C00A95619 /* SDL2_ttf.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2748BDDF1CC4052B0082F0E1 /* SDL2_ttf.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5D1BD2DA0C00A95619 /* SDL2_ttf.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2748BDE01CC4052B0082F0E1 /* SDL2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5E1BD2DA0C00A95619 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2748BDE11CC405330082F0E1 /* SDL2_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2748BDE21CC405330082F0E1 /* SDL2_net.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5C1BD2DA0C00A95619 /* SDL2_net.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -90,11 +90,9 @@
 		2748BDEA1CC4053F0082F0E1 /* SDL2_net.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5C1BD2DA0C00A95619 /* SDL2_net.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2748BDEB1CC4053F0082F0E1 /* SDL2_ttf.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5D1BD2DA0C00A95619 /* SDL2_ttf.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2748BDEC1CC4053F0082F0E1 /* SDL2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E5DD5E1BD2DA0C00A95619 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		274D109D2166BBB300C8F77A /* webp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D109C2166BBB300C8F77A /* webp.framework */; };
 		274D109E2166BBB300C8F77A /* webp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D109C2166BBB300C8F77A /* webp.framework */; };
 		274D109F2166BBB300C8F77A /* webp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D109C2166BBB300C8F77A /* webp.framework */; };
 		274D10A02166BBB300C8F77A /* webp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D109C2166BBB300C8F77A /* webp.framework */; };
-		274D10A52166BBD300C8F77A /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D10A42166BBCD00C8F77A /* FreeType.framework */; };
 		274D10A62166BBD400C8F77A /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D10A42166BBCD00C8F77A /* FreeType.framework */; };
 		274D10A72166BBD400C8F77A /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D10A42166BBCD00C8F77A /* FreeType.framework */; };
 		274D10A82166BBD600C8F77A /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274D10A42166BBCD00C8F77A /* FreeType.framework */; };
@@ -2751,11 +2749,9 @@
 				270F9FD0177687B7009AAE10 /* avcodec.framework in Frameworks */,
 				278BCAEF1A51C53C006F9756 /* speexdsp.framework in Frameworks */,
 				2762A3331AAA51D900B807D4 /* boost_filesystem.framework in Frameworks */,
-				274D10A52166BBD300C8F77A /* FreeType.framework in Frameworks */,
 				274D10AE2166BCCC00C8F77A /* webp.framework in Frameworks */,
 				98457C8A238A1BDE00E12B72 /* boost_locale.framework in Frameworks */,
 				270F9FD4177687B7009AAE10 /* avformat.framework in Frameworks */,
-				274D109D2166BBB300C8F77A /* webp.framework in Frameworks */,
 				27E5DD601BD2DA0C00A95619 /* SDL2_net.framework in Frameworks */,
 				270F9FD8177687B7009AAE10 /* avutil.framework in Frameworks */,
 				98457CB5238A1DB800E12B72 /* libiconv.tbd in Frameworks */,
@@ -2841,6 +2837,7 @@
 				29B97323FDCFA39411CA2CEA /* System Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
+			indentWidth = 2;
 			name = "SDL Application";
 			sourceTree = "<group>";
 		};
@@ -4706,7 +4703,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1140;
 				TargetAttributes = {
 					AE505B3A141D45E600915344 = {
 						SystemCapabilities = {
@@ -4731,8 +4728,8 @@
 					};
 				};
 			};
-			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */;
-			compatibilityVersion = "Xcode 10.0";
+			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */;
+			compatibilityVersion = "Xcode 11.4";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -5986,6 +5983,7 @@
 		AE2A41530B5EFC1F00C567E6 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
 					HAVE_BUNDLE_NAME,
@@ -5999,6 +5997,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
 				PRODUCT_NAME = "Aleph One";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
@@ -6085,8 +6084,9 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -6116,6 +6116,7 @@
 		AE2A41760B5EFEA000C567E6 /* Deployment (Native) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
 					HAVE_BUNDLE_NAME,
@@ -6129,6 +6130,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
 				PRODUCT_NAME = "Aleph One";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Deployment (Native)";
@@ -6215,7 +6217,8 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -6299,6 +6302,7 @@
 		AE78B59D09B00C34002CACF8 /* Deployment (Universal) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
 					HAVE_BUNDLE_NAME,
@@ -6312,6 +6316,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
 				PRODUCT_NAME = "Aleph One";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Deployment (Universal)";
@@ -6398,7 +6403,8 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -6536,7 +6542,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */ = {
+		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE78B59E09B00C34002CACF8 /* Deployment (Universal) */,
