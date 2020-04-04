@@ -576,6 +576,39 @@ uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style,
 	return width;
 }
 
+int get_utf8char_byte(const char* p )
+{
+	int byte = 0;		// バイト数
+
+	// 最初に1となるbitを検索
+	for( int i = 0; i < 6; ++i ){
+		if( ( ( *p >> ( 7 - i ) ) & 0x01 ) == 0 ){
+			byte = i;
+			break;
+		}
+	}
+	// UTF8は1文字で7byte以上を使用することはない
+	if( byte == 6 ){
+		return -1;
+	}
+	// 10から始まる先頭バイトは存在しない
+	else if( byte == 1 ){
+		return -2;
+	}
+	// 0から始まる時は、1byteで1文字を表すことを考慮した計算
+	else if( byte != 0 ){
+		--byte;
+	}
+
+	// 2バイト目以降は、10から始まるビットパターンでなければならない
+	for( int i = 1; i < byte; ++i ){
+		if( ( ( p[ i ] >> 6 ) & 0x03 ) != 0x02 ){
+			return -3;		// ビットパターンの不一致
+		}
+	}
+	return byte + 1;
+}
+
 int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
 {
 	int width;
@@ -586,14 +619,37 @@ int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 
 	if (width < max_width) return strlen(text);
 
+	/*
 	int num = strlen(text) - 1;
 
 	while (num > 0 && width > max_width)
 	{
 		num--;
 		temp[num] = 0x0;
-		//TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
-		TTF_SizeUTF8(get_ttf(style), temp, &width, 0);
+		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	}
+	*/
+	int num = 0;
+
+	while( *text ){
+		/** 次のUTF8文字のサイズ */
+		int utf8char_size = 0;
+		/** UTF-8文字 **/
+		char utf8char[ 20 ];
+
+		utf8char_size = get_utf8char_byte( text );
+
+		if( utf8char_size < 0 ){
+			continue;
+		}
+
+		strncpy( utf8char, text, utf8char_size );
+		// 一文字
+		utf8char[ utf8char_size ] = '\0';
+		// １文字のサイズ
+		TTF_SizeUTF8(get_ttf(style), utf8char, &width, 0);
+		text += utf8char_size;
+		num += utf8char_size;
 	}
 
 	return num;
