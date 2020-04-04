@@ -44,7 +44,7 @@ AlephOneJPで使用できる文字は、原則的にはShift_JISの範囲のみ�
 
 ## ヘッダーファイル化
 
-```
+```cmd
 bin2h.exe -cz [変数名] <[対象ファイル名]> [出力先ファイル名].h
 bin2h.exe -cz SourceHanMonoRegular <SourceHanMono-Regular-subset.otf> SourceHanMono-Regular.h
 ```

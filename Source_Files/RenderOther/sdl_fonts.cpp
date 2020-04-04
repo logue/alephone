@@ -98,12 +98,12 @@ static builtin_font_t builtin_fontspecs[] = {
 	{ "Courier Prime Italic", courier_prime_italic, sizeof(courier_prime_italic) },
 	{" Courier Prime Bold Italic", courier_prime_bold_italic, sizeof(courier_prime_bold_italic) }
 */
-	{ "mono", AlephJPSansMonoBold, sizeof(AlephJPSansMonoBold) },
-	{ "Monaco", k8x12L, sizeof(k8x12L) },
-	{ "Courier Prime", SourceHanMonoRegular, sizeof(SourceHanMonoRegular) },
-	{ "Courier Prime Bold", SourceHanMonoBold, sizeof(SourceHanMonoBold) },
-	{ "Courier Prime Italic", SourceHanMonoRegularIt, sizeof(SourceHanMonoRegularIt) },
-	{" Courier Prime Bold Italic", SourceHanMonoBoldIt, sizeof(SourceHanMonoBoldIt) }
+	{ "mono", AlephJPSansMonoBold, AlephJPSansMonoBold_size },
+	{ "Monaco", k8x12L, k8x12L_size },
+	{ "Courier Prime", SourceHanMonoRegular, SourceHanMonoRegular_size },
+	{ "Courier Prime Bold", SourceHanMonoBold, SourceHanMonoBold_size },
+	{ "Courier Prime Italic", SourceHanMonoRegularIt, SourceHanMonoRegularIt_size },
+	{" Courier Prime Bold Italic", SourceHanMonoBoldIt, SourceHanMonoBoldIt_size }
 };
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)
@@ -592,7 +592,8 @@ int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 	{
 		num--;
 		temp[num] = 0x0;
-		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+		//TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+		TTF_SizeUTF8(get_ttf(style), temp, &width, 0);
 	}
 
 	return num;

@@ -1,0 +1,36 @@
+* text=auto eol=lf encoding=UTF-8
+
+# Documents
+*.pdf binary
+
+# Images
+*.bmp binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.jpg binary
+*.png binary
+*.svg eol=lf encoding=UTF-8
+*.swf binary
+
+# Fonts
+*.otf binary
+*.ttf binary
+
+# Other
+*.bcmap binary
+*.xap binary
+*.properties eol=lf
+*.bat text eol=crlf
+
+# Binary Files
+# executable
+*.exe binary
+
+# archives
+*.tar binary
+*.xz  binary
+*.zip binary
+
+# git archiveから除外するファイルの設定
+.gitkeep export-ignore
