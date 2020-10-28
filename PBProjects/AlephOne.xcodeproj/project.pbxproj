@@ -121,6 +121,30 @@
 		276BECFB1A846D2000AE52F4 /* network_dialog_widgets_sdl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECF91A846D2000AE52F4 /* network_dialog_widgets_sdl.h */; };
 		276BECFC1A846D2000AE52F4 /* network_dialog_widgets_sdl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECF91A846D2000AE52F4 /* network_dialog_widgets_sdl.h */; };
 		276BECFD1A846D2000AE52F4 /* network_dialog_widgets_sdl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECF91A846D2000AE52F4 /* network_dialog_widgets_sdl.h */; };
+		276BED041A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFE1A846FD900AE52F4 /* AlephSansMono-Bold.h */; };
+		276BED051A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFE1A846FD900AE52F4 /* AlephSansMono-Bold.h */; };
+		276BED061A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFE1A846FD900AE52F4 /* AlephSansMono-Bold.h */; };
+		276BED071A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFE1A846FD900AE52F4 /* AlephSansMono-Bold.h */; };
+		276BED081A846FD900AE52F4 /* CourierPrime.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFF1A846FD900AE52F4 /* CourierPrime.h */; };
+		276BED091A846FD900AE52F4 /* CourierPrime.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFF1A846FD900AE52F4 /* CourierPrime.h */; };
+		276BED0A1A846FD900AE52F4 /* CourierPrime.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFF1A846FD900AE52F4 /* CourierPrime.h */; };
+		276BED0B1A846FD900AE52F4 /* CourierPrime.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BECFF1A846FD900AE52F4 /* CourierPrime.h */; };
+		276BED0C1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED001A846FD900AE52F4 /* CourierPrimeBold.h */; };
+		276BED0D1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED001A846FD900AE52F4 /* CourierPrimeBold.h */; };
+		276BED0E1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED001A846FD900AE52F4 /* CourierPrimeBold.h */; };
+		276BED0F1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED001A846FD900AE52F4 /* CourierPrimeBold.h */; };
+		276BED101A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED011A846FD900AE52F4 /* CourierPrimeBoldItalic.h */; };
+		276BED111A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED011A846FD900AE52F4 /* CourierPrimeBoldItalic.h */; };
+		276BED121A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED011A846FD900AE52F4 /* CourierPrimeBoldItalic.h */; };
+		276BED131A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED011A846FD900AE52F4 /* CourierPrimeBoldItalic.h */; };
+		276BED141A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED021A846FD900AE52F4 /* CourierPrimeItalic.h */; };
+		276BED151A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED021A846FD900AE52F4 /* CourierPrimeItalic.h */; };
+		276BED161A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED021A846FD900AE52F4 /* CourierPrimeItalic.h */; };
+		276BED171A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED021A846FD900AE52F4 /* CourierPrimeItalic.h */; };
+		276BED181A846FD900AE52F4 /* ProFontAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED031A846FD900AE52F4 /* ProFontAO.h */; };
+		276BED191A846FD900AE52F4 /* ProFontAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED031A846FD900AE52F4 /* ProFontAO.h */; };
+		276BED1A1A846FD900AE52F4 /* ProFontAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED031A846FD900AE52F4 /* ProFontAO.h */; };
+		276BED1B1A846FD900AE52F4 /* ProFontAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED031A846FD900AE52F4 /* ProFontAO.h */; };
 		276BED1D1A846FF600AE52F4 /* VecOps.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED1C1A846FF600AE52F4 /* VecOps.h */; };
 		276BED1E1A846FF600AE52F4 /* VecOps.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED1C1A846FF600AE52F4 /* VecOps.h */; };
 		276BED1F1A846FF600AE52F4 /* VecOps.h in Headers */ = {isa = PBXBuildFile; fileRef = 276BED1C1A846FF600AE52F4 /* VecOps.h */; };
@@ -339,6 +363,25 @@
 		553AB9F7213A035000EE3861 /* libexpat.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 553AB9F5213A034300EE3861 /* libexpat.tbd */; };
 		553AB9F9213A035000EE3861 /* libexpat.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 553AB9F5213A034300EE3861 /* libexpat.tbd */; };
 		553AB9FB213A035000EE3861 /* libexpat.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 553AB9F5213A034300EE3861 /* libexpat.tbd */; };
+		9859FFB6254A2DD0009B0A02 /* converter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9859FFB4254A2DCF009B0A02 /* converter.h */; };
+		9859FFB7254A2DD0009B0A02 /* converter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9859FFB4254A2DCF009B0A02 /* converter.h */; };
+		9859FFB8254A2DD0009B0A02 /* converter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9859FFB4254A2DCF009B0A02 /* converter.h */; };
+		9859FFB9254A2DD0009B0A02 /* converter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9859FFB4254A2DCF009B0A02 /* converter.h */; };
+		9859FFBA254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
+		9859FFBB254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
+		9859FFBC254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
+		9859FFBD254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
+		9859FFBF254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
+		9859FFC0254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
+		9859FFC1254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
+		9859FFC2254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
+		9859FFC4254A2F28009B0A02 /* boost_locale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC3254A2F28009B0A02 /* boost_locale.framework */; };
+		9859FFC5254A2F29009B0A02 /* boost_locale.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9859FFC3254A2F28009B0A02 /* boost_locale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9859FFC9254A2FE2009B0A02 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC8254A2F63009B0A02 /* libiconv.2.4.0.tbd */; };
+		9859FFCA254A2FE3009B0A02 /* libiconv.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC7254A2F60009B0A02 /* libiconv.2.tbd */; };
+		9859FFCB254A2FE3009B0A02 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC6254A2F5B009B0A02 /* libiconv.tbd */; };
+		9859FFCD254A3093009B0A02 /* libiconv.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFCC254A3093009B0A02 /* libiconv.framework */; };
+		9859FFCE254A3093009B0A02 /* libiconv.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9859FFCC254A3093009B0A02 /* libiconv.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE0053EE0ABE16300038507F /* OGL_Blitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE0053ED0ABE16300038507F /* OGL_Blitter.cpp */; };
 		AE005FD40EE2D6DE007FE7C6 /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE005FD30EE2D6DE007FE7C6 /* screen.cpp */; };
 		AE0E4EC2141D148F00AAA02F /* Marathon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AE0E4EC1141D148F00AAA02F /* Marathon.icns */; };
@@ -2042,6 +2085,8 @@
 				271ADFC718A88B9C0073CB2E /* avformat.framework in CopyFiles */,
 				271ADFC818A88B9C0073CB2E /* avutil.framework in CopyFiles */,
 				271ADFC918A88B9C0073CB2E /* swscale.framework in CopyFiles */,
+				9859FFC5254A2F29009B0A02 /* boost_locale.framework in CopyFiles */,
+				9859FFCE254A3093009B0A02 /* libiconv.framework in CopyFiles */,
 				2759FB2A10D71160000204DD /* jpeg.framework in CopyFiles */,
 				2759FB2610D71158000204DD /* png.framework in CopyFiles */,
 				2759F33310D5BCD1000204DD /* zziplib.framework in CopyFiles */,
@@ -2183,17 +2228,14 @@
 		3DF290EF046F5C5B00000104 /* OGL_Model_Def.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = OGL_Model_Def.cpp; sourceTree = "<group>"; };
 		3DF290F0046F5C5B00000104 /* OGL_Subst_Texture_Def.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = OGL_Subst_Texture_Def.cpp; sourceTree = "<group>"; usesTabs = 1; };
 		553AB9F5213A034300EE3861 /* libexpat.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libexpat.tbd; path = usr/lib/libexpat.tbd; sourceTree = SDKROOT; };
-		98457C86238A1BD700E12B72 /* libiconv.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libiconv.framework; sourceTree = "<group>"; };
-		98457C89238A1BDE00E12B72 /* boost_locale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = boost_locale.framework; sourceTree = "<group>"; };
-		98457C8C238A1C6600E12B72 /* converter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = converter.cpp; path = ../Source_Files/CSeries/converter.cpp; sourceTree = "<group>"; };
-		98457C91238A1C8200E12B72 /* converter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = converter.h; path = ../Source_Files/CSeries/converter.h; sourceTree = "<group>"; };
-		98457C96238A1CEE00E12B72 /* AlephJPSansMono-Bold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AlephJPSansMono-Bold.h"; path = "../Source_Files/Misc/jp-fonts/AlephJPSansMono-Bold.h"; sourceTree = "<group>"; };
-		98457C97238A1CEF00E12B72 /* SourceHanMono-BoldIt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SourceHanMono-BoldIt.h"; path = "../Source_Files/Misc/jp-fonts/SourceHanMono-BoldIt.h"; sourceTree = "<group>"; };
-		98457C98238A1CEF00E12B72 /* SourceHanMono-RegularIt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SourceHanMono-RegularIt.h"; path = "../Source_Files/Misc/jp-fonts/SourceHanMono-RegularIt.h"; sourceTree = "<group>"; };
-		98457C99238A1CEF00E12B72 /* k8x12L.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = k8x12L.h; path = "../Source_Files/Misc/jp-fonts/k8x12L.h"; sourceTree = "<group>"; };
-		98457C9A238A1CF000E12B72 /* SourceHanMono-Bold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SourceHanMono-Bold.h"; path = "../Source_Files/Misc/jp-fonts/SourceHanMono-Bold.h"; sourceTree = "<group>"; };
-		98457C9B238A1CF000E12B72 /* SourceHanMono-Regular.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SourceHanMono-Regular.h"; path = "../Source_Files/Misc/jp-fonts/SourceHanMono-Regular.h"; sourceTree = "<group>"; };
-		98457CB4238A1DA600E12B72 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		9859FFB4254A2DCF009B0A02 /* converter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = converter.h; path = ../Source_Files/CSeries/converter.h; sourceTree = "<group>"; };
+		9859FFB5254A2DCF009B0A02 /* converter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = converter.cpp; path = ../Source_Files/CSeries/converter.cpp; sourceTree = "<group>"; };
+		9859FFBE254A2E54009B0A02 /* jp-fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "jp-fonts"; path = "../Source_Files/Misc/jp-fonts"; sourceTree = "<group>"; };
+		9859FFC3254A2F28009B0A02 /* boost_locale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = boost_locale.framework; sourceTree = "<group>"; };
+		9859FFC6254A2F5B009B0A02 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		9859FFC7254A2F60009B0A02 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
+		9859FFC8254A2F63009B0A02 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
+		9859FFCC254A3093009B0A02 /* libiconv.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libiconv.framework; sourceTree = "<group>"; };
 		AE0053ED0ABE16300038507F /* OGL_Blitter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = OGL_Blitter.cpp; sourceTree = "<group>"; };
 		AE005FD30EE2D6DE007FE7C6 /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = screen.cpp; sourceTree = "<group>"; };
 		AE0E4EC1141D148F00AAA02F /* Marathon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = Marathon.icns; path = AppStore/Marathon/Marathon.icns; sourceTree = "<group>"; };
@@ -2691,22 +2733,27 @@
 				553AB9F6213A034300EE3861 /* libexpat.tbd in Frameworks */,
 				273FBB491E122C9F0076351E /* IOKit.framework in Frameworks */,
 				275A7BD31A60DE77002EE952 /* libcurl.tbd in Frameworks */,
+				9859FFCA254A2FE3009B0A02 /* libiconv.2.tbd in Frameworks */,
 				AEC3C87009AD68AC003258E4 /* OpenGL.framework in Frameworks */,
 				27E5DD621BD2DA0C00A95619 /* SDL2.framework in Frameworks */,
+				9859FFC4254A2F28009B0A02 /* boost_locale.framework in Frameworks */,
 				AEA85F4B24DF251300BB7827 /* webp.framework in Frameworks */,
 				AEC3C87109AD68AC003258E4 /* Cocoa.framework in Frameworks */,
 				AE23F5640BDAC0E700C11385 /* speex.framework in Frameworks */,
 				3D22CF890FD86EAE00B17822 /* AudioUnit.framework in Frameworks */,
+				9859FFC9254A2FE2009B0A02 /* libiconv.2.4.0.tbd in Frameworks */,
 				2762A3371AAA51D900B807D4 /* boost_system.framework in Frameworks */,
 				3D22CF8D0FD86EBD00B17822 /* libz.tbd in Frameworks */,
 				3D22CFAC0FD8707C00B17822 /* CoreAudio.framework in Frameworks */,
 				2759F33010D5BCC0000204DD /* zziplib.framework in Frameworks */,
 				2759FB1F10D7114D000204DD /* jpeg.framework in Frameworks */,
 				2759FB2110D7114D000204DD /* png.framework in Frameworks */,
+				9859FFCB254A2FE3009B0A02 /* libiconv.tbd in Frameworks */,
 				270F9FD0177687B7009AAE10 /* avcodec.framework in Frameworks */,
 				278BCAEF1A51C53C006F9756 /* speexdsp.framework in Frameworks */,
 				2762A3331AAA51D900B807D4 /* boost_filesystem.framework in Frameworks */,
 				270F9FD4177687B7009AAE10 /* avformat.framework in Frameworks */,
+				9859FFCD254A3093009B0A02 /* libiconv.framework in Frameworks */,
 				27E5DD601BD2DA0C00A95619 /* SDL2_net.framework in Frameworks */,
 				270F9FD8177687B7009AAE10 /* avutil.framework in Frameworks */,
 				270F9FDC177687B7009AAE10 /* swscale.framework in Frameworks */,
@@ -2821,6 +2868,9 @@
 		29B97323FDCFA39411CA2CEA /* System Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9859FFC6254A2F5B009B0A02 /* libiconv.tbd */,
+				9859FFC7254A2F60009B0A02 /* libiconv.2.tbd */,
+				9859FFC8254A2F63009B0A02 /* libiconv.2.4.0.tbd */,
 				273FBB481E122C9F0076351E /* IOKit.framework */,
 				3D22CFAB0FD8707C00B17822 /* CoreAudio.framework */,
 				3D22CF880FD86EAE00B17822 /* AudioUnit.framework */,
@@ -3011,11 +3061,9 @@
 		EF2EF5B004819A5C00A8000D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9859FFCC254A3093009B0A02 /* libiconv.framework */,
+				9859FFC3254A2F28009B0A02 /* boost_locale.framework */,
 				AEA85F4A24DF251300BB7827 /* webp.framework */,
-				98457CB4238A1DA600E12B72 /* libiconv.tbd */,
-				98457C89238A1BDE00E12B72 /* boost_locale.framework */,
-				98457C86238A1BD700E12B72 /* libiconv.framework */,
-				274D10A42166BBCD00C8F77A /* FreeType.framework */,
 				27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */,
 				27E5DD5C1BD2DA0C00A95619 /* SDL2_net.framework */,
 				27E5DD5D1BD2DA0C00A95619 /* SDL2_ttf.framework */,
@@ -3097,7 +3145,8 @@
 		F522144A0136C0C401000001 /* CSeries */ = {
 			isa = PBXGroup;
 			children = (
-				98457C8C238A1C6600E12B72 /* converter.cpp */,
+				9859FFB5254A2DCF009B0A02 /* converter.cpp */,
+				9859FFB4254A2DCF009B0A02 /* converter.h */,
 				27D1A4F112FDF3630085E79C /* FilmProfile.cpp */,
 				27D1A4F212FDF3630085E79C /* FilmProfile.h */,
 				F522144B0136C0C401000001 /* Headers */,
@@ -3119,7 +3168,6 @@
 		F522144B0136C0C401000001 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				98457C91238A1C8200E12B72 /* converter.h */,
 				AEAE132D0FC9C3C800EDA5A6 /* BStream.h */,
 				F522111D0136A4DD01000001 /* byte_swapping.h */,
 				F522111E0136A4DD01000001 /* csalerts.h */,
@@ -3141,6 +3189,7 @@
 		F522144E0136C0C401000001 /* Misc */ = {
 			isa = PBXGroup;
 			children = (
+				9859FFBE254A2E54009B0A02 /* jp-fonts */,
 				F522144F0136C0C401000001 /* Headers */,
 				F5CC94290240DB8801A80001 /* SDL */,
 				F5A00022023FDA1601A80001 /* ActionQueues.cpp */,
@@ -3165,16 +3214,16 @@
 		F522144F0136C0C401000001 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				98457C96238A1CEE00E12B72 /* AlephJPSansMono-Bold.h */,
-				98457C99238A1CEF00E12B72 /* k8x12L.h */,
-				98457C9A238A1CF000E12B72 /* SourceHanMono-Bold.h */,
-				98457C97238A1CEF00E12B72 /* SourceHanMono-BoldIt.h */,
-				98457C9B238A1CF000E12B72 /* SourceHanMono-Regular.h */,
-				98457C98238A1CEF00E12B72 /* SourceHanMono-RegularIt.h */,
 				C13C71E61B3FB4C500F1188D /* DefaultStringSets.h */,
+				276BECFE1A846FD900AE52F4 /* AlephSansMono-Bold.h */,
 				276BED2B1A8470A900AE52F4 /* binders.h */,
+				276BECFF1A846FD900AE52F4 /* CourierPrime.h */,
+				276BED001A846FD900AE52F4 /* CourierPrimeBold.h */,
+				276BED011A846FD900AE52F4 /* CourierPrimeBoldItalic.h */,
+				276BED021A846FD900AE52F4 /* CourierPrimeItalic.h */,
 				276BED2C1A8470A900AE52F4 /* PlayerImage_sdl.h */,
 				276BED211A84701E00AE52F4 /* powered_by_alephone.h */,
+				276BED031A846FD900AE52F4 /* ProFontAO.h */,
 				276BED1C1A846FF600AE52F4 /* VecOps.h */,
 				AE48F3551421900900051D61 /* Statistics.h */,
 				AE2FDED109E9352B00A18ABC /* preference_dialogs.h */,
@@ -3690,6 +3739,7 @@
 				AE505B46141D45E600915344 /* sdl_widgets.h in Headers */,
 				AE505B47141D45E600915344 /* shell.h in Headers */,
 				AE505B48141D45E600915344 /* vbl_definitions.h in Headers */,
+				9859FFB8254A2DD0009B0A02 /* converter.h in Headers */,
 				AE505B49141D45E600915344 /* vbl.h in Headers */,
 				AE505B52141D45E600915344 /* byte_swapping.h in Headers */,
 				AE505B53141D45E600915344 /* csalerts.h in Headers */,
@@ -3700,7 +3750,7 @@
 				AE505B58141D45E600915344 /* csfonts.h in Headers */,
 				AE505B59141D45E600915344 /* csmacros.h in Headers */,
 				AE505B5A141D45E600915344 /* csmisc.h in Headers */,
-				98457C9E238A1CF100E12B72 /* AlephJPSansMono-Bold.h in Headers */,
+				276BED0E1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */,
 				AE505B5B141D45E600915344 /* cspixels.h in Headers */,
 				AE505B5C141D45E600915344 /* csstrings.h in Headers */,
 				AE505B5D141D45E600915344 /* cstypes.h in Headers */,
@@ -3744,15 +3794,16 @@
 				278E0C831AA4012600FA93B7 /* SDL_rwops_ostream.h in Headers */,
 				AE505B7D141D45E600915344 /* lightsource.h in Headers */,
 				AE505B7E141D45E600915344 /* map.h in Headers */,
+				276BED121A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */,
 				27A6DB521B9CED1E003DA766 /* confpaths.h in Headers */,
 				AE505B7F141D45E600915344 /* media.h in Headers */,
-				98457CAE238A1CF100E12B72 /* SourceHanMono-Bold.h in Headers */,
 				AE505B80141D45E600915344 /* media_definitions.h in Headers */,
 				AE505B81141D45E600915344 /* monster_definitions.h in Headers */,
 				AE505B82141D45E600915344 /* monsters.h in Headers */,
 				AE505B83141D45E600915344 /* physics_models.h in Headers */,
 				AE505B84141D45E600915344 /* platform_definitions.h in Headers */,
 				27A6DAD31B9CE9A5003DA766 /* mytm.h in Headers */,
+				276BED0A1A846FD900AE52F4 /* CourierPrime.h in Headers */,
 				27FF265C1B6F169200DA0A19 /* InfoTree.h in Headers */,
 				AE505B85141D45E600915344 /* platforms.h in Headers */,
 				AE505B86141D45E600915344 /* player.h in Headers */,
@@ -3767,7 +3818,6 @@
 				AE505B8E141D45E600915344 /* mouse.h in Headers */,
 				AE505B8F141D45E600915344 /* AnimatedTextures.h in Headers */,
 				AE505B90141D45E600915344 /* collection_definition.h in Headers */,
-				98457CA6238A1CF100E12B72 /* SourceHanMono-RegularIt.h in Headers */,
 				AE505B91141D45E600915344 /* Crosshairs.h in Headers */,
 				AE505B92141D45E600915344 /* low_level_textures.h in Headers */,
 				AE505B93141D45E600915344 /* OGL_Faders.h in Headers */,
@@ -3781,6 +3831,7 @@
 				AE505B9B141D45E600915344 /* RenderPlaceObjs.h in Headers */,
 				AE505B9C141D45E600915344 /* RenderRasterize.h in Headers */,
 				AE505B9D141D45E600915344 /* RenderSortPoly.h in Headers */,
+				276BED1A1A846FD900AE52F4 /* ProFontAO.h in Headers */,
 				AE505B9E141D45E600915344 /* RenderVisTree.h in Headers */,
 				AE505B9F141D45E600915344 /* scottish_textures.h in Headers */,
 				AE505BA0141D45E600915344 /* shape_definitions.h in Headers */,
@@ -3810,13 +3861,13 @@
 				AE505BB3141D45E600915344 /* screen_drawing.h in Headers */,
 				AE505BB4141D45E600915344 /* screen_shared.h in Headers */,
 				AE505BB5141D45E600915344 /* sdl_fonts.h in Headers */,
+				276BED161A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */,
 				AE505BB6141D45E600915344 /* TextLayoutHelper.h in Headers */,
 				AE505BB7141D45E600915344 /* TextStrings.h in Headers */,
 				27A6DB2D1B9CEA77003DA766 /* VorbisDecoder.h in Headers */,
 				AE505BB8141D45E600915344 /* ViewControl.h in Headers */,
 				AE505BB9141D45E600915344 /* song_definitions.h in Headers */,
 				27A6DB421B9CEB47003DA766 /* OGL_Headers.h in Headers */,
-				98457CAA238A1CF100E12B72 /* k8x12L.h in Headers */,
 				27A6DB261B9CEA72003DA766 /* SndfileDecoder.h in Headers */,
 				AE505BBA141D45E600915344 /* sound_definitions.h in Headers */,
 				C13C71E91B3FB4C500F1188D /* DefaultStringSets.h in Headers */,
@@ -3824,14 +3875,12 @@
 				AE505BC3141D45E600915344 /* XML_ParseTreeRoot.h in Headers */,
 				AE505BC6141D45E600915344 /* alephversion.h in Headers */,
 				AE505BC7141D45E600915344 /* Logging.h in Headers */,
-				98457CB2238A1CF100E12B72 /* SourceHanMono-Regular.h in Headers */,
 				AE505BC8141D45E600915344 /* network_microphone_shared.h in Headers */,
 				AE505BC9141D45E600915344 /* OGL_Model_Def.h in Headers */,
 				AE505BCA141D45E600915344 /* OGL_Subst_Texture_Def.h in Headers */,
 				AE505BCB141D45E600915344 /* OGL_Texture_Def.h in Headers */,
 				AE505BCC141D45E600915344 /* network_star.h in Headers */,
 				AE505BCD141D45E600915344 /* NetworkGameProtocol.h in Headers */,
-				98457CA2238A1CF100E12B72 /* SourceHanMono-BoldIt.h in Headers */,
 				AE505BCE141D45E600915344 /* RingGameProtocol.h in Headers */,
 				AE505BCF141D45E600915344 /* StarGameProtocol.h in Headers */,
 				AE505BD0141D45E600915344 /* AStream.h in Headers */,
@@ -3855,6 +3904,7 @@
 				AE505BE0141D45E600915344 /* Message.h in Headers */,
 				AE505BE1141D45E600915344 /* MessageDispatcher.h in Headers */,
 				AE505BE2141D45E600915344 /* MessageHandler.h in Headers */,
+				276BED061A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */,
 				AE505BE3141D45E600915344 /* MessageInflater.h in Headers */,
 				AE505BE4141D45E600915344 /* network_capabilities.h in Headers */,
 				AE505BE5141D45E600915344 /* shared_widgets.h in Headers */,
@@ -3876,7 +3926,6 @@
 				AE505BF6141D45E600915344 /* HUDRenderer_Lua.h in Headers */,
 				AE505BF7141D45E600915344 /* Image_Blitter.h in Headers */,
 				AE505BF8141D45E600915344 /* Shape_Blitter.h in Headers */,
-				98457C94238A1C8200E12B72 /* converter.h in Headers */,
 				AE505BF9141D45E600915344 /* OGL_Shader.h in Headers */,
 				AE505BFA141D45E600915344 /* vec3.h in Headers */,
 				AE505BFB141D45E600915344 /* Plugins.h in Headers */,
@@ -3912,6 +3961,7 @@
 				AEB4A0E614296CAE00537AE7 /* sdl_widgets.h in Headers */,
 				AEB4A0E714296CAE00537AE7 /* shell.h in Headers */,
 				AEB4A0E814296CAE00537AE7 /* vbl_definitions.h in Headers */,
+				9859FFB9254A2DD0009B0A02 /* converter.h in Headers */,
 				AEB4A0E914296CAE00537AE7 /* vbl.h in Headers */,
 				AEB4A0F214296CAE00537AE7 /* byte_swapping.h in Headers */,
 				AEB4A0F314296CAE00537AE7 /* csalerts.h in Headers */,
@@ -3922,7 +3972,7 @@
 				AEB4A0F814296CAE00537AE7 /* csfonts.h in Headers */,
 				AEB4A0F914296CAE00537AE7 /* csmacros.h in Headers */,
 				AEB4A0FA14296CAE00537AE7 /* csmisc.h in Headers */,
-				98457C9F238A1CF100E12B72 /* AlephJPSansMono-Bold.h in Headers */,
+				276BED0F1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */,
 				AEB4A0FB14296CAE00537AE7 /* cspixels.h in Headers */,
 				AEB4A0FC14296CAE00537AE7 /* csstrings.h in Headers */,
 				AEB4A0FD14296CAE00537AE7 /* cstypes.h in Headers */,
@@ -3966,15 +4016,16 @@
 				278E0C841AA4012600FA93B7 /* SDL_rwops_ostream.h in Headers */,
 				AEB4A11D14296CAE00537AE7 /* lightsource.h in Headers */,
 				AEB4A11E14296CAE00537AE7 /* map.h in Headers */,
+				276BED131A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */,
 				27A6DB531B9CED1E003DA766 /* confpaths.h in Headers */,
 				AEB4A11F14296CAE00537AE7 /* media.h in Headers */,
-				98457CAF238A1CF100E12B72 /* SourceHanMono-Bold.h in Headers */,
 				AEB4A12014296CAE00537AE7 /* media_definitions.h in Headers */,
 				AEB4A12114296CAE00537AE7 /* monster_definitions.h in Headers */,
 				AEB4A12214296CAE00537AE7 /* monsters.h in Headers */,
 				AEB4A12314296CAE00537AE7 /* physics_models.h in Headers */,
 				AEB4A12414296CAE00537AE7 /* platform_definitions.h in Headers */,
 				27A6DAD41B9CE9A6003DA766 /* mytm.h in Headers */,
+				276BED0B1A846FD900AE52F4 /* CourierPrime.h in Headers */,
 				27FF265D1B6F169200DA0A19 /* InfoTree.h in Headers */,
 				AEB4A12514296CAE00537AE7 /* platforms.h in Headers */,
 				AEB4A12614296CAE00537AE7 /* player.h in Headers */,
@@ -3989,7 +4040,6 @@
 				AEB4A12E14296CAE00537AE7 /* mouse.h in Headers */,
 				AEB4A12F14296CAE00537AE7 /* AnimatedTextures.h in Headers */,
 				AEB4A13014296CAE00537AE7 /* collection_definition.h in Headers */,
-				98457CA7238A1CF100E12B72 /* SourceHanMono-RegularIt.h in Headers */,
 				AEB4A13114296CAE00537AE7 /* Crosshairs.h in Headers */,
 				AEB4A13214296CAE00537AE7 /* low_level_textures.h in Headers */,
 				AEB4A13314296CAE00537AE7 /* OGL_Faders.h in Headers */,
@@ -4003,6 +4053,7 @@
 				AEB4A13B14296CAE00537AE7 /* RenderPlaceObjs.h in Headers */,
 				AEB4A13C14296CAE00537AE7 /* RenderRasterize.h in Headers */,
 				AEB4A13D14296CAE00537AE7 /* RenderSortPoly.h in Headers */,
+				276BED1B1A846FD900AE52F4 /* ProFontAO.h in Headers */,
 				AEB4A13E14296CAE00537AE7 /* RenderVisTree.h in Headers */,
 				AEB4A13F14296CAE00537AE7 /* scottish_textures.h in Headers */,
 				AEB4A14014296CAE00537AE7 /* shape_definitions.h in Headers */,
@@ -4032,13 +4083,13 @@
 				AEB4A15314296CAE00537AE7 /* screen_drawing.h in Headers */,
 				AEB4A15414296CAE00537AE7 /* screen_shared.h in Headers */,
 				AEB4A15514296CAE00537AE7 /* sdl_fonts.h in Headers */,
+				276BED171A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */,
 				AEB4A15614296CAE00537AE7 /* TextLayoutHelper.h in Headers */,
 				AEB4A15714296CAE00537AE7 /* TextStrings.h in Headers */,
 				27A6DB2E1B9CEA78003DA766 /* VorbisDecoder.h in Headers */,
 				AEB4A15814296CAE00537AE7 /* ViewControl.h in Headers */,
 				AEB4A15914296CAE00537AE7 /* song_definitions.h in Headers */,
 				27A6DB431B9CEB48003DA766 /* OGL_Headers.h in Headers */,
-				98457CAB238A1CF100E12B72 /* k8x12L.h in Headers */,
 				27A6DB271B9CEA72003DA766 /* SndfileDecoder.h in Headers */,
 				AEB4A15A14296CAE00537AE7 /* sound_definitions.h in Headers */,
 				C13C71EA1B3FB4C500F1188D /* DefaultStringSets.h in Headers */,
@@ -4046,14 +4097,12 @@
 				AEB4A16314296CAE00537AE7 /* XML_ParseTreeRoot.h in Headers */,
 				AEB4A16614296CAE00537AE7 /* alephversion.h in Headers */,
 				AEB4A16714296CAE00537AE7 /* Logging.h in Headers */,
-				98457CB3238A1CF100E12B72 /* SourceHanMono-Regular.h in Headers */,
 				AEB4A16814296CAE00537AE7 /* network_microphone_shared.h in Headers */,
 				AEB4A16914296CAE00537AE7 /* OGL_Model_Def.h in Headers */,
 				AEB4A16A14296CAE00537AE7 /* OGL_Subst_Texture_Def.h in Headers */,
 				AEB4A16B14296CAE00537AE7 /* OGL_Texture_Def.h in Headers */,
 				AEB4A16C14296CAE00537AE7 /* network_star.h in Headers */,
 				AEB4A16D14296CAE00537AE7 /* NetworkGameProtocol.h in Headers */,
-				98457CA3238A1CF100E12B72 /* SourceHanMono-BoldIt.h in Headers */,
 				AEB4A16E14296CAE00537AE7 /* RingGameProtocol.h in Headers */,
 				AEB4A16F14296CAE00537AE7 /* StarGameProtocol.h in Headers */,
 				AEB4A17014296CAE00537AE7 /* AStream.h in Headers */,
@@ -4077,6 +4126,7 @@
 				AEB4A18014296CAE00537AE7 /* Message.h in Headers */,
 				AEB4A18114296CAE00537AE7 /* MessageDispatcher.h in Headers */,
 				AEB4A18214296CAE00537AE7 /* MessageHandler.h in Headers */,
+				276BED071A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */,
 				AEB4A18314296CAE00537AE7 /* MessageInflater.h in Headers */,
 				AEB4A18414296CAE00537AE7 /* network_capabilities.h in Headers */,
 				AEB4A18514296CAE00537AE7 /* shared_widgets.h in Headers */,
@@ -4098,7 +4148,6 @@
 				AEB4A19614296CAE00537AE7 /* HUDRenderer_Lua.h in Headers */,
 				AEB4A19714296CAE00537AE7 /* Image_Blitter.h in Headers */,
 				AEB4A19814296CAE00537AE7 /* Shape_Blitter.h in Headers */,
-				98457C95238A1C8200E12B72 /* converter.h in Headers */,
 				AEB4A19914296CAE00537AE7 /* OGL_Shader.h in Headers */,
 				AEB4A19A14296CAE00537AE7 /* vec3.h in Headers */,
 				AEB4A19B14296CAE00537AE7 /* Plugins.h in Headers */,
@@ -4134,6 +4183,7 @@
 				AEC3C70A09AD68AC003258E4 /* sdl_network.h in Headers */,
 				AEC3C70B09AD68AC003258E4 /* sdl_widgets.h in Headers */,
 				AEC3C70C09AD68AC003258E4 /* shell.h in Headers */,
+				9859FFB6254A2DD0009B0A02 /* converter.h in Headers */,
 				AEC3C70D09AD68AC003258E4 /* vbl_definitions.h in Headers */,
 				27FF265A1B6F169200DA0A19 /* InfoTree.h in Headers */,
 				AEC3C70E09AD68AC003258E4 /* vbl.h in Headers */,
@@ -4145,7 +4195,6 @@
 				AEC3C71D09AD68AC003258E4 /* csdialogs.h in Headers */,
 				AEC3C71E09AD68AC003258E4 /* cseries.h in Headers */,
 				AEC3C72009AD68AC003258E4 /* csfonts.h in Headers */,
-				98457C9C238A1CF100E12B72 /* AlephJPSansMono-Bold.h in Headers */,
 				AEC3C72209AD68AC003258E4 /* csmacros.h in Headers */,
 				AEC3C72309AD68AC003258E4 /* csmisc.h in Headers */,
 				AEC3C72409AD68AC003258E4 /* cspixels.h in Headers */,
@@ -4153,6 +4202,7 @@
 				27A6DB321B9CEAA3003DA766 /* IMG_savepng.h in Headers */,
 				AEC3C72609AD68AC003258E4 /* cstypes.h in Headers */,
 				AEC3C72C09AD68AC003258E4 /* network.h in Headers */,
+				276BED181A846FD900AE52F4 /* ProFontAO.h in Headers */,
 				276BED2D1A8470A900AE52F4 /* binders.h in Headers */,
 				AEC3C72D09AD68AC003258E4 /* network_games.h in Headers */,
 				AEC3C73009AD68AC003258E4 /* Model3D.h in Headers */,
@@ -4191,7 +4241,6 @@
 				27A6DB501B9CED1E003DA766 /* confpaths.h in Headers */,
 				276BECFA1A846D2000AE52F4 /* network_dialog_widgets_sdl.h in Headers */,
 				AEC3C75009AD68AC003258E4 /* map.h in Headers */,
-				98457CAC238A1CF100E12B72 /* SourceHanMono-Bold.h in Headers */,
 				AEC3C75109AD68AC003258E4 /* media.h in Headers */,
 				AEC3C75209AD68AC003258E4 /* media_definitions.h in Headers */,
 				AEC3C75309AD68AC003258E4 /* monster_definitions.h in Headers */,
@@ -4212,8 +4261,8 @@
 				AEC3C76009AD68AC003258E4 /* mouse.h in Headers */,
 				AEC3C76109AD68AC003258E4 /* AnimatedTextures.h in Headers */,
 				AEC3C76209AD68AC003258E4 /* collection_definition.h in Headers */,
-				98457CA4238A1CF100E12B72 /* SourceHanMono-RegularIt.h in Headers */,
 				AEC3C76309AD68AC003258E4 /* Crosshairs.h in Headers */,
+				276BED041A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */,
 				AEC3C76509AD68AC003258E4 /* low_level_textures.h in Headers */,
 				AEC3C76609AD68AC003258E4 /* OGL_Faders.h in Headers */,
 				AEC3C76709AD68AC003258E4 /* OGL_Render.h in Headers */,
@@ -4230,6 +4279,7 @@
 				AEC3C77109AD68AC003258E4 /* RenderVisTree.h in Headers */,
 				AEC3C77209AD68AC003258E4 /* scottish_textures.h in Headers */,
 				AEC3C77309AD68AC003258E4 /* shape_definitions.h in Headers */,
+				276BED141A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */,
 				AEC3C77409AD68AC003258E4 /* shape_descriptors.h in Headers */,
 				AEC3C77609AD68AC003258E4 /* textures.h in Headers */,
 				AEC3C77709AD68AC003258E4 /* ChaseCam.h in Headers */,
@@ -4238,7 +4288,9 @@
 				AEC3C77B09AD68AC003258E4 /* FontHandler.h in Headers */,
 				2710CC651B8F94FC00CE2EAE /* OGL_FBO.h in Headers */,
 				AEC3C77C09AD68AC003258E4 /* game_window.h in Headers */,
+				276BED101A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */,
 				AEC3C77D09AD68AC003258E4 /* HUDRenderer.h in Headers */,
+				276BED0C1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */,
 				AEC3C77E09AD68AC003258E4 /* HUDRenderer_OGL.h in Headers */,
 				AEC3C77F09AD68AC003258E4 /* HUDRenderer_SW.h in Headers */,
 				AEC3C78009AD68AC003258E4 /* images.h in Headers */,
@@ -4261,7 +4313,6 @@
 				AEC3C78E09AD68AC003258E4 /* TextStrings.h in Headers */,
 				AEC3C78F09AD68AC003258E4 /* ViewControl.h in Headers */,
 				AEC3C79209AD68AC003258E4 /* song_definitions.h in Headers */,
-				98457CA8238A1CF100E12B72 /* k8x12L.h in Headers */,
 				276BED1D1A846FF600AE52F4 /* VecOps.h in Headers */,
 				AEC3C79309AD68AC003258E4 /* sound_definitions.h in Headers */,
 				AEC3C79B09AD68AC003258E4 /* XML_LevelScript.h in Headers */,
@@ -4269,14 +4320,12 @@
 				C13C71E71B3FB4C500F1188D /* DefaultStringSets.h in Headers */,
 				AEC3C7A009AD68AC003258E4 /* alephversion.h in Headers */,
 				AEC3C7A109AD68AC003258E4 /* Logging.h in Headers */,
-				98457CB0238A1CF100E12B72 /* SourceHanMono-Regular.h in Headers */,
 				AEC3C7A209AD68AC003258E4 /* network_microphone_shared.h in Headers */,
 				AEC3C7A309AD68AC003258E4 /* OGL_Model_Def.h in Headers */,
 				AEC3C7A409AD68AC003258E4 /* OGL_Subst_Texture_Def.h in Headers */,
 				AEC3C7A509AD68AC003258E4 /* OGL_Texture_Def.h in Headers */,
 				AEC3C7A609AD68AC003258E4 /* network_star.h in Headers */,
 				AEC3C7A709AD68AC003258E4 /* NetworkGameProtocol.h in Headers */,
-				98457CA0238A1CF100E12B72 /* SourceHanMono-BoldIt.h in Headers */,
 				AEC3C7A809AD68AC003258E4 /* RingGameProtocol.h in Headers */,
 				AEC3C7A909AD68AC003258E4 /* StarGameProtocol.h in Headers */,
 				27A6DB1D1B9CEA6B003DA766 /* MADDecoder.h in Headers */,
@@ -4321,7 +4370,6 @@
 				27911B25100073460063ACB6 /* HUDRenderer_Lua.h in Headers */,
 				27CE0844100ECDBC00F59FD1 /* Image_Blitter.h in Headers */,
 				2739B493101B862A00CC8098 /* Shape_Blitter.h in Headers */,
-				98457C92238A1C8200E12B72 /* converter.h in Headers */,
 				27DC607110917F690062003A /* OGL_Shader.h in Headers */,
 				27DC60C5109218800062003A /* vec3.h in Headers */,
 				277AB98110A26B020003402A /* Plugins.h in Headers */,
@@ -4357,6 +4405,7 @@
 				AEFD85F413EB84CF00C1E687 /* sdl_widgets.h in Headers */,
 				AEFD85F513EB84CF00C1E687 /* shell.h in Headers */,
 				AEFD85F613EB84CF00C1E687 /* vbl_definitions.h in Headers */,
+				9859FFB7254A2DD0009B0A02 /* converter.h in Headers */,
 				AEFD85F713EB84CF00C1E687 /* vbl.h in Headers */,
 				AEFD860013EB84CF00C1E687 /* byte_swapping.h in Headers */,
 				AEFD860113EB84CF00C1E687 /* csalerts.h in Headers */,
@@ -4367,7 +4416,7 @@
 				AEFD860613EB84CF00C1E687 /* csfonts.h in Headers */,
 				AEFD860713EB84CF00C1E687 /* csmacros.h in Headers */,
 				AEFD860813EB84CF00C1E687 /* csmisc.h in Headers */,
-				98457C9D238A1CF100E12B72 /* AlephJPSansMono-Bold.h in Headers */,
+				276BED0D1A846FD900AE52F4 /* CourierPrimeBold.h in Headers */,
 				AEFD860913EB84CF00C1E687 /* cspixels.h in Headers */,
 				AEFD860A13EB84CF00C1E687 /* csstrings.h in Headers */,
 				AEFD860B13EB84CF00C1E687 /* cstypes.h in Headers */,
@@ -4411,15 +4460,16 @@
 				278E0C821AA4012600FA93B7 /* SDL_rwops_ostream.h in Headers */,
 				AEFD862B13EB84CF00C1E687 /* lightsource.h in Headers */,
 				AEFD862C13EB84CF00C1E687 /* map.h in Headers */,
+				276BED111A846FD900AE52F4 /* CourierPrimeBoldItalic.h in Headers */,
 				27A6DB511B9CED1E003DA766 /* confpaths.h in Headers */,
 				AEFD862D13EB84CF00C1E687 /* media.h in Headers */,
-				98457CAD238A1CF100E12B72 /* SourceHanMono-Bold.h in Headers */,
 				AEFD862E13EB84CF00C1E687 /* media_definitions.h in Headers */,
 				AEFD862F13EB84CF00C1E687 /* monster_definitions.h in Headers */,
 				AEFD863013EB84CF00C1E687 /* monsters.h in Headers */,
 				AEFD863113EB84CF00C1E687 /* physics_models.h in Headers */,
 				AEFD863213EB84CF00C1E687 /* platform_definitions.h in Headers */,
 				27A6DAD21B9CE9A5003DA766 /* mytm.h in Headers */,
+				276BED091A846FD900AE52F4 /* CourierPrime.h in Headers */,
 				27FF265B1B6F169200DA0A19 /* InfoTree.h in Headers */,
 				AEFD863313EB84CF00C1E687 /* platforms.h in Headers */,
 				AEFD863413EB84CF00C1E687 /* player.h in Headers */,
@@ -4434,7 +4484,6 @@
 				AEFD863C13EB84CF00C1E687 /* mouse.h in Headers */,
 				AEFD863D13EB84CF00C1E687 /* AnimatedTextures.h in Headers */,
 				AEFD863E13EB84CF00C1E687 /* collection_definition.h in Headers */,
-				98457CA5238A1CF100E12B72 /* SourceHanMono-RegularIt.h in Headers */,
 				AEFD863F13EB84CF00C1E687 /* Crosshairs.h in Headers */,
 				AEFD864013EB84CF00C1E687 /* low_level_textures.h in Headers */,
 				AEFD864113EB84CF00C1E687 /* OGL_Faders.h in Headers */,
@@ -4448,6 +4497,7 @@
 				AEFD864913EB84CF00C1E687 /* RenderPlaceObjs.h in Headers */,
 				AEFD864A13EB84CF00C1E687 /* RenderRasterize.h in Headers */,
 				AEFD864B13EB84CF00C1E687 /* RenderSortPoly.h in Headers */,
+				276BED191A846FD900AE52F4 /* ProFontAO.h in Headers */,
 				AEFD864C13EB84CF00C1E687 /* RenderVisTree.h in Headers */,
 				AEFD864D13EB84CF00C1E687 /* scottish_textures.h in Headers */,
 				AEFD864E13EB84CF00C1E687 /* shape_definitions.h in Headers */,
@@ -4477,13 +4527,13 @@
 				AEFD866113EB84CF00C1E687 /* screen_drawing.h in Headers */,
 				AEFD866213EB84CF00C1E687 /* screen_shared.h in Headers */,
 				AEFD866313EB84CF00C1E687 /* sdl_fonts.h in Headers */,
+				276BED151A846FD900AE52F4 /* CourierPrimeItalic.h in Headers */,
 				AEFD866413EB84CF00C1E687 /* TextLayoutHelper.h in Headers */,
 				AEFD866513EB84CF00C1E687 /* TextStrings.h in Headers */,
 				27A6DB2C1B9CEA76003DA766 /* VorbisDecoder.h in Headers */,
 				AEFD866613EB84CF00C1E687 /* ViewControl.h in Headers */,
 				AEFD866713EB84CF00C1E687 /* song_definitions.h in Headers */,
 				27A6DB411B9CEB47003DA766 /* OGL_Headers.h in Headers */,
-				98457CA9238A1CF100E12B72 /* k8x12L.h in Headers */,
 				27A6DB251B9CEA71003DA766 /* SndfileDecoder.h in Headers */,
 				AEFD866813EB84CF00C1E687 /* sound_definitions.h in Headers */,
 				C13C71E81B3FB4C500F1188D /* DefaultStringSets.h in Headers */,
@@ -4491,14 +4541,12 @@
 				AEFD867113EB84CF00C1E687 /* XML_ParseTreeRoot.h in Headers */,
 				AEFD867413EB84CF00C1E687 /* alephversion.h in Headers */,
 				AEFD867513EB84CF00C1E687 /* Logging.h in Headers */,
-				98457CB1238A1CF100E12B72 /* SourceHanMono-Regular.h in Headers */,
 				AEFD867613EB84CF00C1E687 /* network_microphone_shared.h in Headers */,
 				AEFD867713EB84CF00C1E687 /* OGL_Model_Def.h in Headers */,
 				AEFD867813EB84CF00C1E687 /* OGL_Subst_Texture_Def.h in Headers */,
 				AEFD867913EB84CF00C1E687 /* OGL_Texture_Def.h in Headers */,
 				AEFD867A13EB84CF00C1E687 /* network_star.h in Headers */,
 				AEFD867B13EB84CF00C1E687 /* NetworkGameProtocol.h in Headers */,
-				98457CA1238A1CF100E12B72 /* SourceHanMono-BoldIt.h in Headers */,
 				AEFD867C13EB84CF00C1E687 /* RingGameProtocol.h in Headers */,
 				AEFD867D13EB84CF00C1E687 /* StarGameProtocol.h in Headers */,
 				AEFD867E13EB84CF00C1E687 /* AStream.h in Headers */,
@@ -4522,6 +4570,7 @@
 				AEFD868E13EB84CF00C1E687 /* Message.h in Headers */,
 				AEFD868F13EB84CF00C1E687 /* MessageDispatcher.h in Headers */,
 				AEFD869013EB84CF00C1E687 /* MessageHandler.h in Headers */,
+				276BED051A846FD900AE52F4 /* AlephSansMono-Bold.h in Headers */,
 				AEFD869113EB84CF00C1E687 /* MessageInflater.h in Headers */,
 				AEFD869213EB84CF00C1E687 /* network_capabilities.h in Headers */,
 				AEFD869313EB84CF00C1E687 /* shared_widgets.h in Headers */,
@@ -4543,7 +4592,6 @@
 				AEFD86A413EB84CF00C1E687 /* HUDRenderer_Lua.h in Headers */,
 				AEFD86A513EB84CF00C1E687 /* Image_Blitter.h in Headers */,
 				AEFD86A613EB84CF00C1E687 /* Shape_Blitter.h in Headers */,
-				98457C93238A1C8200E12B72 /* converter.h in Headers */,
 				AEFD86A713EB84CF00C1E687 /* OGL_Shader.h in Headers */,
 				AEFD86A813EB84CF00C1E687 /* vec3.h in Headers */,
 				AEFD86A913EB84CF00C1E687 /* Plugins.h in Headers */,
@@ -4658,7 +4706,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1000;
 				TargetAttributes = {
 					AE505B3A141D45E600915344 = {
 						SystemCapabilities = {
@@ -4683,8 +4731,8 @@
 					};
 				};
 			};
-			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */;
-			compatibilityVersion = "Xcode 11.4";
+			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */;
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -4719,6 +4767,7 @@
 				AE505C08141D45E600915344 /* MusakIcon.icns in Resources */,
 				AE505C0A141D45E600915344 /* PhysIcon.icns in Resources */,
 				AE505C0B141D45E600915344 /* SaveIcon.icns in Resources */,
+				9859FFC1254A2E55009B0A02 /* jp-fonts in Resources */,
 				AE505D16141D46B100915344 /* InfoPlist.strings in Resources */,
 				AE505D21141D47BF00915344 /* Marathon 2.icns in Resources */,
 			);
@@ -4737,6 +4786,7 @@
 				AEB4A1A914296CAE00537AE7 /* MusakIcon.icns in Resources */,
 				AEB4A1AB14296CAE00537AE7 /* PhysIcon.icns in Resources */,
 				AEB4A1AC14296CAE00537AE7 /* SaveIcon.icns in Resources */,
+				9859FFC2254A2E55009B0A02 /* jp-fonts in Resources */,
 				AEB4A2B314296DC000537AE7 /* Marathon Infinity.icns in Resources */,
 				AEB4A2B614296DC700537AE7 /* InfoPlist.strings in Resources */,
 			);
@@ -4755,6 +4805,7 @@
 				AEC3C7C909AD68AC003258E4 /* MapIcon.icns in Resources */,
 				AEC3C7CA09AD68AC003258E4 /* MMLIcon.icns in Resources */,
 				AEC3C7CB09AD68AC003258E4 /* MusakIcon.icns in Resources */,
+				9859FFBF254A2E55009B0A02 /* jp-fonts in Resources */,
 				AEC3C7CD09AD68AC003258E4 /* PhysIcon.icns in Resources */,
 				AEC3C7CE09AD68AC003258E4 /* SaveIcon.icns in Resources */,
 			);
@@ -4773,6 +4824,7 @@
 				AEFD86B713EB84CF00C1E687 /* MusakIcon.icns in Resources */,
 				AEFD86B913EB84CF00C1E687 /* PhysIcon.icns in Resources */,
 				AEFD86BA13EB84CF00C1E687 /* SaveIcon.icns in Resources */,
+				9859FFC0254A2E55009B0A02 /* jp-fonts in Resources */,
 				AE0E4EC2141D148F00AAA02F /* Marathon.icns in Resources */,
 				AE7A143C141D16D000834C2D /* InfoPlist.strings in Resources */,
 			);
@@ -5024,7 +5076,6 @@
 				AE505C46141D45E600915344 /* map.cpp in Sources */,
 				AE505C47141D45E600915344 /* map_constructors.cpp in Sources */,
 				AE505C48141D45E600915344 /* marathon2.cpp in Sources */,
-				98457C8F238A1C6700E12B72 /* converter.cpp in Sources */,
 				AE505C49141D45E600915344 /* media.cpp in Sources */,
 				AE505C4A141D45E600915344 /* monsters.cpp in Sources */,
 				AE505C4B141D45E600915344 /* pathfinding.cpp in Sources */,
@@ -5032,6 +5083,7 @@
 				AE505C4C141D45E600915344 /* physics.cpp in Sources */,
 				AE505C4D141D45E600915344 /* placement.cpp in Sources */,
 				AE780E122533A4C7002184B5 /* lua_ephemera.cpp in Sources */,
+				9859FFBC254A2DD0009B0A02 /* converter.cpp in Sources */,
 				AE505C4E141D45E600915344 /* platforms.cpp in Sources */,
 				AE505C4F141D45E600915344 /* player.cpp in Sources */,
 				AE505C50141D45E600915344 /* projectiles.cpp in Sources */,
@@ -5259,7 +5311,6 @@
 				AEB4A1E714296CAE00537AE7 /* map.cpp in Sources */,
 				AEB4A1E814296CAE00537AE7 /* map_constructors.cpp in Sources */,
 				AEB4A1E914296CAE00537AE7 /* marathon2.cpp in Sources */,
-				98457C90238A1C6700E12B72 /* converter.cpp in Sources */,
 				AEB4A1EA14296CAE00537AE7 /* media.cpp in Sources */,
 				AEB4A1EB14296CAE00537AE7 /* monsters.cpp in Sources */,
 				AEB4A1EC14296CAE00537AE7 /* pathfinding.cpp in Sources */,
@@ -5267,6 +5318,7 @@
 				AEB4A1ED14296CAE00537AE7 /* physics.cpp in Sources */,
 				AEB4A1EE14296CAE00537AE7 /* placement.cpp in Sources */,
 				AE780E132533A4C7002184B5 /* lua_ephemera.cpp in Sources */,
+				9859FFBD254A2DD0009B0A02 /* converter.cpp in Sources */,
 				AEB4A1EF14296CAE00537AE7 /* platforms.cpp in Sources */,
 				AEB4A1F014296CAE00537AE7 /* player.cpp in Sources */,
 				AEB4A1F114296CAE00537AE7 /* projectiles.cpp in Sources */,
@@ -5494,7 +5546,6 @@
 				AEC3C80F09AD68AC003258E4 /* lightsource.cpp in Sources */,
 				AEC3C81009AD68AC003258E4 /* map.cpp in Sources */,
 				AEC3C81109AD68AC003258E4 /* map_constructors.cpp in Sources */,
-				98457C8D238A1C6700E12B72 /* converter.cpp in Sources */,
 				AEC3C81209AD68AC003258E4 /* marathon2.cpp in Sources */,
 				AEC3C81309AD68AC003258E4 /* media.cpp in Sources */,
 				AEC3C81409AD68AC003258E4 /* monsters.cpp in Sources */,
@@ -5502,6 +5553,7 @@
 				AEC3C81609AD68AC003258E4 /* physics.cpp in Sources */,
 				AEC3C81709AD68AC003258E4 /* placement.cpp in Sources */,
 				AE780E102533A4C7002184B5 /* lua_ephemera.cpp in Sources */,
+				9859FFBA254A2DD0009B0A02 /* converter.cpp in Sources */,
 				AEC3C81809AD68AC003258E4 /* platforms.cpp in Sources */,
 				AEC3C81909AD68AC003258E4 /* player.cpp in Sources */,
 				AEC3C81A09AD68AC003258E4 /* projectiles.cpp in Sources */,
@@ -5729,7 +5781,6 @@
 				AEFD86F313EB84CF00C1E687 /* map.cpp in Sources */,
 				AEFD86F413EB84CF00C1E687 /* map_constructors.cpp in Sources */,
 				AEFD86F513EB84CF00C1E687 /* marathon2.cpp in Sources */,
-				98457C8E238A1C6700E12B72 /* converter.cpp in Sources */,
 				AEFD86F613EB84CF00C1E687 /* media.cpp in Sources */,
 				AEFD86F713EB84CF00C1E687 /* monsters.cpp in Sources */,
 				AEFD86F813EB84CF00C1E687 /* pathfinding.cpp in Sources */,
@@ -5737,6 +5788,7 @@
 				AEFD86F913EB84CF00C1E687 /* physics.cpp in Sources */,
 				AEFD86FA13EB84CF00C1E687 /* placement.cpp in Sources */,
 				AE780E112533A4C7002184B5 /* lua_ephemera.cpp in Sources */,
+				9859FFBB254A2DD0009B0A02 /* converter.cpp in Sources */,
 				AEFD86FB13EB84CF00C1E687 /* platforms.cpp in Sources */,
 				AEFD86FC13EB84CF00C1E687 /* player.cpp in Sources */,
 				AEFD86FD13EB84CF00C1E687 /* projectiles.cpp in Sources */,
@@ -5949,7 +6001,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -5958,7 +6010,11 @@
 					SPEEX,
 				);
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -6081,7 +6137,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -6090,7 +6146,11 @@
 					SPEEX,
 				);
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -6296,7 +6356,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -6305,7 +6365,11 @@
 					SPEEX,
 				);
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -6592,7 +6656,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */ = {
+		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE78B59E09B00C34002CACF8 /* Deployment (Universal) */,
