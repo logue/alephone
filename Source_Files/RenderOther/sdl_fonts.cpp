@@ -591,9 +591,9 @@ int get_utf8char_byte(const char* p )
 int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
 {
 	int width;
-	static uint16 temp[1024];
-	//mac_roman_to_unicode(text, temp, 1024);
-	//TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	// static uint16 temp[1024];
+	// mac_roman_to_unicode(text, temp, 1024);
+	// TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
 
 	if (width < max_width) return strlen(text);

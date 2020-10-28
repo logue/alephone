@@ -130,6 +130,9 @@ Jan 25, 2002 (Br'fin (Jeremy Parsons)):
 
 #include <sstream>
 
+// Japanese fix
+#include "converter.h"
+
 namespace algo = boost::algorithm;
 namespace io = boost::iostreams;
 

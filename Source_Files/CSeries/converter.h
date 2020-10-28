@@ -12,6 +12,8 @@
 
 #include <vector>
 #include <string>
+#include <iconv.h>
+#include <boost/locale/encoding.hpp>
 #include "SDL_ttf.h"
 
 #define MAC_LINE_END 13

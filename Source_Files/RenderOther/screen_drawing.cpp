@@ -140,7 +140,7 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
 */
-// HUD‚Ìƒ{[ƒ‹ƒh‚ğ‰ğœ
+// HUDãƒ•ã‚©ãƒ³ãƒˆã§ã¯ãƒœãƒ¼ãƒ«ãƒ‰ã‚’ä½¿ã‚ãªã„
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleNormal,  0, "#4"},
