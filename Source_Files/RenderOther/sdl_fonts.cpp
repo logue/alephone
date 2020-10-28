@@ -28,7 +28,6 @@
 #include "cseries.h"
 #include "sdl_fonts.h"
 #include "byte_swapping.h"
-#include "game_errors.h"
 #include "resource_manager.h"
 #include "FileHandler.h"
 #include "Logging.h"
@@ -39,8 +38,6 @@
 
 #include <boost/tokenizer.hpp>
 #include <string>
-#include<fstream>
-#include<iostream>
 
 #ifndef NO_STD_NAMESPACE
 using std::vector;
@@ -113,7 +110,7 @@ builtin_fonts_t builtin_fonts;
 
 void initialize_fonts(bool last_chance)
 {
-	logContext("initializing fonts");
+        logContext("initializing fonts");
     
 	// Initialize builtin TTF fonts
 	for (int j = 0; j < NUMBER_OF_BUILTIN_FONTS; ++j)
@@ -261,38 +258,20 @@ static TTF_Font *load_ttf_font(const std::string& path, uint16 style, int16 size
 
 		return font;
 	}
-	TTF_Init();
+
 	TTF_Font *font = 0;
-	bool found = false;
-
-	static const string fontPath[] = { "./Fonts.ttf", "./Fonts.otf" };
-	for ( int i=0; i < sizeof(fontPath)/sizeof(fontPath[0]); i++ ) {
-		const char* file = fontPath[i].c_str();
-		std::ifstream ifs(file);
-		found = ifs.is_open();
-		if (found) {
-			font = TTF_OpenFont(file , size);
-		}
+	builtin_fonts_t::iterator j = builtin_fonts.find(path);
+	if (j != builtin_fonts.end())
+	{
+		font = TTF_OpenFontRW(SDL_RWFromConstMem(j->second.data, j->second.size), 0, size);
 	}
-	
-	if (!found) {
-		builtin_fonts_t::iterator j = builtin_fonts.find(path);
-		if (j != builtin_fonts.end())
+	else
+	{
+		FileSpecifier fileSpec(path);
+		OpenedFile file;
+		if (fileSpec.Open(file))
 		{
-			font = TTF_OpenFontRW(SDL_RWFromConstMem(j->second.data, j->second.size), 0, size);
-		}
-		else
-		{
-			short SavedType, SavedError = get_game_error(&SavedType);
-
-			FileSpecifier fileSpec(path);
-			OpenedFile file;
-			if (fileSpec.Open(file))
-			{
-				font = TTF_OpenFontRW(file.TakeRWops(), 1, size);
-			}
-
-			set_game_error(SavedType, SavedError);
+			font = TTF_OpenFontRW(file.TakeRWops(), 1, size);
 		}
 	}
 
@@ -545,13 +524,13 @@ int sdl_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 int8 ttf_font_info::char_width(uint8 c, uint16 style) const
 {
 	int advance;
+	// TTF_GlyphMetrics(get_ttf(style), mac_roman_to_unicode(static_cast<char>(c)), 0, 0, 0, 0, &advance);
 	TTF_GlyphMetrics(get_ttf(style), static_cast<char>(c), 0, 0, 0, 0, &advance);
 
 	return advance;
 }
 uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) const
 {
-	// TODO:ここの処理でクラッシュする
 	return _text_width(text, strlen(text), style, utf8);
 }
 

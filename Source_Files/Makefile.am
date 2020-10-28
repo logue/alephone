@@ -7,15 +7,14 @@ SUBDIRS += Expat
 endif
 
 if MAKE_WINDOWS
-# bin_PROGRAMS = AlephOne Marathon Marathon2 MarathonInfinity
-bin_PROGRAMS = AlephOne
+bin_PROGRAMS = AlephOne Marathon Marathon2 MarathonInfinity
 else
 bin_PROGRAMS = alephone
 endif
 
 alephone_SOURCES = shell.h \
   \
-  shell.cpp shell_misc.cpp
+  shell.cpp shell_misc.cpp shell_options.h shell_options.cpp
 
 alephone_LDADD = \
   CSeries/libcseries.a Files/libfiles.a FFmpeg/libffmpeg.a \

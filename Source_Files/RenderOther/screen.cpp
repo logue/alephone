@@ -68,6 +68,7 @@
 #include "lua_hud_script.h"
 #include "HUDRenderer_Lua.h"
 #include "Movie.h"
+#include "shell_options.h"
 
 #include <algorithm>
 
@@ -93,6 +94,9 @@ SDL_Surface *Intro_Buffer_corrected = NULL;
 bool intro_buffer_changed = false;
 SDL_Surface *Map_Buffer = NULL;
 
+// A bitmap_definition view of world_pixels for software rendering
+static bitmap_definition_buffer software_render_dest;
+
 #ifdef HAVE_OPENGL
 static OGL_Blitter Term_Blitter;
 static OGL_Blitter Intro_Blitter;
@@ -116,9 +120,6 @@ static int desktop_height;
 
 static int failed_multisamples = 0;		// remember when GL multisample setting didn't succeed
 static bool passed_shader = false;      // remember when we passed Shader tests
-
-// From shell_sdl.cpp
-extern bool option_nogamma;
 
 #include "screen_shared.h"
 
@@ -144,6 +145,21 @@ static void DrawSurface(SDL_Surface *s, SDL_Rect &dest_rect, SDL_Rect &src_rect)
 static void clear_screen_margin();
 
 SDL_PixelFormat pixel_format_16, pixel_format_32;
+
+static bitmap_definition_buffer bitmap_definition_of_sdl_surface(const SDL_Surface* surface)
+{
+	assert(surface);
+	bitmap_definition_buffer buf(/*row_count:*/ surface->h);
+	auto& def = *buf.get();
+	def.width = surface->w;
+	def.height = surface->h;
+	def.bytes_per_row = surface->pitch;
+	def.flags = 0;
+	def.bit_depth = surface->format->BitsPerPixel;
+	def.row_addresses[0] = static_cast<pixel8*>(surface->pixels);
+	precalculate_bitmap_row_addresses(&def);
+	return buf;
+}
 
 // LP addition:
 void start_tunnel_vision_effect(
@@ -181,10 +197,6 @@ void Screen::Initialize(screen_mode_data* mode)
 		memset(world_color_table, 0, sizeof(struct color_table));
 		memset(visible_color_table, 0, sizeof(struct color_table));
 		memset(interface_color_table, 0, sizeof(struct color_table));
-
-		// Allocate the bitmap_definition structure for our GWorld (it is reinitialized every frame)
-		world_pixels_structure = (struct bitmap_definition *)malloc(sizeof(struct bitmap_definition) + sizeof(pixel8 *) * MAXIMUM_WORLD_HEIGHT);
-		assert(world_pixels_structure);
 
 		// Allocate and initialize our view_data structure
 		world_view = (struct view_data *)malloc(sizeof(struct view_data));
@@ -1358,28 +1370,6 @@ void render_screen(short ticks_elapsed)
 		clear_next_screen = false;
 	}
 
-	switch (screen_mode.acceleration) {
-		case _opengl_acceleration:
-			// If we're using the overhead map, fall through to no acceleration
-			if (!world_view->overhead_map_active && !world_view->terminal_mode_active)
-				break;
-		case _no_acceleration:
-			world_pixels_structure->width = world_view->screen_width;
-			world_pixels_structure->height = world_view->screen_height;
-			world_pixels_structure->bytes_per_row = world_pixels->pitch;
-			world_pixels_structure->flags = 0;
-			world_pixels_structure->bit_depth = bit_depth;
-			world_pixels_structure->row_addresses[0] = (pixel8 *)world_pixels->pixels;
-
-			//!! set world_pixels to VoidColor to avoid smearing?
-
-			precalculate_bitmap_row_addresses(world_pixels_structure);
-			break;
-		default:
-			assert(false);
-			break;
-	}
-
 	world_view->origin = current_player->camera_location;
 	if (!graphics_preferences->screen_mode.camera_bob)
 		world_view->origin.z -= current_player->step_height;
@@ -1409,8 +1399,14 @@ void render_screen(short ticks_elapsed)
     if (screen_mode.acceleration != _no_acceleration)
         clear_screen_margin();
     
+	// Update software_render_dest
+	if (OGL_IsActive())
+		software_render_dest.clear();
+	else if (software_render_dest.empty() || ViewChangedSize)
+		software_render_dest = bitmap_definition_of_sdl_surface(world_pixels);
+	
 	// Render world view
-	render_view(world_view, world_pixels_structure);
+	render_view(world_view, software_render_dest.get());
 
     // clear Lua drawing from previous frame
     // (SDL is slower if we do this before render_view)
@@ -1713,7 +1709,7 @@ void initialize_gamma(void)
 
 void build_direct_color_table(struct color_table *color_table, short bit_depth)
 {
-	if (!option_nogamma && !default_gamma_inited)
+	if (!shell_options.nogamma && !default_gamma_inited)
 		initialize_gamma();
 	color_table->color_count = 256;
 	rgb_color *color = color_table->colors;

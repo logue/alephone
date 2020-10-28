@@ -167,7 +167,7 @@ void widget::place(const SDL_Rect &r, placement_flags flags)
 // ZZZ change: copy the given string instead of just pointing to it.  Much easier for messages that change.
 w_static_text::w_static_text(const char *t, int _theme_type) : widget(_theme_type), theme_type(_theme_type)
 {
-	text = strdup(t);
+        text = strdup(t);
 	rect.w = text_width(text, font, style);
 	rect.h = font->get_line_height();
 	saved_min_height = rect.h;
@@ -200,7 +200,7 @@ void w_label::draw(SDL_Surface *s) const
 void
 w_static_text::set_text(const char* t) {
     free(text);
-	text = strdup(t);
+    text = strdup(t);
     dirty = true;
 }
 
@@ -236,35 +236,6 @@ void w_slider_text::draw(SDL_Surface *s) const
 	draw_text(s, text, rect.x, rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2, get_theme_color(LABEL_WIDGET, state, FOREGROUND_COLOR), font, style);
 }
 
-/*
- *  Picture (PICT resource)
- */
-
-w_pict::w_pict(int id)
-{
-	LoadedResource rsrc;
-	get_resource(FOUR_CHARS_TO_INT('P', 'I', 'C', 'T'), id, rsrc);
-	picture = picture_to_surface(rsrc);
-	if (picture) {
-		rect.w = static_cast<uint16>(picture->w);
-		rect.h = static_cast<uint16>(picture->h);
-		SDL_SetColorKey(picture, SDL_TRUE, SDL_MapRGB(picture->format, 0xff, 0xff, 0xff));
-	} else
-		rect.w = rect.h = 0;
-}
-
-w_pict::~w_pict()
-{
-	if (picture)
-		SDL_FreeSurface(picture);
-}
-
-void w_pict::draw(SDL_Surface *s) const
-{
-	if (picture)
-		SDL_BlitSurface(picture, NULL, s, const_cast<SDL_Rect *>(&rect));
-}
-
 
 /*
  *  Button
@@ -272,7 +243,6 @@ void w_pict::draw(SDL_Surface *s) const
 
 w_button_base::w_button_base(const char *t, action_proc p, void *a, int _type) : widget(_type), text(t), proc(p), arg(a), down(false), pressed(false), type(_type)
 {
-	
 	rect.w = text_width(text.c_str(), font, style) + get_theme_space(_type, BUTTON_L_SPACE) + get_theme_space(_type, BUTTON_R_SPACE);
 	button_c_default = get_theme_image(_type, DEFAULT_STATE, BUTTON_C_IMAGE, rect.w - get_theme_image(_type, DEFAULT_STATE, BUTTON_L_IMAGE)->w - get_theme_image(_type, DEFAULT_STATE, BUTTON_R_IMAGE)->w);
 	button_c_active = get_theme_image(_type, ACTIVE_STATE, BUTTON_C_IMAGE, rect.w - get_theme_image(_type, ACTIVE_STATE, BUTTON_L_IMAGE)->w - get_theme_image(_type, ACTIVE_STATE, BUTTON_R_IMAGE)->w);
@@ -534,9 +504,8 @@ void w_tab::draw(SDL_Surface *s) const
 		}
 
 		int c_space;
-		const char* str = labels[i].c_str();
 		SDL_Surface *c_image = images[state][i];
-		c_space = font->text_width(str, style);
+		c_space = font->text_width(labels[i].c_str(), style);
 
 		if (use_theme_images(TAB_WIDGET))
 		{
@@ -561,7 +530,7 @@ void w_tab::draw(SDL_Surface *s) const
 			}
 		}
 
-		font->draw_text(s, str, labels[i].size(), x + l_space, rect.y + get_theme_space(TAB_WIDGET, BUTTON_T_SPACE) + font->get_ascent(), get_theme_color(TAB_WIDGET, state, FOREGROUND_COLOR), style);
+		font->draw_text(s, labels[i].c_str(), labels[i].size(), x + l_space, rect.y + get_theme_space(TAB_WIDGET, BUTTON_T_SPACE) + font->get_ascent(), get_theme_color(TAB_WIDGET, state, FOREGROUND_COLOR), style);
 
 		x += l_space + c_space + r_space;
 	}
@@ -813,7 +782,7 @@ void w_select::draw(SDL_Surface *s) const
 	int y = rect.y + font->get_ascent() + (rect.h - font->get_line_height()) / 2;
 
 	// Selection (ZZZ: different color for disabled)
-	const char *str = num_labels > 0 ? labels[selection] : sNoValidOptionsString;
+	const char *str = (num_labels > 0 ? labels[selection] : sNoValidOptionsString);
 
     int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
@@ -931,7 +900,7 @@ void w_select::set_labels_stringset(short inStringSetID) {
         
 		for(size_t i = 0; i < num_labels; i++) {
             // shared references should be OK, stringsets ought to be pretty stable.  No need to copy...
-			labels[i] = TS_GetCString(inStringSetID, i);
+            labels[i] = TS_GetCString(inStringSetID, i);
         }
         
         // we allocated; we free.
@@ -1001,7 +970,7 @@ w_toggle::w_toggle(bool selection, const char **labels) : w_select(selection, la
 void w_toggle::draw(SDL_Surface *s) const
 {
 	// Selection (ZZZ: different color for disabled)
-	const char *str = num_labels > 0 ? labels[selection] : sNoValidOptionsString;
+	const char *str = (num_labels > 0 ? labels[selection] : sNoValidOptionsString);
 
 	int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
 
@@ -1216,21 +1185,20 @@ void w_text_entry::draw(SDL_Surface *s) const
   int16 theTextX = text_x;
   
   // Text
-  char *str = buf;
   int16 x = theRectX + theTextX;
-  uint16 width = text_width(str, font, style);
+  uint16 width = text_width(buf, font, style);
   if (width > max_text_width)
     x -= width - max_text_width;
   set_drawing_clip_rectangle(0, theRectX + theTextX, static_cast<uint16>(s->h), theRectX + theRectW);
   
   int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
   
-  draw_text(s, str, x, y, get_theme_color(TEXT_ENTRY_WIDGET, state), font, style);
+  draw_text(s, buf, x, y, get_theme_color(TEXT_ENTRY_WIDGET, state), font, style);
   set_drawing_clip_rectangle(SHRT_MIN, SHRT_MIN, SHRT_MAX, SHRT_MAX);
   
   // Cursor
   if (active) {
-	  width = text_width(str, cursor_position, font, style);
+	  width = text_width(buf, cursor_position, font, style);
 	  SDL_Rect r = {x + width - (width ? 1 : 0), rect.y, 1, rect.h};
 	  SDL_FillRect(s, &r, get_theme_color(TEXT_ENTRY_WIDGET, CURSOR_STATE));
   }
@@ -1474,7 +1442,7 @@ void w_number_entry::event(SDL_Event &e)
 		for (std::string::iterator it = input_roman.begin(); it != input_roman.end(); ++it)
 		{
 			uint16 uc = *it;
-			if (uc >= '0' && (uc < 0x80 || enable_mac_roman) && (num_chars + 1) < max_chars) {
+			if (uc >= '0' && uc <= '9' && (num_chars + 1) < max_chars) {
 				memmove(&buf[cursor_position + 1], &buf[cursor_position], num_chars - cursor_position);
 				buf[cursor_position++] = static_cast<char>(uc);
 				buf[++num_chars] = 0;
@@ -1483,8 +1451,10 @@ void w_number_entry::event(SDL_Event &e)
 			}
 		}
 	}
-
-	w_text_entry::event(e);
+	else
+	{
+		w_text_entry::event(e);
+	}
 }
 
 void w_number_entry::set_number(int number)
@@ -1556,7 +1526,7 @@ GetSDLKeyName(SDL_Scancode inKey) {
 	if (w_key::event_type_for_key(inKey) == w_key::MouseButton)
         return sMouseButtonKeyName[inKey - AO_SCANCODE_BASE_MOUSE_BUTTON];
 	else if (w_key::event_type_for_key(inKey) == w_key::JoystickButton)
-        return sJoystickButtonKeyName[inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON];
+	    return sJoystickButtonKeyName[inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON];
     else
         return SDL_GetScancodeName(inKey);
 }
@@ -1613,7 +1583,7 @@ void w_key::event(SDL_Event &e)
 		switch (e.type) {
 			case SDL_MOUSEBUTTONDOWN:
 				if (event_type == MouseButton) {
-					if (e.button.button < NUM_SDL_REAL_MOUSE_BUTTONS) {
+					if (e.button.button < NUM_SDL_REAL_MOUSE_BUTTONS + 1) {
 						set_key(static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + e.button.button - 1));
 						handled = true;
 					}
@@ -2274,7 +2244,7 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
 	char str[256];
 
     if(show_level_numbers)
-    	sprintf(str, "%d - %s", i->level_number + 1, _UTF8(i->level_name));
+    	sprintf(str, "%d - %s", i->level_number + 1, i->level_name);
     else
         sprintf(str, "%s", i->level_name);
 
@@ -2346,7 +2316,7 @@ void w_select_popup::set_selection (int value)
 	if (selection == -1)
 		w_select_button::set_selection ("");
 	else
-		w_select_button::set_selection (labels[selection].c_str());
+		w_select_button::set_selection (labels[selection].c_str ());
 }
 
 void w_select_popup::gotSelected ()
@@ -2369,7 +2339,7 @@ void w_select_popup::gotSelected ()
 }
 
 
-static const char* const sFileChooserInvalidFileString = "（無効な選択）";
+static const char* const sFileChooserInvalidFileString = "(no valid selection)";
 
 w_file_chooser::w_file_chooser(const char* inDialogPrompt, Typecode inTypecode)
 	: w_select_button("", NULL, NULL, true), typecode(inTypecode)
@@ -2488,16 +2458,16 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		{
 			if (item.minutes_remaining() == 1)
 			{
-				time_or_ping << "1分未満";
+				time_or_ping << "~1 Minute";
 			}
 			else
 			{
-				time_or_ping << item.minutes_remaining() << "分";
+				time_or_ping << item.minutes_remaining() << " Minutes";
 			}
 		}
 		else
 		{
-			time_or_ping << "無制限";
+			time_or_ping << "Untimed";
 		}
 	}
 	else
@@ -2524,7 +2494,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_and_map << "|i" << item.m_description.m_scenarioName;
 		if (item.m_description.m_scenarioVersion != "")
 		{
-			game_and_map << ", バージョン " << item.m_description.m_scenarioVersion;
+			game_and_map << ", Version " << item.m_description.m_scenarioVersion;
 		}
 	} 
 	else
@@ -2546,11 +2516,11 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	{
 		if (item.m_description.m_numPlayers == 1)
 		{
-			game_settings << "1 プレイヤー";
+			game_settings << "1 Player";
 		}
 		else
 		{
-			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " プレイヤー";
+			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " Players";
 		}
 	}
 	else
@@ -2558,19 +2528,19 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_settings << static_cast<uint16>(item.m_description.m_numPlayers)
 			      << "/"
 			      << item.m_description.m_maxPlayers
-			      << " プレイヤー";
+			      << " Players";
 	}
 
 	if (item.m_description.m_timeLimit && !(item.m_description.m_timeLimit == INT32_MAX || item.m_description.m_timeLimit == -1))
 	{
 		game_settings << ", " 
 			      << item.m_description.m_timeLimit / 60 / TICKS_PER_SECOND 
-			      << " 分";
+			      << " Minutes";
 	}
 
 	if (item.m_description.m_teamsAllowed)
 	{
-		game_settings << ", チーム";
+		game_settings << ", Teams";
 	}
 
 	draw_text(s, game_settings.str().c_str(), x, y, fg, font, game_style);

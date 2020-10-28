@@ -139,7 +139,7 @@ namespace io = boost::iostreams;
 #define BORDER_INSET 9
 #define FUDGE_FACTOR 1
 
-//#define MAC_LINE_END 13
+#define MAC_LINE_END 13
 
 enum {
 	_reading_terminal,
@@ -301,7 +301,7 @@ static void _draw_computer_text(char *base_text, short start_index, Rect *bounds
 	terminal_text_t *terminal_text, short current_line);
 static short find_group_type(terminal_text_t *data, 
 	short group_type);
-static void teleport_to_level(short level_number);
+static void teleport_to_level(short level_number, int16 delay_before_teleport);
 static void teleport_to_polygon(short player_index, short polygon_index);
 static struct terminal_groupings *get_indexed_grouping(
 	terminal_text_t *data, short index);
@@ -603,7 +603,7 @@ void enter_computer_interface(
 	next_terminal_group(player_index, terminal_text);
 }
 
-/*  Assumes �t==1 tick */
+/*  Assumes ｶt==1 tick */
 void update_player_for_terminal_mode(
 	short player_index)
 {
@@ -1111,14 +1111,14 @@ static short find_group_type(
 }
 
 static void teleport_to_level(
-	short level_number)
+	short level_number, int16_t delay_before_teleport)
 {
 	/* It doesn't matter which player we get. */
 	struct player_data *player= get_player_data(0);
 	
 	// LP change: moved down by 1 so that level 0 will be valid
 	player->teleporting_destination= -level_number - 1;
-	player->delay_before_teleport= TICKS_PER_SECOND/2; // delay before we teleport.
+	player->delay_before_teleport = delay_before_teleport;
 }
 			
 static void teleport_to_polygon(
@@ -1207,12 +1207,11 @@ static void display_picture(
 	short flags)
 {
 	LoadedResource PictRsrc;
-	SDL_Surface *s = NULL;
 
-	if (get_picture_resource_from_scenario(picture_id, PictRsrc))
-	{
-		s = picture_to_surface(PictRsrc);
-	}
+	auto s = get_picture_resource_from_scenario(picture_id, PictRsrc) ? 
+			 picture_to_surface(PictRsrc) :
+			 std::shared_ptr<SDL_Surface>(nullptr, SDL_FreeSurface);
+
 	if (s)
 	{
 		Rect bounds;
@@ -1224,7 +1223,7 @@ static void display_picture(
 
 		int pict_header_width = get_pict_header_width(PictRsrc);
 		bool cinemascopeHack = false;
-		if (bounds.right == 614 && pict_header_width == 307)
+		if (bounds.right != pict_header_width)
 		{
 			cinemascopeHack = true;
 			bounds.right = pict_header_width;
@@ -1264,16 +1263,15 @@ static void display_picture(
 
 		SDL_Rect r = {bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top};
 		if ((s->w == r.w && s->h == r.h) || cinemascopeHack)
-			SDL_BlitSurface(s, NULL, /*world_pixels*/draw_surface, &r);
+			SDL_BlitSurface(s.get(), NULL, /*world_pixels*/draw_surface, &r);
 		else {
 			// Rescale picture
-			SDL_Surface *s2 = rescale_surface(s, r.w, r.h);
+			SDL_Surface *s2 = rescale_surface(s.get(), r.w, r.h);
 			if (s2) {
 				SDL_BlitSurface(s2, NULL, /*world_pixels*/draw_surface, &r);
 				SDL_FreeSurface(s2);
 			}
 		}
-		SDL_FreeSurface(s);
 		/* And let the caller know where we drew the picture */
 		*frame= bounds;
 	} else {
@@ -1359,6 +1357,8 @@ void clear_compiled_terminal_cache()
 	resource_terminal_id = NONE;
 }
 
+extern OpenedResourceFile M1ShapesFile;
+
 static terminal_text_t* compile_marathon_terminal(char*, short);
 
 static terminal_text_t *get_indexed_terminal_data(
@@ -1371,10 +1371,20 @@ static terminal_text_t *get_indexed_terminal_data(
 		{
 			return resource_terminal.get();
 		}
-		else if (ExternalResources.IsOpen())
+		else
 		{
 			LoadedResource rsrc;
-			if (ExternalResources.Get('t', 'e', 'r', 'm', id, rsrc))
+			if (ExternalResources.IsOpen())
+			{
+				ExternalResources.Get('t', 'e', 'r', 'm', id, rsrc);
+			}
+
+			if (!rsrc.IsLoaded() && M1ShapesFile.IsOpen())
+			{
+				M1ShapesFile.Get('t', 'e', 'r', 'm', id, rsrc);
+			}
+
+			if (rsrc.IsLoaded())
 			{
 				resource_terminal.reset(compile_marathon_terminal(reinterpret_cast<char*>(rsrc.GetPointer()), rsrc.GetLength()));
 				
@@ -1968,7 +1978,14 @@ static void handle_reading_terminal_keys(
 			break;
 		
 		case _interlevel_teleport_group: // permutation is level to go to
-			teleport_to_level(current_group->permutation);
+			if (film_profile.m1_teleport_without_delay && (current_group->flags & _group_is_marathon_1))
+			{
+				teleport_to_level(current_group->permutation, 0);
+			}
+			else
+			{
+				teleport_to_level(current_group->permutation, TICKS_PER_SECOND / 2);
+			}
 			initialize_player_terminal_info(player_index);
 			aborted= true;
 			break;
@@ -2178,7 +2195,7 @@ terminal_text_t* MarathonTerminalCompiler::Compile()
 	terminal->text = out;
 
 	terminal->lines_per_page = calculate_lines_per_page();
-	calculate_maximum_lines_for_groups(&*terminal,&terminal->groupings[0], terminal->groupings.size(), reinterpret_cast<char*>(terminal->text.data()));
+	calculate_maximum_lines_for_groups(&*terminal, &terminal->groupings[0], terminal->groupings.size(), reinterpret_cast<char*>(terminal->text.data()));
 
 	return terminal.release();
 }
@@ -2498,7 +2515,7 @@ static void calculate_maximum_lines_for_groups(
 		
 					/* The only thing we care about is the width. */
 					calculate_bounds_for_text_box(groups[index].flags, &text_bounds);
-					groups[index].maximum_line_count= count_total_lines(terminal_text,text_base,
+					groups[index].maximum_line_count= count_total_lines(terminal_text, text_base,
 						RECTANGLE_WIDTH(&text_bounds), groups[index].start_index, 
 						groups[index].start_index+groups[index].length);
 				}
@@ -2508,7 +2525,7 @@ static void calculate_maximum_lines_for_groups(
 				{
 					Rect text_bounds= get_term_rectangle(_terminal_full_text_rect);
 		
-					groups[index].maximum_line_count= count_total_lines(terminal_text,text_base,
+					groups[index].maximum_line_count= count_total_lines(terminal_text, text_base,
 						RECTANGLE_WIDTH(&text_bounds), groups[index].start_index, 
 						groups[index].start_index+groups[index].length);
 				}
@@ -2539,7 +2556,6 @@ static struct text_face_data *get_indexed_font_changes(
 
 	return &data->font_changes[index];
 }
-// 0 13 22 29
 
 static char *get_text_base(
 	terminal_text_t *data)

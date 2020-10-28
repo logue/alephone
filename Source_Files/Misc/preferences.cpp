@@ -100,6 +100,8 @@ May 22, 2003 (Woody Zenfell):
 #include <sstream>
 #include <boost/algorithm/hex.hpp>
 
+#include "shell_options.h"
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -107,6 +109,7 @@ May 22, 2003 (Woody Zenfell):
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> // for GetUserName()
+#include <lmcons.h>
 #endif
 
 // 8-bit support is still here if you undefine this, but you'll need to fix it
@@ -188,18 +191,16 @@ static std::string get_name_from_system()
 
 #elif defined(__WIN32__)
 
-	char login[17];
-	DWORD len = 17;
-
-	bool hasName = (GetUserName((LPSTR)login, &len) == TRUE);
-	if (hasName && strpbrk(login, "\\/:*?\"<>|") == NULL) // Ignore illegal names
-		return login;
+	wchar_t wname[UNLEN + 1];
+	DWORD wname_n = UNLEN + 1;
+	if (GetUserNameW(wname, &wname_n))
+		return wide_to_utf8(wname);
 
 #else
 //#error get_name_from_system() not implemented for this platform
 #endif
 
-	return "ボブ市民";
+	return "Bob User";
 }
 
 
@@ -374,7 +375,7 @@ static void crosshair_dialog(void *arg)
 	SelectSelectorWidget shapeWidget(shape_w);
 	Int16Pref shapePref(player_preferences->Crosshairs.Shape);
 	crosshair_binders->insert<int> (&shapeWidget, &shapePref);
-	table->dual_add(shape_w->label("形"), d);
+	table->dual_add(shape_w->label("形状"), d);
 	table->dual_add(shape_w, d);
 
 	table->add_row(new w_spacer(), true);
@@ -531,7 +532,7 @@ static void player_dialog(void *arg)
 
 	horizontal_placer *button_placer = new horizontal_placer;
 	
-	w_button *ok_button = new w_button("OK", dialog_ok, &d);
+	w_button* ok_button = new w_button("ACCEPT", dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
@@ -703,7 +704,7 @@ static void signup_dialog(void *arg)
 	
 	horizontal_placer *button_placer = new horizontal_placer;
 	
-	w_button *ok_button = new w_button("登録", signup_dialog_ok, &d);
+	w_button* ok_button = new w_button("登録", signup_dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
@@ -845,7 +846,7 @@ static void online_dialog(void *arg)
 
 	horizontal_placer *button_placer = new horizontal_placer;
 	
-	w_button *ok_button = new w_button("OK", dialog_ok, &d);
+	w_button* ok_button = new w_button("OK", dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
@@ -968,6 +969,10 @@ static const char *sw_sdl_driver_labels[5] = {
 	"デフォルト", "なし", "Direct3D", "OpenGL", NULL
 };
 
+static const char* ephemera_quality_labels[5] = {
+	"なし", "低", "中", "高", "最高"
+};
+
 static const char *gamma_labels[9] = {
 	"とても暗い", "暗い", "やや暗い", "通常", "やや明るい", "明るい", "より明るい", "とても明るい", NULL
 };
@@ -1039,9 +1044,14 @@ static void software_rendering_options_dialog(void* arg)
 	table->dual_add(sw_alpha_blending_w->label("液面を半透明化"), d);
 	table->dual_add(sw_alpha_blending_w, d);
 
+	w_select* ephemera_quality_w = new w_select(graphics_preferences->ephemera_quality, ephemera_quality_labels);
+	table->dual_add(ephemera_quality_w->label("スクリプトによるエフェクトのクオリティ"), d);
+	table->dual_add(ephemera_quality_w, d);
+
 	w_select *sw_driver_w = new w_select(graphics_preferences->software_sdl_driver, sw_sdl_driver_labels);
 	table->dual_add(sw_driver_w->label("アクセラーション"), d);
 	table->dual_add(sw_driver_w, d);
+
 	
 	placer->add(table, true);
 
@@ -1085,6 +1095,12 @@ static void software_rendering_options_dialog(void* arg)
 		if (sw_driver_w->get_selection() != graphics_preferences->software_sdl_driver)
 		{
 			graphics_preferences->software_sdl_driver = sw_driver_w->get_selection();
+			changed = true;
+		}
+
+		if (ephemera_quality_w->get_selection() != graphics_preferences->ephemera_quality)
+		{
+			graphics_preferences->ephemera_quality = ephemera_quality_w->get_selection();
 			changed = true;
 		}
 		
@@ -1369,12 +1385,25 @@ static const char *channel_labels[] = {"1", "2", "4", "8", "16", "32", NULL};
 
 class w_volume_slider : public w_percentage_slider {
 public:
-	w_volume_slider(int vol) : w_percentage_slider(NUMBER_OF_SOUND_VOLUME_LEVELS, vol) {}
+	w_volume_slider(int vol) : w_percentage_slider(21, vol) {}
 	~w_volume_slider() {}
 
 	void item_selected(void)
 	{
-		SoundManager::instance()->TestVolume(selection, _snd_adjust_volume);
+		SoundManager::instance()->TestVolume((selection - 20) * 2, _snd_adjust_volume);
+	}
+};
+
+class w_music_slider : public w_slider {
+public:
+	w_music_slider(int sel) : w_slider(41, sel) {
+		init_formatted_value();
+	}
+
+	virtual std::string formatted_value() {
+		std::ostringstream ss;
+		ss << (selection * 200 / (num_items - 1)) << "%";
+		return ss.str();
 	}
 };
 
@@ -1418,11 +1447,11 @@ static void sound_dialog(void *arg)
 	table->dual_add(channels_w->label("チャンネル数"), d);
 	table->dual_add(channels_w, d);
 
-	w_volume_slider *volume_w = new w_volume_slider(sound_preferences->volume);
+	w_volume_slider *volume_w = new w_volume_slider(static_cast<int>(sound_preferences->volume_db / 2 + 20));
 	table->dual_add(volume_w->label("音量"), d);
 	table->dual_add(volume_w, d);
 
-	w_slider *music_volume_w = new w_percentage_slider(NUMBER_OF_SOUND_VOLUME_LEVELS, sound_preferences->music);
+	w_slider *music_volume_w = new w_music_slider(sound_preferences->music_db + 20);
 	table->dual_add(music_volume_w->label("音楽の音量"), d);
 	table->dual_add(music_volume_w, d);
 
@@ -1484,15 +1513,15 @@ static void sound_dialog(void *arg)
 			changed = true;
 		}
 
-		int volume = volume_w->get_selection();
-		if (volume != sound_preferences->volume) {
-			sound_preferences->volume = volume;
+		float volume_db = (volume_w->get_selection() - 20) * 2;
+		if (volume_db != sound_preferences->volume_db) {
+			sound_preferences->volume_db = volume_db;
 			changed = true;
 		}
 
-		int music_volume = music_volume_w->get_selection();
-		if (music_volume != sound_preferences->music) {
-			sound_preferences->music = music_volume;
+		float music_db = music_volume_w->get_selection() - 20;
+		if (music_db != sound_preferences->music_db) {
+			sound_preferences->music_db = music_db;
 			changed = true;
 		}
 
@@ -1823,7 +1852,7 @@ enum {
 	TAB_MORE_KEYS
 };
 
-const std::vector<std::string> mouse_feel_labels = {"旧式", "現代風", "（カスタム）"};
+const std::vector<std::string> mouse_feel_labels = {"クラシック", "モダン", "（カスタム）"};
 static w_select_popup *mouse_feel_w;
 static w_select_popup *mouse_feel_details_w;
 static w_toggle *mouse_raw_w;
@@ -1840,7 +1869,7 @@ static void mouse_feel_details_changed(void *arg)
 	switch (mouse_feel_details_w->get_selection())
 	{
 		case 0:
-			mouse_raw_w->set_selection(0);
+			mouse_raw_w->set_selection(1);
 			mouse_accel_w->set_selection(1);
 			mouse_vertical_w->set_selection(1);
 			mouse_precision_w->set_selection(1);
@@ -1862,7 +1891,7 @@ static void update_mouse_feel_details(void *arg)
 	if (inside_callback)
 		return;
 	inside_callback = true;
-	if (mouse_raw_w->get_selection() == 0 &&
+	if (mouse_raw_w->get_selection() == 1 &&
 		mouse_accel_w->get_selection() == 1 &&
 		mouse_vertical_w->get_selection() == 1 &&
 		mouse_precision_w->get_selection() == 1)
@@ -1885,7 +1914,7 @@ static void update_mouse_feel_details(void *arg)
 
 static void update_mouse_feel(void *arg)
 {
-	if (input_preferences->raw_mouse_input == false &&
+	if (input_preferences->raw_mouse_input == true &&
 		input_preferences->mouse_accel_type == _mouse_accel_classic &&
 		input_preferences->classic_vertical_aim == true &&
 		input_preferences->extra_mouse_precision == false)
@@ -1911,8 +1940,8 @@ static bool apply_mouse_feel(int selection)
 	switch (selection)
 	{
 		case 0:
-			if (false != input_preferences->raw_mouse_input) {
-				input_preferences->raw_mouse_input = false;
+			if (true != input_preferences->raw_mouse_input) {
+				input_preferences->raw_mouse_input = true;
 				changed = true;
 			}
 			if (_mouse_accel_classic != input_preferences->mouse_accel_type) {
@@ -2199,7 +2228,7 @@ static void controls_dialog(void *arg)
 	
 	tab_placer* tabs = new tab_placer();
 	
-	std::vector<std::string> labels = { "照準", "移動", "アクション", "インターフェース", "その他" };
+	std::vector<std::string> labels = { "照準", "移動", "アクション", "インターフェイス", "その他" };
 	w_tab *tab_w = new w_tab(labels, tabs);
 	
 	placer->dual_add(tab_w, d);
@@ -2620,9 +2649,9 @@ static void plugins_dialog(void *)
 	placer->add(new w_spacer, true);
 
 	horizontal_placer* button_placer = new horizontal_placer;
-	w_button *accept_w = new w_button("OK", dialog_ok, &d);
+	w_button* accept_w = new w_button("OK", dialog_ok, &d);
 	button_placer->dual_add(accept_w, d);
-	w_button *cancel_w = new w_button("キャンセル", dialog_cancel, &d);
+	w_button* cancel_w = new w_button("キャンセル", dialog_cancel, &d);
 	button_placer->dual_add(cancel_w, d);
 
 	placer->add(button_placer, true);
@@ -2692,7 +2721,7 @@ static void environment_dialog(void *arg)
 	table->dual_add(sounds_w->label("サウンド"), d);
 	table->dual_add(sounds_w, d);
 
-	w_env_select *resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_unknown, &d);
+	w_env_select* resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_unknown, &d);
 	table->dual_add(resources_w->label("外部リソース"), d);
 	table->dual_add(resources_w, d);
 #endif
@@ -2703,7 +2732,7 @@ static void environment_dialog(void *arg)
 #ifndef MAC_APP_STORE
 	table->add_row(new w_spacer, true);
 	table->dual_add_row(new w_static_text("ソロスクリプト"), d);
-	w_enabling_toggle *use_solo_lua_w = new w_enabling_toggle(environment_preferences->use_solo_lua);
+	w_enabling_toggle* use_solo_lua_w = new w_enabling_toggle(environment_preferences->use_solo_lua);
 	table->dual_add(use_solo_lua_w->label("ソロスクリプトを使用"), d);
 	table->dual_add(use_solo_lua_w, d);
 
@@ -2984,12 +3013,33 @@ void read_preferences ()
 	FileSpecifier FileSpec;
 
 	FileSpec.SetToPreferencesDir();
-	FileSpec += getcstr(temporary, strFILENAMES, filenamePREFERENCES);
+	std::string name = getcstr(temporary, strFILENAMES, filenamePREFERENCES);
+	if (shell_options.editor)
+	{
+		// check for editor prefs
+		name += " Editor";
+	}
+	FileSpec += name;
 
 	OpenedFile OFile;
 	bool defaults = false;
 	bool opened = FileSpec.Open(OFile);
 
+	if (!opened && shell_options.editor)
+	{
+		// copy non-editor prefs
+		FileSpec.SetToPreferencesDir();
+		FileSpec += getcstr(temporary,strFILENAMES, filenamePREFERENCES);
+		opened = FileSpec.Open(OFile);
+	}
+
+	if (!opened) {
+		defaults = true;
+		FileSpec.SetNameWithPath("Scripts/Default Preferences.xml");
+		opened = FileSpec.Open(OFile);
+	}
+
+	// legacy defalt prefs
 	if (!opened) {
 		defaults = true;
 		FileSpec.SetNameWithPath(getcstr(temporary, strFILENAMES, filenamePREFERENCES));
@@ -3042,13 +3092,17 @@ void read_preferences ()
 			parse_error = true;
 		}
 	}
-	
-	if (!opened || parse_error)
+
+	if (defaults)
 	{
-		if (defaults)
+		if (parse_error)
+		{
 			alert_user(expand_app_variables("There were default preferences-file parsing errors (see $appLogFile$ for details)").c_str(), infoError);
-		else
-			alert_user(expand_app_variables("There were preferences-file parsing errors (see $appLogFile$ for details)").c_str(), infoError);
+		}
+	}
+	else if (!opened || parse_error)
+	{
+		alert_user(expand_app_variables("There were preferences-file parsing errors (see $appLogFile$ for details)").c_str(), infoError);
 	}
 
 	// Check on the read-in prefs
@@ -3106,7 +3160,9 @@ InfoTree graphics_preferences_tree()
 	root.put_attr("double_corpse_limit", graphics_preferences->double_corpse_limit);
 	root.put_attr("hog_the_cpu", graphics_preferences->hog_the_cpu);
 	root.put_attr("movie_export_video_quality", graphics_preferences->movie_export_video_quality);
+	root.put_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
 	root.put_attr("movie_export_audio_quality", graphics_preferences->movie_export_audio_quality);
+	root.put_attr("scripted_effects_quality", graphics_preferences->ephemera_quality);
 	
 	root.add_color("void.color", graphics_preferences->OGL_Configure.VoidColor);
 
@@ -3359,13 +3415,14 @@ InfoTree sound_preferences_tree()
 	InfoTree root;
 	
 	root.put_attr("channels", sound_preferences->channel_count);
-	root.put_attr("volume", sound_preferences->volume);
-	root.put_attr("music_volume", sound_preferences->music);
+	root.put_attr("volume_db", sound_preferences->volume_db);
+	root.put_attr("music_db", sound_preferences->music_db);
 	root.put_attr("flags", sound_preferences->flags);
 	root.put_attr("rate", sound_preferences->rate);
 	root.put_attr("samples", sound_preferences->samples);
 	root.put_attr("volume_while_speaking", sound_preferences->volume_while_speaking);
 	root.put_attr("mute_while_transmitting", sound_preferences->mute_while_transmitting);
+	root.put_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
 	
 	return root;
 }
@@ -3471,7 +3528,13 @@ void write_preferences()
 	
 	FileSpecifier FileSpec;
 	FileSpec.SetToPreferencesDir();
-	FileSpec += getcstr(temporary, strFILENAMES, filenamePREFERENCES);
+
+	std::string name = getcstr(temporary, strFILENAMES, filenamePREFERENCES);
+	if (shell_options.editor)
+	{
+		name += " Editor";
+	}
+	FileSpec += name;
 	
 	try {
 		fileroot.save_xml(FileSpec);
@@ -3499,7 +3562,7 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 	preferences->screen_mode.hud = true;
 	preferences->screen_mode.hud_scale_level = 0;
 	preferences->screen_mode.term_scale_level = 2;
-	preferences->screen_mode.translucent_map = true;
+	preferences->screen_mode.translucent_map = false;
 	preferences->screen_mode.acceleration = _opengl_acceleration;
 	preferences->screen_mode.high_resolution = true;
 	preferences->screen_mode.fullscreen = true;
@@ -3519,6 +3582,9 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 
 	preferences->movie_export_video_quality = 50;
 	preferences->movie_export_audio_quality = 50;
+	preferences->movie_export_video_bitrate = 0; // auto
+
+	preferences->ephemera_quality = _ephemera_medium;
 }
 
 static void default_network_preferences(network_preferences_data *preferences)
@@ -3567,7 +3633,8 @@ static void default_player_preferences(player_preferences_data *preferences)
 	obj_clear(*preferences);
 
 	preferences->difficulty_level= 2;
-	strncpy(preferences->name, get_name_from_system().c_str(), PREFERENCES_NAME_LENGTH+1);
+	strncpy(preferences->name, get_name_from_system().c_str(), PREFERENCES_NAME_LENGTH);
+	preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
 	
 	// LP additions for new fields:
 	
@@ -3985,7 +4052,9 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	root.read_attr("hog_the_cpu", graphics_preferences->hog_the_cpu);
 	root.read_attr_bounded<int16>("movie_export_video_quality", graphics_preferences->movie_export_video_quality, 0, 100);
 	root.read_attr_bounded<int16>("movie_export_audio_quality", graphics_preferences->movie_export_audio_quality, 0, 100);
-	
+	root.read_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
+
+	root.read_attr("scripted_effects_quality", graphics_preferences->ephemera_quality);
 	
 	BOOST_FOREACH(InfoTree vtree, root.children_named("void"))
 	{
@@ -4278,13 +4347,49 @@ void parse_input_preferences(InfoTree root, std::string version)
 void parse_sound_preferences(InfoTree root, std::string version)
 {
 	root.read_attr("channels", sound_preferences->channel_count);
-	root.read_attr("volume", sound_preferences->volume);
-	root.read_attr("music_volume", sound_preferences->music);
+
+	if (!version.length() || version < "20200803")
+	{
+		int old_volume;
+		root.read_attr("volume", old_volume);
+		if (old_volume > 0)
+		{
+			sound_preferences->volume_db = 10.f * std::log10(static_cast<float>(old_volume) / NUMBER_OF_SOUND_VOLUME_LEVELS);
+		}
+		else
+		{
+			sound_preferences->volume_db = SoundManager::MINIMUM_VOLUME_DB;
+		}
+	}
+	else
+	{
+		root.read_attr("volume_db", sound_preferences->volume_db);
+	}
+
+	if (!version.length() || version < "20200803")
+	{
+		int old_music_volume;
+		root.read_attr("music_volume", old_music_volume);
+		if (old_music_volume > 0)
+		{
+			sound_preferences->music_db = 10.f * std::log10(static_cast<float>(old_music_volume) / NUMBER_OF_SOUND_VOLUME_LEVELS);
+		}
+		else
+		{
+			sound_preferences->music_db = SoundManager::MINIMUM_VOLUME_DB / 2;
+		}
+	}
+	else
+	{
+		root.read_attr("music_db", sound_preferences->music_db);
+	}
+
 	root.read_attr("flags", sound_preferences->flags);
 	root.read_attr("rate", sound_preferences->rate);
 	root.read_attr("samples", sound_preferences->samples);
 	root.read_attr("volume_while_speaking", sound_preferences->volume_while_speaking);
 	root.read_attr("mute_while_transmitting", sound_preferences->mute_while_transmitting);
+	root.read_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
 }
 
 

@@ -537,6 +537,7 @@ enum /* side flags */
 	_side_switch_can_be_destroyed= 0x0020, // projectile hits toggle and destroy this switch
 	_side_switch_can_only_be_hit_by_projectiles= 0x0040,
 	_side_item_is_optional= 0x0080, // in Marathon, switches still work without items
+        _side_is_m1_lighted_switch = 0x0100, // in Marathon, lighted switches must be above 50% (unlike M2, 75%)
 
 	_editor_dirty_bit= 0x4000 // used by the editor...
 };
@@ -819,7 +820,7 @@ enum /* environment flags */
 	_environment_terminals_stop_time = 0x0100, // solo only
 	_environment_activation_ranges = 0x0200, // Marathon 1 monster activation limits
 	_environment_m1_weapons = 0x0400,    // multiple weapon pickups on TC; low gravity grenades
-
+        
 	_environment_network= 0x2000,	// these two pseudo-environments are used to prevent items 
 	_environment_single_player= 0x4000 // from arriving in the items.c code.
 };
@@ -1151,8 +1152,10 @@ struct shape_and_transfer_mode
 };
 
 void get_object_shape_and_transfer_mode(world_point3d *camera_location, short object_index, struct shape_and_transfer_mode *data);
+void get_object_shape_and_transfer_mode(world_point3d *camera_location, object_data* object, shape_and_transfer_mode *data);
 void set_object_shape_and_transfer_mode(short object_index, shape_descriptor shape, short transfer_mode);
 void animate_object(short object_index); /* assumes ¶t==1 tick */
+void animate_object(object_data* data, int16_t object_index);
 bool randomize_object_sequence(short object_index, shape_descriptor shape);
 
 void play_object_sound(short object_index, short sound_code);
@@ -1290,7 +1293,7 @@ uint8 *pack_polygon_data(uint8 *Stream, polygon_data* Objects, size_t Count);
 
 uint8 *unpack_map_annotation(uint8 *Stream, map_annotation* Objects, size_t Count);
 uint8 *pack_map_annotation(uint8 *Stream, map_annotation* Objects, size_t Count);
-uint8 *unpack_map_object(uint8 *Stream, map_object* Objects, size_t Count);
+uint8 *unpack_map_object(uint8 *Stream, map_object* Objects, size_t Count, int version);
 uint8 *pack_map_object(uint8 *Stream, map_object* Objects, size_t Count);
 uint8 *unpack_object_frequency_definition(uint8 *Stream, object_frequency_definition* Objects, size_t Count);
 uint8 *pack_object_frequency_definition(uint8 *Stream, object_frequency_definition* Objects, size_t Count);

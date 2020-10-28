@@ -140,7 +140,7 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
 */
-// HUDã®ãƒœãƒ¼ãƒ«ãƒ‰ã‚’è§£é™¤
+// HUD‚Ìƒ{[ƒ‹ƒh‚ğ‰ğœ
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleNormal,  0, "#4"},
@@ -1254,3 +1254,4 @@ static void load_interface_rectangles(void)
 static void load_screen_interface_colors(void)
 {
 }
+

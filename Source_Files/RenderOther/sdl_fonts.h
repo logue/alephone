@@ -25,6 +25,11 @@
  *  Written in 2000 by Christian Bauer
  */
 
+#if defined _MSC_VER
+#define NOMINMAX
+#include <algorithm>
+#endif
+
 #ifndef SDL_FONTS_H
 #define SDL_FONTS_H
 
@@ -124,7 +129,7 @@ public:
 	TTF_Font* m_styles[styleUnderline];
 	ttf_font_key_t m_keys[styleUnderline];
 	int m_adjust_height;
-	int ascii_width[styleUnderline][128];
+
 	int8 char_width(uint8, uint16) const;
 
 	ttf_font_info() { 
@@ -139,8 +144,7 @@ protected:
 private:
 	char *process_printable(const char *src, int len) const;
 	uint16 *process_macroman(const char *src, int len) const;
-	// TTF_Font *get_ttf(uint16 style) const { return m_styles[style & (styleBold | styleItalic)]; }
-	TTF_Font *get_ttf(uint16 style) const { return m_styles[style & (styleBold | styleItalic | styleUnderline)]; }
+	TTF_Font *get_ttf(uint16 style) const { return m_styles[style & (styleBold | styleItalic)]; }
 	virtual void _unload();
 };
 

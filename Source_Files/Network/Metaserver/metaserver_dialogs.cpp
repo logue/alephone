@@ -95,7 +95,6 @@ setupAndConnectClient(MetaserverClient& client)
 			placer->dual_add(new w_hyperlink(A1_HOMEPAGE_URL), d);
 #endif
 			
-			
 			placer->add(new w_spacer(), true);
 			placer->dual_add(new w_button("OK", dialog_ok, &d), d);
 			d.set_widget_placer(placer);

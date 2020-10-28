@@ -447,7 +447,20 @@ bool Movie::Setup()
         
         // tuning options
         int vq = graphics_preferences->movie_export_video_quality;
-        video_stream->codec->bit_rate = ScaleQuality(vq, 100*1024, 1024*1024, 10*1024*1024);
+		int bitrate = graphics_preferences->movie_export_video_bitrate;
+
+		if (bitrate <= 0) // auto, based on YouTube's SDR standard frame rate
+						  // recommendations
+		{
+			if      (view_rect.h >= 2160) bitrate = 40 * 1024 * 1024;
+			else if (view_rect.h >= 1440) bitrate = 16 * 1024 * 1024;
+			else if (view_rect.h >= 1080) bitrate =  8 * 1024 * 1024;
+			else if (view_rect.h >=  720) bitrate =  5 * 1024 * 1024;
+			else if (view_rect.h >=  480) bitrate =  5 * 1024 * 1024 / 2;
+			else                          bitrate =      1024 * 1024;
+		}
+		
+        video_stream->codec->bit_rate = bitrate;
         video_stream->codec->qmin = ScaleQuality(vq, 10, 4, 0);
         video_stream->codec->qmax = ScaleQuality(vq, 63, 63, 50);
         std::string crf = boost::lexical_cast<std::string>(ScaleQuality(vq, 63, 10, 4));
@@ -826,8 +839,8 @@ void Movie::AddFrame(FrameType ftype)
 	
 	int audio_bytes_per_frame = audiobuf.size();
 	Mixer *mx = Mixer::instance();
-	int old_vol = mx->main_volume;
-	mx->main_volume = 0x100;
+	float old_vol = mx->main_volume;
+	mx->SetVolume(sound_preferences->video_export_volume_db);
 	mx->Mix(&audiobuf.front(), audio_bytes_per_frame / 4, true, true, true);
 	mx->main_volume = old_vol;
 	

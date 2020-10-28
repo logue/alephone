@@ -756,6 +756,7 @@ void HUD_Class::draw_inventory_item(char *text, short count,
 	text_destination= destination;
 	text_destination.left+= NAME_OFFSET+TEXT_INSET;
 	DrawText(text, &text_destination, _center_vertical, _interface_font, color);
+
 	/* Draw the text count-> Change the font!! */
 	text_destination= destination;
 	text_destination.left+= TEXT_INSET;

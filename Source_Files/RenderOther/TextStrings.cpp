@@ -123,9 +123,9 @@ void parse_mml_stringset(const InfoTree& root)
 			continue;
 		
 		std::string val = child.get_value<std::string>("");
-		//char cbuf[256];
-		//DeUTF8_C(val.c_str(), val.size(), cbuf, 255);
-		//StringSetRoot[index][cindex] = std::string(cbuf);
+		// char cbuf[256];
+		// DeUTF8_C(val.c_str(), val.size(), cbuf, 255);
+		// StringSetRoot[index][cindex] = std::string(cbuf);
 		StringSetRoot[index][cindex] = val.c_str();
 	}
 }

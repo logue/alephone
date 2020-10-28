@@ -261,7 +261,6 @@ static OvhdMap_CfgDataStruct OvhdMap_ConfigData =
 	// Player-entity definition
 	{16, 10, (7*NUMBER_OF_ANGLES)/20},
 	// Annotations (color, 4 fonts)
-	/*
 	{
 		{{0, 65535, 0},
 		{
@@ -273,18 +272,6 @@ static OvhdMap_CfgDataStruct OvhdMap_ConfigData =
 	},
 	// Map name (color, font)
 	{{0, 65535, 0}, {"Monaco", 18, styleNormal, 0, "#4"}, 25},
-	*/
-	{
-		{{0, 65535, 0},
-		{
-			{"Courier",  5, styleBold, 0, "#22"},
-			{"Courier",  9, styleBold, 0, "#22"},
-			{"Courier", 12, styleBold, 0, "#22"},
-			{"Courier", 18, styleBold, 0, "#22"},
-		}}
-	},
-	// Map name (color, font)
-	{{0, 65535, 0}, {"Courier", 18, styleNormal, 0, "#22"}, 25},
 	// Path color
 	{65535, 65535, 65535},
 	// What to show (aliens, items, projectiles, paths)

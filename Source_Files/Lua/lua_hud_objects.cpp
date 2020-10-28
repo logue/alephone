@@ -20,6 +20,11 @@ LUA_HUD_OBJECTS.CPP
     Implements Lua HUD objects and globals
 */
 
+
+#if defined (_MSC_VER) && !defined (M_PI)
+#define _USE_MATH_DEFINES
+#endif 
+
 #include "lua_hud_objects.h"
 #include "lua_objects.h"
 #include "lua_map.h"
@@ -837,7 +842,7 @@ int Lua_Font_Draw_Text(lua_State *L)
 	float a = Lua_HUDColor_Get_A(L, 5);
 	
 	Lua_HUDInstance()->draw_text(Lua_Font::Object(L, 1),
-		str,
+															 str,
 															 x, y, r, g, b, a,
 															 Lua_Font::Scale(L, 1));
 	return 0;

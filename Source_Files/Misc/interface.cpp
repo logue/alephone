@@ -148,6 +148,7 @@ extern TP2PerfGlobals perf_globals;
 #include "QuickSave.h"
 #include "Plugins.h"
 #include "Statistics.h"
+#include "shell_options.h"
 
 #ifdef HAVE_SMPEG
 #include <smpeg/smpeg.h>
@@ -171,10 +172,11 @@ enum recording_version {
 	RECORDING_VERSION_ALEPH_ONE_PRE_PIN = 6,
 	RECORDING_VERSION_ALEPH_ONE_1_0 = 7,
 	RECORDING_VERSION_ALEPH_ONE_1_1 = 8,
-	RECORDING_VERSION_ALEPH_ONE_1_2 = 9
+	RECORDING_VERSION_ALEPH_ONE_1_2 = 9,
+	RECORDING_VERSION_ALEPH_ONE_1_3 = 10,
 };
-const short default_recording_version = RECORDING_VERSION_ALEPH_ONE_1_2;
-const short max_handled_recording= RECORDING_VERSION_ALEPH_ONE_1_2;
+const short default_recording_version = RECORDING_VERSION_ALEPH_ONE_1_3;
+const short max_handled_recording= RECORDING_VERSION_ALEPH_ONE_1_3;
 
 #include "screen_definitions.h"
 #include "interface_menus.h"
@@ -304,11 +306,10 @@ static struct color_table *current_picture_clut= NULL;
 /* -------------- externs */
 extern short interface_bit_depth;
 extern short bit_depth;
-extern bool insecure_lua;
 extern bool shapes_file_is_m1();
 
 /* ----------- prototypes/PREPROCESS_MAP_MAC.C */
-extern bool load_game_from_file(FileSpecifier& File, bool run_scripts, bool *was_map_found);
+extern bool load_game_from_file(FileSpecifier& File, bool run_scripts);
 extern bool choose_saved_game_to_load(FileSpecifier& File);
 
 /* ---------------------- prototypes */
@@ -371,11 +372,21 @@ void initialize_game_state(
 
 	toggle_menus(false);
 
-	if(insecure_lua) {
+	if(shell_options.insecure_lua) {
 	  alert_user(expand_app_variables("Insecure Lua has been manually enabled. Malicious Lua scripts can use Insecure Lua to take over your computer. Unless you specifically trust every single Lua script that will be running, you should quit $appName$ IMMEDIATELY.").c_str());
 	}
 
-	display_introduction();
+	if (!shell_options.editor)
+	{
+		if (shell_options.skip_intro)
+		{
+			display_main_menu();
+		}
+		else
+		{
+			display_introduction();
+		}
+	}
 }
 
 void force_game_state_change(
@@ -788,12 +799,23 @@ bool join_networked_resume_game()
                         free(theSavedGameFlatData);
                 }
                 
+				bool found_map = false;
                 if(success)
                 {
-                        success = process_map_wad(theWad, true /* resuming */, theWadHeader.data_version);
-                        free_wad(theWad); /* Note that the flat data points into the wad. */
-                        // ZZZ: maybe this is what the Bungie comment meant, but apparently
-                        // free_wad() somehow (voodoo) frees theSavedGameFlatData as well.
+					ResetLevelScript();
+					uint32 theParentChecksum = theWadHeader.parent_checksum;
+					found_map = use_map_file(theParentChecksum);
+
+					if (found_map) {
+						dynamic_data dynamic_data_wad;
+						get_dynamic_data_from_wad(theWad, &dynamic_data_wad);
+						RunLevelScript(dynamic_data_wad.current_level_number);
+					}
+
+                    success = process_map_wad(theWad, true /* resuming */, theWadHeader.data_version);
+                    free_wad(theWad); /* Note that the flat data points into the wad. */
+                    // ZZZ: maybe this is what the Bungie comment meant, but apparently
+                    // free_wad() somehow (voodoo) frees theSavedGameFlatData as well.
                 }
                 
                 if(success)
@@ -806,15 +828,13 @@ bool join_networked_resume_game()
                         // try to locate the Map file for the saved-game, so that (1) we have a crack
                         // at continuing the game if the original gatherer disappears, and (2) we can
                         // save the game on our own machine and continue it properly (as part of a bigger scenario) later.
-                        uint32 theParentChecksum = theWadHeader.parent_checksum;
-                        if(use_map_file(theParentChecksum))
+                        
+                        if(found_map)
                         {
                                 // LP: getting the level scripting off of the map file
                                 // Being careful to carry over errors so that Pfhortran errors can be ignored
                                 short SavedType, SavedError = get_game_error(&SavedType);
-                                RunLevelScript(dynamic_world->current_level_number);
-				RunScriptChunks();
-				LoadStatsLua();
+								LoadStatsLua();
                                 set_game_error(SavedType,SavedError);
                         }
                         else
@@ -829,8 +849,6 @@ bool join_networked_resume_game()
                                 /* Set to the default map. */
                                 set_to_default_map();
 				
-				ResetLevelScript();
-				RunScriptChunks();
 				LoadStatsLua();
                         }
                         
@@ -870,9 +888,7 @@ bool load_and_start_game(FileSpecifier& File)
 		interface_fade_out(MAIN_MENU_BASE, true);
 	}
 
-	// run scripts after we decide single vs. multiplayer
-	bool found_map;
-	success= load_game_from_file(File, false, &found_map);
+	success= load_game_from_file(File, false);
 
 	if (!success)
 	{
@@ -919,16 +935,7 @@ bool load_and_start_game(FileSpecifier& File)
 			
 			// load the scripts we put off before
 			short SavedType, SavedError = get_game_error(&SavedType);
-			if (found_map)
-			{
-				RunLevelScript(dynamic_world->current_level_number);
-			}
-			else
-			{
-				ResetLevelScript();
-			}
-			RunScriptChunks();
-			if (!userWantsMultiplayer)
+			if(!userWantsMultiplayer)
 			{
 				LoadSoloLua();
 			}
@@ -1011,6 +1018,16 @@ bool handle_open_replay(FileSpecifier& File)
 	force_system_colors();
 	success= begin_game(_replay_from_file, false);
 	if(!success) display_main_menu();
+	return success;
+}
+
+bool handle_edit_map()
+{
+	bool success;
+
+	force_system_colors();
+	success = begin_game(_single_player, false);
+	if (!success) display_main_menu();
 	return success;
 }
 
@@ -1358,7 +1375,7 @@ void do_menu_item_command(
 						{
 							case _single_player:
 								if(PLAYER_IS_DEAD(local_player) || 
-									dynamic_world->tick_count-local_player->ticks_at_last_successful_save<CLOSE_WITHOUT_WARNING_DELAY)
+								   dynamic_world->tick_count-local_player->ticks_at_last_successful_save<CLOSE_WITHOUT_WARNING_DELAY || shell_options.output.size())
 								{
 									really_wants_to_quit= true;
 								} else {
@@ -1709,7 +1726,7 @@ static void display_about_dialog()
 	vertical_placer* placer = new vertical_placer;
 	std::vector<std::string> labels;
 	labels.push_back("AlephOneについて");
-	labels.push_back("制作");
+	labels.push_back("作者");
 	labels.push_back("日本語化");
 	w_tab *tab_w = new w_tab(labels, tabs);
 	
@@ -1734,25 +1751,25 @@ static void display_about_dialog()
 	about_placer->add(new w_spacer(2 * get_theme_space(SPACER_WIDGET)), true);
 	
 	about_placer->dual_add(new w_static_text(expand_app_variables("Aleph Oneは、無料ですが無保証です。").c_str()), d);
-	about_placer->dual_add(new w_static_text("以下のライセンス下で再配布することを歓迎します。"), d);
+	about_placer->dual_add(new w_static_text("以下のの条件下で再配布することを歓迎します。"), d);
 	about_placer->dual_add(new w_hyperlink("http://www.gnu.org/licenses/gpl-3.0.html"), d);
 
 	about_placer->add(new w_spacer, true);
 
-	about_placer->dual_add(new w_static_text("このライセンスにはゲームのコンテンツは含まれません。"), d);
+	about_placer->dual_add(new w_static_text("このライセンスはゲームコンテンツには適用されません。"), d);
 
 	about_placer->add(new w_spacer, true);
 
-	about_placer->dual_add(new w_static_text(expand_app_variables("読み込まれているシナリオ：$scenarioName$ $scenarioVersion$").c_str()), d);
+	about_placer->dual_add(new w_static_text(expand_app_variables("以下のシナリオが読み込まれています：$scenarioName$ $scenarioVersion$").c_str()), d);
 
 	vertical_placer *authors_placer = new vertical_placer();
 	
-	authors_placer->dual_add(new w_static_text("Aleph Oneは、Bungie SoftwareのMarathon 2及びMarathon Infiniyの"), d);
-	authors_placer->dual_add(new w_static_text("ソースコードをベースに作られています。"), d);
+	authors_placer->dual_add(new w_static_text("Aleph Oneは、Bungie Softwareによって開発されたMarathon2および、"), d);
+	authors_placer->dual_add(new w_static_text("Marathon Infinityのソースコードに基づいています。"), d);
 	authors_placer->add(new w_spacer, true);
 	
-	authors_placer->dual_add(new w_static_text("AlephOneを構成するMarathon 2およびMarathon Infinityの機能強化"), d);
-	authors_placer->dual_add(new w_static_text("および拡張は以下のスタッフによって成し遂げられました："), d);
+	authors_placer->dual_add(new w_static_text("AlephOneを構成するMarathon2およびMarathon Infinityの"), d);
+	authors_placer->dual_add(new w_static_text("機能強化と拡張は、以下のメンバーによって行われました："), d);
 
 	authors_placer->add(new w_spacer, true);
 
@@ -1822,7 +1839,7 @@ static void display_about_dialog()
 	
 	w_authors_list *jp_staffs_w = new w_authors_list(jp_staffs, &d);
 	jp_stuff_placer->dual_add(jp_staffs_w, d);
-	
+
 	tabs->add(about_placer, true);
 	tabs->add(authors_placer, true);
 	tabs->add(jp_stuff_placer, true);
@@ -2112,6 +2129,9 @@ static bool begin_game(
 						load_film_profile(FILM_PROFILE_ALEPH_ONE_1_1);
 						break;
 					case RECORDING_VERSION_ALEPH_ONE_1_2:
+						load_film_profile(FILM_PROFILE_ALEPH_ONE_1_2);
+						break;
+					case RECORDING_VERSION_ALEPH_ONE_1_3:
 						load_film_profile(FILM_PROFILE_DEFAULT);
 						break;
 					default:
@@ -2335,6 +2355,19 @@ static void finish_game(
 			break;
 	}
 	Movie::instance()->StopRecording();
+
+	if (shell_options.editor && shell_options.output.size())
+	{
+		FileSpecifier file(shell_options.output);
+		if (export_level(file))
+		{
+			exit(0);
+		}
+		else
+		{
+			exit(-1);
+		}
+	}
 
 	/* Fade out! (Pray) */ // should be interface_color_table for valkyrie, but doesn't work.
 	Music::instance()->ClearLevelMusic();
@@ -3328,13 +3361,13 @@ size_t should_restore_game_networked(FileSpecifier& file)
         dialog d;
 
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title("ゲーム再開"), d);
+	placer->dual_add(new w_title("RESUME GAME"), d);
 	placer->add(new w_spacer, true);
 
 	horizontal_placer *resume_as_placer = new horizontal_placer;
         w_toggle* theRestoreAsNetgameToggle = new w_toggle(dynamic_world->player_count > 1, 0);
         theRestoreAsNetgameToggle->set_labels_stringset(kSingleOrNetworkStringSetID);
-	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("以下で再開："), d);
+	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("Resume as"), d);
 	resume_as_placer->dual_add(theRestoreAsNetgameToggle, d);
 
 	placer->add(resume_as_placer, true);
@@ -3343,8 +3376,8 @@ size_t should_restore_game_networked(FileSpecifier& file)
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button("続ける", dialog_ok, &d), d);
-	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("RESUME", dialog_ok, &d), d);
+	button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 
