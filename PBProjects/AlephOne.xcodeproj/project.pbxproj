@@ -371,7 +371,6 @@
 		9859FFBB254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
 		9859FFBC254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
 		9859FFBD254A2DD0009B0A02 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9859FFB5254A2DCF009B0A02 /* converter.cpp */; };
-		9859FFBF254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
 		9859FFC0254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
 		9859FFC1254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
 		9859FFC2254A2E55009B0A02 /* jp-fonts in Resources */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
@@ -380,8 +379,7 @@
 		9859FFC9254A2FE2009B0A02 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC8254A2F63009B0A02 /* libiconv.2.4.0.tbd */; };
 		9859FFCA254A2FE3009B0A02 /* libiconv.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC7254A2F60009B0A02 /* libiconv.2.tbd */; };
 		9859FFCB254A2FE3009B0A02 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFC6254A2F5B009B0A02 /* libiconv.tbd */; };
-		9859FFCD254A3093009B0A02 /* libiconv.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9859FFCC254A3093009B0A02 /* libiconv.framework */; };
-		9859FFCE254A3093009B0A02 /* libiconv.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9859FFCC254A3093009B0A02 /* libiconv.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9892630A254AA0D800B2C94C /* jp-fonts in Headers */ = {isa = PBXBuildFile; fileRef = 9859FFBE254A2E54009B0A02 /* jp-fonts */; };
 		AE0053EE0ABE16300038507F /* OGL_Blitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE0053ED0ABE16300038507F /* OGL_Blitter.cpp */; };
 		AE005FD40EE2D6DE007FE7C6 /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE005FD30EE2D6DE007FE7C6 /* screen.cpp */; };
 		AE0E4EC2141D148F00AAA02F /* Marathon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AE0E4EC1141D148F00AAA02F /* Marathon.icns */; };
@@ -2086,7 +2084,6 @@
 				271ADFC818A88B9C0073CB2E /* avutil.framework in CopyFiles */,
 				271ADFC918A88B9C0073CB2E /* swscale.framework in CopyFiles */,
 				9859FFC5254A2F29009B0A02 /* boost_locale.framework in CopyFiles */,
-				9859FFCE254A3093009B0A02 /* libiconv.framework in CopyFiles */,
 				2759FB2A10D71160000204DD /* jpeg.framework in CopyFiles */,
 				2759FB2610D71158000204DD /* png.framework in CopyFiles */,
 				2759F33310D5BCD1000204DD /* zziplib.framework in CopyFiles */,
@@ -2235,7 +2232,7 @@
 		9859FFC6254A2F5B009B0A02 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		9859FFC7254A2F60009B0A02 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
 		9859FFC8254A2F63009B0A02 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
-		9859FFCC254A3093009B0A02 /* libiconv.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libiconv.framework; sourceTree = "<group>"; };
+		9892630B254AA21600B2C94C /* libiconv.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libiconv.framework; sourceTree = "<group>"; };
 		AE0053ED0ABE16300038507F /* OGL_Blitter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = OGL_Blitter.cpp; sourceTree = "<group>"; };
 		AE005FD30EE2D6DE007FE7C6 /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = screen.cpp; sourceTree = "<group>"; };
 		AE0E4EC1141D148F00AAA02F /* Marathon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = Marathon.icns; path = AppStore/Marathon/Marathon.icns; sourceTree = "<group>"; };
@@ -2730,35 +2727,34 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				553AB9F6213A034300EE3861 /* libexpat.tbd in Frameworks */,
-				273FBB491E122C9F0076351E /* IOKit.framework in Frameworks */,
-				275A7BD31A60DE77002EE952 /* libcurl.tbd in Frameworks */,
+				9859FFCB254A2FE3009B0A02 /* libiconv.tbd in Frameworks */,
 				9859FFCA254A2FE3009B0A02 /* libiconv.2.tbd in Frameworks */,
-				AEC3C87009AD68AC003258E4 /* OpenGL.framework in Frameworks */,
-				27E5DD621BD2DA0C00A95619 /* SDL2.framework in Frameworks */,
-				9859FFC4254A2F28009B0A02 /* boost_locale.framework in Frameworks */,
-				AEA85F4B24DF251300BB7827 /* webp.framework in Frameworks */,
-				AEC3C87109AD68AC003258E4 /* Cocoa.framework in Frameworks */,
-				AE23F5640BDAC0E700C11385 /* speex.framework in Frameworks */,
-				3D22CF890FD86EAE00B17822 /* AudioUnit.framework in Frameworks */,
 				9859FFC9254A2FE2009B0A02 /* libiconv.2.4.0.tbd in Frameworks */,
-				2762A3371AAA51D900B807D4 /* boost_system.framework in Frameworks */,
+				553AB9F6213A034300EE3861 /* libexpat.tbd in Frameworks */,
+				275A7BD31A60DE77002EE952 /* libcurl.tbd in Frameworks */,
 				3D22CF8D0FD86EBD00B17822 /* libz.tbd in Frameworks */,
+				273FBB491E122C9F0076351E /* IOKit.framework in Frameworks */,
+				AEC3C87009AD68AC003258E4 /* OpenGL.framework in Frameworks */,
 				3D22CFAC0FD8707C00B17822 /* CoreAudio.framework in Frameworks */,
-				2759F33010D5BCC0000204DD /* zziplib.framework in Frameworks */,
+				3D22CF890FD86EAE00B17822 /* AudioUnit.framework in Frameworks */,
+				AEC3C87109AD68AC003258E4 /* Cocoa.framework in Frameworks */,
 				2759FB1F10D7114D000204DD /* jpeg.framework in Frameworks */,
 				2759FB2110D7114D000204DD /* png.framework in Frameworks */,
-				9859FFCB254A2FE3009B0A02 /* libiconv.tbd in Frameworks */,
-				270F9FD0177687B7009AAE10 /* avcodec.framework in Frameworks */,
-				278BCAEF1A51C53C006F9756 /* speexdsp.framework in Frameworks */,
+				AEA85F4B24DF251300BB7827 /* webp.framework in Frameworks */,
+				2762A3371AAA51D900B807D4 /* boost_system.framework in Frameworks */,
 				2762A3331AAA51D900B807D4 /* boost_filesystem.framework in Frameworks */,
-				270F9FD4177687B7009AAE10 /* avformat.framework in Frameworks */,
-				9859FFCD254A3093009B0A02 /* libiconv.framework in Frameworks */,
-				27E5DD601BD2DA0C00A95619 /* SDL2_net.framework in Frameworks */,
-				270F9FD8177687B7009AAE10 /* avutil.framework in Frameworks */,
-				270F9FDC177687B7009AAE10 /* swscale.framework in Frameworks */,
-				27E5DD611BD2DA0C00A95619 /* SDL2_ttf.framework in Frameworks */,
+				9859FFC4254A2F28009B0A02 /* boost_locale.framework in Frameworks */,
+				27E5DD621BD2DA0C00A95619 /* SDL2.framework in Frameworks */,
 				27E5DD5F1BD2DA0C00A95619 /* SDL2_image.framework in Frameworks */,
+				27E5DD611BD2DA0C00A95619 /* SDL2_ttf.framework in Frameworks */,
+				27E5DD601BD2DA0C00A95619 /* SDL2_net.framework in Frameworks */,
+				2759F33010D5BCC0000204DD /* zziplib.framework in Frameworks */,
+				270F9FD8177687B7009AAE10 /* avutil.framework in Frameworks */,
+				270F9FD4177687B7009AAE10 /* avformat.framework in Frameworks */,
+				270F9FD0177687B7009AAE10 /* avcodec.framework in Frameworks */,
+				270F9FDC177687B7009AAE10 /* swscale.framework in Frameworks */,
+				AE23F5640BDAC0E700C11385 /* speex.framework in Frameworks */,
+				278BCAEF1A51C53C006F9756 /* speexdsp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3061,15 +3057,14 @@
 		EF2EF5B004819A5C00A8000D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9859FFCC254A3093009B0A02 /* libiconv.framework */,
-				9859FFC3254A2F28009B0A02 /* boost_locale.framework */,
-				AEA85F4A24DF251300BB7827 /* webp.framework */,
+				9892630B254AA21600B2C94C /* libiconv.framework */,
 				27E5DD5B1BD2DA0C00A95619 /* SDL2_image.framework */,
 				27E5DD5C1BD2DA0C00A95619 /* SDL2_net.framework */,
 				27E5DD5D1BD2DA0C00A95619 /* SDL2_ttf.framework */,
 				27E5DD5E1BD2DA0C00A95619 /* SDL2.framework */,
 				2762A3311AAA51D900B807D4 /* boost_filesystem.framework */,
 				2762A3321AAA51D900B807D4 /* boost_system.framework */,
+				9859FFC3254A2F28009B0A02 /* boost_locale.framework */,
 				270F9FCC177687B7009AAE10 /* avcodec.framework */,
 				270F9FCD177687B7009AAE10 /* avformat.framework */,
 				270F9FCE177687B7009AAE10 /* avutil.framework */,
@@ -3079,6 +3074,7 @@
 				2759F32F10D5BCC0000204DD /* zziplib.framework */,
 				2759FB1E10D7114D000204DD /* jpeg.framework */,
 				2759FB2010D7114D000204DD /* png.framework */,
+				AEA85F4A24DF251300BB7827 /* webp.framework */,
 			);
 			name = Frameworks;
 			path = /Library/Frameworks;
@@ -4169,6 +4165,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9892630A254AA0D800B2C94C /* jp-fonts in Headers */,
 				AEC3C70109AD68AC003258E4 /* PlayerName.h in Headers */,
 				27A6DAC31B9CE94E003DA766 /* Scenario.h in Headers */,
 				AEC3C70209AD68AC003258E4 /* Random.h in Headers */,
@@ -4805,7 +4802,6 @@
 				AEC3C7C909AD68AC003258E4 /* MapIcon.icns in Resources */,
 				AEC3C7CA09AD68AC003258E4 /* MMLIcon.icns in Resources */,
 				AEC3C7CB09AD68AC003258E4 /* MusakIcon.icns in Resources */,
-				9859FFBF254A2E55009B0A02 /* jp-fonts in Resources */,
 				AEC3C7CD09AD68AC003258E4 /* PhysIcon.icns in Resources */,
 				AEC3C7CE09AD68AC003258E4 /* SaveIcon.icns in Resources */,
 			);
@@ -6014,6 +6010,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6103,7 +6100,7 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
@@ -6150,6 +6147,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6239,7 +6237,7 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -6369,6 +6367,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOne;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6458,7 +6457,7 @@
 				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -6575,7 +6574,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -6603,7 +6602,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -6631,7 +6630,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,

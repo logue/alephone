@@ -28,12 +28,12 @@ void system_alert_user(const char* message, short severity)
 	NSAlert *alert = [NSAlert new];
 	if (severity == infoError) 
 	{
-		[alert setMessageText: @"Warning"];
+		[alert setMessageText: @"警告"];
 		[alert setAlertStyle: NSWarningAlertStyle];
 	}
 	else
 	{
-		[alert setMessageText: @"Error"];
+		[alert setMessageText: @"エラー"];
 		[alert setAlertStyle: NSCriticalAlertStyle];
 	}
 	[alert setInformativeText: [NSString stringWithUTF8String: message]];
@@ -47,9 +47,9 @@ bool system_alert_choose_scenario(char *chosen_dir)
 	[panel setCanChooseFiles:NO];
 	[panel setCanChooseDirectories:YES];
 	[panel setAllowsMultipleSelection:NO];
-	[panel setTitle:@"Choose Scenario"];
-	[panel setMessage:@"Select a scenario to play:"];
-	[panel setPrompt:@"Choose"];
+	[panel setTitle:@"シナリオ選択"];
+	[panel setMessage:@"プレイしたいシナリオを選んでください："];
+	[panel setPrompt:@"選択"];
 	
 	if (!chosen_dir)
 		return false;
