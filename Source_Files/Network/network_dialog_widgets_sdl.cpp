@@ -995,7 +995,7 @@ w_entry_point_selector::gotSelected() {
 
         placer->add(new w_spacer(), true);
 
-        sprintf(temporary, "%zu %s levels available",
+        sprintf(temporary, "%zu %s レベルが利用可能です。",
             mEntryPoints.size(),
             TS_GetCString(kNetworkGameTypesStringSetID, mGameType)
         );

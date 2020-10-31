@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 	} catch (std::exception &e) {
 		try 
 		{
-			logFatal("Unhandled exception: %s", e.what());
+			logFatal("捕捉されなかった例外が発生しました：%s", e.what());
 		}
 		catch (...) 
 		{
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
 	} catch (...) {
 		try
 		{
-			logFatal("Unknown exception");
+			logFatal("例外が発生しました。");
 		}
 		catch (...)
 		{
@@ -335,7 +335,7 @@ static void initialize_application(void)
 		if (sdl_err)
 			fprintf(stderr, "SDLの初期化ができませんでした。(%s)\n", sdl_err);
 		else
-			fprintf(stderr, "Couldn't initialize SDL\n");
+			fprintf(stderr, "SDLの初期化ができませんでした。\n");
 		exit(1);
 	}
 #if defined(HAVE_SDL_IMAGE)
@@ -448,7 +448,7 @@ static void initialize_application(void)
 
 	// Check for presence of strings
 	if (!TS_IsPresent(strERRORS) || !TS_IsPresent(strFILENAMES)) {
-		fprintf(stderr, "Can't find required text strings (missing MML?).\n");
+		fprintf(stderr, "動作に必要なテキスト文字列が見つかりませんでした。（MMLが無い？）\n");
 		exit(1);
 	}
 	
@@ -488,7 +488,7 @@ static void initialize_application(void)
 		if (scen.length())
 			scen.erase(std::remove_if(scen.begin(), scen.end(), char_is_not_filesafe), scen.end());
 		if (!scen.length())
-			scen = "Unknown";
+			scen = "不明";
 		quick_saves_dir += scen;
 		quick_saves_dir.CreateDirectory();
 	}
@@ -617,7 +617,7 @@ short get_level_number_from_user(void)
 	if (!get_entry_points(levels, AllPlayableLevels)) {
 		entry_point dummy;
 		dummy.level_number = 0;
-		strcpy(dummy.level_name, "Untitled Level");
+		strcpy(dummy.level_name, "名称未設定レベル");
 		levels.push_back(dummy);
 	}
 
@@ -893,9 +893,9 @@ static void handle_game_key(const SDL_Event &event)
 					}
 					else {
 #if defined(__APPLE__) && defined(__MACH__)
-						screen_printf("If you wish to quit, press Command-Q");
+						screen_printf("終了したい場合はコマンドキーとQを押下してください。");
 #else
-						screen_printf("If you wish to quit, press Alt+Q.");
+						screen_printf("終了したい場合はAltキーとQを押下してください。");
 #endif
 					}
 				}

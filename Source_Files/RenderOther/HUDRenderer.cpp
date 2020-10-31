@@ -322,7 +322,7 @@ void HUD_Class::update_weapon_panel(bool force_redraw)
 				source.right= definition->weapon_name_end_x;
 			}
 			
-			DrawText(weapon_name, &source, _center_horizontal|_center_vertical|_wrap_text,
+			DrawText(_SJIS(weapon_name), &source, _center_horizontal|_center_vertical|_wrap_text,
 				_weapon_name_font, _inventory_text_color);
 				
 			/* And make sure that the ammo knows it needs to update */

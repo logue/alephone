@@ -10,6 +10,6 @@ STD_PATH="/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/X11/b
 # No Touchie
 
 export PATH="$PATH:$MINGW_PATH:$STD_PATH"
-PATH="$MINGW_PATH:$STD_PATH" SDL_CONFIG="$MINGW_PREFIX/$MINGW_TARGET/bin/sdl-config" ACLOCAL_FLAGS="-I$MINGW_PREFIX/$MINGW_TARGET/share/aclocal" LDFLAGS=-Wl,-S LIBS="-lfreetype -ltiff -ljpeg -lpng -lz -lstdc++ -lws2_32 -lbz2 -liphlpapi" ./autogen.sh --prefix=$MINGW_PREFIX --target=$MINGW_TARGET --host=$MINGW_TARGET
+# PATH="$MINGW_PATH:$STD_PATH" SDL_CONFIG="$MINGW_PREFIX/$MINGW_TARGET/bin/sdl-config" ACLOCAL_FLAGS="-I$MINGW_PREFIX/$MINGW_TARGET/share/aclocal" LDFLAGS=-Wl,-S LIBS="-lfreetype -ltiff -ljpeg -lpng -lz -lstdc++ -lws2_32 -lbz2 -liphlpapi" ./autogen.sh --prefix=$MINGW_PREFIX --target=$MINGW_TARGET --host=$MINGW_TARGET
 PATH="$MINGW_PATH:$STD_PATH" make -j`nproc`
 PATH="$MINGW_PATH:$STD_PATH" make dist windist datadist

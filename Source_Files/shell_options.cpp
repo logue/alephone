@@ -253,7 +253,7 @@ void print_usage()
 		<< "読み込ませたいデータディレクトリを指定することができます。\n";
 
 #ifdef __WIN32__
-	MessageBoxW(NULL, utf8_to_wide(oss.str()).c_str(), L"Usage", MB_OK | MB_ICONINFORMATION);
+	MessageBoxW(NULL, utf8_to_wide(oss.str()).c_str(), L"使用方法", MB_OK | MB_ICONINFORMATION);
 #else
 	std::cout << oss.str();
 #endif

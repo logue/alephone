@@ -179,13 +179,14 @@ void InfoTree::put_attr_path(std::string key, std::string filepath)
 	put_attr(key, tempstr);
 }
 
+// ※シナリオに含まれるテキストはすべてShift JisなのでここでUTF-8に変換する
 bool InfoTree::read_cstr(std::string key, char *dest, int maxlen) const
 {
 	std::string str;
 	if (read_attr(key, str))
 	{
 		//DeUTF8_C(str.c_str(), str.length(), dest, maxlen);
-		strncpy(dest, str.c_str(), maxlen);
+		strncpy(dest, _SJIS(str.c_str()), maxlen);
 		return true;
 	}
 	return false;
@@ -195,14 +196,14 @@ void InfoTree::put_cstr(std::string key, std::string cstr)
 {
 	//put(key, mac_roman_to_utf8(cstr));
 	const char* str = cstr.c_str();
-	put(key, str);
+	put(key, sjis2utf8(str, strlen(str)));
 }
 
 void InfoTree::put_attr_cstr(std::string key, std::string cstr)
 {
 	//put_attr(key, mac_roman_to_utf8(cstr));
 	const char* str = cstr.c_str();
-	put(key, str);
+	put(key, sjis2utf8(str, strlen(str)));
 }
 
 

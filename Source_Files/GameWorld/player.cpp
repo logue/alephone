@@ -27,7 +27,7 @@ Wednesday, October 26, 1994 3:18:59 PM (Jason)
 Wednesday, November 30, 1994 6:56:20 PM  (Jason)
 	oxygen is used up faster by running and by firing.
 Thursday, January 12, 1995 11:18:18 AM  (Jason')
-	dead players don�t continue to use up oxygen.
+	dead players donﾕt continue to use up oxygen.
 Thursday, July 6, 1995 4:53:52 PM
 	supports multi-player cooperative games. (Ryan)
 
@@ -392,7 +392,7 @@ player_data *get_player_data(
 {
 	player_data *data = GetMemberWithBounds(players,player_index,dynamic_world->player_count);
 	vassert(data,
-		csprintf(temporary, "asked for player #%zu/#%d", player_index, dynamic_world->player_count));
+		csprintf(temporary, "以下のプレイヤーに問い合わせ： #%zu/#%d", player_index, dynamic_world->player_count));
 	
 	return data;
 }
@@ -539,7 +539,7 @@ reset_player_queues()
 {
 	sRealActionQueues->reset();
 	reset_recording_and_playback_queues();
-	sync_heartbeat_count(); //���MY ADDITION...
+	sync_heartbeat_count(); //･･ﾊMY ADDITION...
 }
 
 // ZZZ addition: need to reset (potentially) multiple sets of ActionQueues, not just the RealActionQueues.
@@ -579,7 +579,7 @@ void update_m1_solo_player_in_terminal(ActionQueues* inActionQueuesToUse)
 	sLocalPlayerTicksSinceTerminal = 0;
 }
 
-/* assumes �t==1 tick */
+/* assumes ｶt==1 tick */
 void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 {
 	struct player_data *player;
@@ -609,7 +609,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 			 NONE, NONE, 10*FIXED_ONE);
 				}
 
-				screen_printf("%s has become disconnected", player->name);
+				screen_printf("%sの接続が切れました。", player->name);
 				player->netdead = true;
 			}
 
@@ -631,7 +631,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 		
 		bool IsSwimming = TEST_FLAG(player->variables.flags,_HEAD_BELOW_MEDIA_BIT) && player_settings.CanSwim;
 
-		// if we�ve got the ball we can�t run (that sucks)
+		// if weﾕve got the ball we canﾕt run (that sucks)
 		// Benad: also works with _game_of_rugby and _game_of_capture_the_flag
 		// LP change: made it possible to swim under a liquid if one has the ball
 		// START Benad changed oct. 1st (works with ANY ball color, d'uh...)
@@ -644,7 +644,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 		
 		// if (GET_GAME_TYPE()==_game_of_kill_man_with_ball && dynamic_world->game_player_index==player_index) action_flags&= ~_run_dont_walk;
 		
-		// if our head is under media, we can�t run (that sucks, too)
+		// if our head is under media, we canﾕt run (that sucks, too)
 		if (IsSwimming && (action_flags&_run_dont_walk)) action_flags&= ~_run_dont_walk, action_flags|= _swim;
 		
 		update_player_physics_variables(player_index, action_flags, inPredictive);
@@ -666,7 +666,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 				if(((GET_GAME_OPTIONS()&_suicide_is_penalized) || (GET_GAME_OPTIONS()&_dying_is_penalized)) && (player_index == message_player_index))
 				{
 					if(player->reincarnation_delay == 0)
-						screen_printf("You may rise to fight again");
+						screen_printf("起き上がって再び戦うことができます。");
 					else if(player->reincarnation_delay < 4 * TICKS_PER_SECOND && (player->reincarnation_delay % TICKS_PER_SECOND) == 0)
 						screen_printf("%d...", player->reincarnation_delay / TICKS_PER_SECOND);
 				}
@@ -737,7 +737,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 							int theSeconds = player->reincarnation_delay / TICKS_PER_SECOND;
 							// If 3 or less, he'll be getting a countdown anyway, and may start spamming the action key.
 							if(theSeconds > 3)
-								screen_printf("%d penalty seconds remain", theSeconds);
+								screen_printf("ペナルティ解除まであと、%d秒", theSeconds);
 						}
 					}
 					else
@@ -1410,7 +1410,7 @@ static void update_player_teleport(
 					{
 						player= get_player_data(other_player_index);
 
-						/* Set them to be teleporting if the already aren�t, or if they are but it */
+						/* Set them to be teleporting if the already arenﾕt, or if they are but it */
 						/*  is a simple teleport (intralevel) */
 						if (player_index!=other_player_index)
 						{
@@ -1529,7 +1529,7 @@ static void set_player_shapes(
 	
 	get_player_transfer_mode(player_index, &transfer_mode, &transfer_period);
 	
-	/* if we�re not dead, handle changing shapes (if we are dead, the correct dying shape has
+	/* if weﾕre not dead, handle changing shapes (if we are dead, the correct dying shape has
 		already been set and we just have to wait for the animation to finish) */
 	if (!PLAYER_IS_DEAD(player))
 	{
@@ -1564,11 +1564,11 @@ static void set_player_shapes(
 	
 	if (animate)
 	{
-		/* animate the player only if we�re not airborne and not totally dead */
+		/* animate the player only if weﾕre not airborne and not totally dead */
 		if ((variables->action!=_player_airborne || (PLAYER_IS_TELEPORTING(player) || PLAYER_IS_INTERLEVEL_TELEPORTING(player)))&&!PLAYER_IS_TOTALLY_DEAD(player)) animate_object(monster->object_index);
 		if (PLAYER_IS_DEAD(player) && !PLAYER_IS_TELEPORTING(player) && (GET_OBJECT_ANIMATION_FLAGS(legs)&_obj_last_frame_animated) && !PLAYER_IS_TOTALLY_DEAD(player))
 		{
-			/* we�ve finished the animation; let the player reincarnate if he wants to */
+			/* weﾕve finished the animation; let the player reincarnate if he wants to */
 			SET_PLAYER_TOTALLY_DEAD_STATUS(player, true);
 			set_player_dead_shape(player_index, false);
 
@@ -1594,13 +1594,13 @@ static void revive_player(
 
 	monster->action= _monster_is_moving; /* was probably _dying or something */
 
-	/* remove only the player�s torso, which should be invisible anyway, and turn his legs
+	/* remove only the playerﾕs torso, which should be invisible anyway, and turn his legs
 		into garbage */
 	remove_parasitic_object(monster->object_index);
 	turn_object_to_shit(monster->object_index);
 
-	/* create a new pair of legs, and (completely behind MONSTERS.C�s back) reattach it to
-		it�s monster (shape will be set by set_player_shapes, below) */
+	/* create a new pair of legs, and (completely behind MONSTERS.Cﾕs back) reattach it to
+		itﾕs monster (shape will be set by set_player_shapes, below) */
 	player->object_index= monster->object_index= new_map_object(&location, 0);
 	object= get_object_data(monster->object_index);
 	SET_OBJECT_SOLIDITY(object, true);
@@ -1833,7 +1833,7 @@ static void remove_dead_player_items(
 			short item_kind= get_item_kind(item_type);
 			bool dropped= false;
 			
-			// if we�re not set to burn items or this is an important item (i.e., repair chip) drop it
+			// if weﾕre not set to burn items or this is an important item (i.e., repair chip) drop it
 			if (!(GET_GAME_OPTIONS()&_burn_items_on_death) ||
 				(item_kind==_item && dynamic_world->player_count>1))
 			{

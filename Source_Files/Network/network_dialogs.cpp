@@ -236,11 +236,11 @@ bool network_gather(bool inResumingGame)
 						}
 						else if (e.code() == MetaserverClient::LoginDeniedException::AccountLocked)
 						{
-							strncpy(message, "Login denied: your account is locked. Your game could not be advertised on the Internet.", 1024);
+							strncpy(message, "ログイン拒否：あなたのアカウントはロックされています。インターネット上にゲームの募集広告を出すことができませんでした。", 1024);
 						}
 						else
 						{
-							sprintf(message, "ログイン拒否：そのアカウントはロックされています。インターネット上にゲームの募集広告を出すことができませんでした。", e.what());
+							sprintf(message, "ログイン拒否：あなたのアカウントはロックされています。インターネット上にゲームの募集広告を出すことができませんでした。", e.what());
 						}
 
 						alert_user(message, 0);
@@ -2327,14 +2327,14 @@ send_text_fake(w_text_entry* te) {
     if(netState != netUninitialized && netState != netJoining && netState != netDown
         && !(netState == netGathering && NetGetNumberOfPlayers() <= 1))
     {
-        ch->append_chat_entry(NULL, "This is not finished yet.  Your text will not be seen by others.");
+        ch->append_chat_entry(NULL, "まだ完了していません。あなたのテキストは他者から見えません。");
         player_info* info = (player_info*)NetGetPlayerData(NetGetLocalPlayerIndex());
         ch->append_chat_entry(info, te->get_text());
     
         te->set_text("");
     }
     else {
-        ch->append_chat_entry(NULL, "There is nobody in the game to hear you yet.");
+        ch->append_chat_entry(NULL, "ゲームの中では、まだ誰もあなたの声を聞くことができません。");
     }
 }
 #endif // NETWORK_TWO_WAY_CHAT
@@ -2359,7 +2359,7 @@ void display_net_game_stats(void)
     w_select* graph_type_w = new w_select(0, NULL);
     graph_type_w->set_identifier(iGRAPH_POPUP);
     graph_type_w->set_selection_changed_callback(respond_to_graph_type_change);
-    graph_type_placer->dual_add(graph_type_w->label("Report on"), d);
+    graph_type_placer->dual_add(graph_type_w->label("リポート"), d);
     graph_type_placer->dual_add(graph_type_w, d);
 
     placer->add(graph_type_placer, true);
