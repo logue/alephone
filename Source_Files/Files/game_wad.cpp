@@ -828,7 +828,7 @@ bool goto_level(
 		// ghs: this runs very early now
 		// we want to be before place_initial_objects, and
 		// before MarkLuaCollections
-		RunLuaScript();
+//		RunLuaScript();
 
 		if (film_profile.early_object_initialization)
 		{
@@ -1267,7 +1267,7 @@ bool revert_game(
 		if (successful) 
 		{
 			Music::instance()->PreloadLevelMusic();
-			RunLuaScript();
+			// RunLuaScript();
 			
 			// LP: added for loading the textures if one had died on another level;
 			// this gets around WZ's moving of this line into make_restored_game_relevant()
