@@ -532,7 +532,7 @@ static void player_dialog(void *arg)
 
 	horizontal_placer *button_placer = new horizontal_placer;
 	
-	w_button* ok_button = new w_button("ACCEPT", dialog_ok, &d);
+	w_button* ok_button = new w_button("OK", dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
