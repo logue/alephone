@@ -23,7 +23,7 @@
 
 	Friday, July 8, 1994 2:32:44 PM (alain)
 		All old code in here is obsolete. This now has interface for the top-level
-		interface (Begin Game, etc�)
+		interface (Begin Game, etcﾉ)
 	Saturday, September 10, 1994 12:45:48 AM  (alain)
 		the interface gutted again. just the stuff that handles the menu though, the rest stayed
 		the same.
@@ -174,9 +174,10 @@ enum recording_version {
 	RECORDING_VERSION_ALEPH_ONE_1_1 = 8,
 	RECORDING_VERSION_ALEPH_ONE_1_2 = 9,
 	RECORDING_VERSION_ALEPH_ONE_1_3 = 10,
+	RECORDING_VERSION_ALEPH_ONE_1_4 = 11
 };
-const short default_recording_version = RECORDING_VERSION_ALEPH_ONE_1_3;
-const short max_handled_recording= RECORDING_VERSION_ALEPH_ONE_1_3;
+const short default_recording_version = RECORDING_VERSION_ALEPH_ONE_1_4;
+const short max_handled_recording= RECORDING_VERSION_ALEPH_ONE_1_4;
 
 #include "screen_definitions.h"
 #include "interface_menus.h"
@@ -839,7 +840,7 @@ bool join_networked_resume_game()
                         }
                         else
                         {
-                                /* Tell the user they�re screwed when they try to leave this level. */
+                                /* Tell the user theyﾕre screwed when they try to leave this level. */
                                 // ZZZ: should really issue a different warning since the ramifications are different
                                 alert_user(infoError, strERRORS, cantFindMap, 0);
         
@@ -1078,7 +1079,7 @@ void draw_menu_button_for_command(
 	
 	/* Draw it initially depressed.. */
 	draw_button(rectangle_index, true);
-	SDL_Delay(1000 / 12);
+	sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 12);
 	draw_button(rectangle_index, false);
 }
 
@@ -1104,6 +1105,7 @@ void update_interface_display(
 
 bool idle_game_state(uint32 time)
 {
+	static float last_heartbeat_fraction = -1.f;
 	int machine_ticks_elapsed = time - game_state.last_ticks_on_idle;
 
 	if(machine_ticks_elapsed || game_state.phase==0)
@@ -1207,7 +1209,7 @@ bool idle_game_state(uint32 time)
 		game_state.last_ticks_on_idle= machine_tick_count();
 	}
 
-	/* if we�re not paused and there�s something to draw (i.e., anything different from
+	/* if weﾕre not paused and thereﾕs something to draw (i.e., anything different from
 		last time), render a frame */
 	if(game_state.state==_game_in_progress)
 	{
@@ -1221,8 +1223,11 @@ bool idle_game_state(uint32 time)
 			// ZZZ: I don't know for sure that render_screen works best with the number of _real_
 			// ticks elapsed rather than the number of (potentially predictive) ticks elapsed.
 			// This is a guess.
-			if (theUpdateResult.first)
+			auto heartbeat_fraction = get_heartbeat_fraction();
+			if (theUpdateResult.first || (last_heartbeat_fraction != -1 && last_heartbeat_fraction != heartbeat_fraction)) {
+				last_heartbeat_fraction = heartbeat_fraction;
 				render_screen(ticks_elapsed);
+			}
 		}
 		
 		return theUpdateResult.first;
@@ -1784,6 +1789,8 @@ static void display_about_dialog()
 	authors.push_back("Will Dyson");
 	authors.push_back("Carl Gherardi");
 	authors.push_back("Thomas Herzog");
+	authors.push_back("Chris Hallock (LidMop)");
+	authors.push_back("Beno杯 Hauquier (Kolfering)");
 	authors.push_back("Peter Hessler");
 	authors.push_back("Matthew Hielscher");
 	authors.push_back("Rhys Hill");
@@ -1816,6 +1823,7 @@ static void display_about_dialog()
 	authors.push_back("Alexander Strange (mrvacbob)");
 	authors.push_back("Alexei Svitkine");
 	authors.push_back("Ben Thompson");
+	authors.push_back("TrajansRow");
 	authors.push_back("Clemens Unterkofler (hogdotmac)");
 	authors.push_back("James Willson");
 	authors.push_back("Woody Zenfell III");
@@ -2132,6 +2140,9 @@ static bool begin_game(
 						load_film_profile(FILM_PROFILE_ALEPH_ONE_1_2);
 						break;
 					case RECORDING_VERSION_ALEPH_ONE_1_3:
+						load_film_profile(FILM_PROFILE_ALEPH_ONE_1_3);
+						break;
+					case RECORDING_VERSION_ALEPH_ONE_1_4:
 						load_film_profile(FILM_PROFILE_DEFAULT);
 						break;
 					default:
@@ -3361,13 +3372,13 @@ size_t should_restore_game_networked(FileSpecifier& file)
         dialog d;
 
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title("RESUME GAME"), d);
+	placer->dual_add(new w_title("ゲーム再開"), d);
 	placer->add(new w_spacer, true);
 
 	horizontal_placer *resume_as_placer = new horizontal_placer;
         w_toggle* theRestoreAsNetgameToggle = new w_toggle(dynamic_world->player_count > 1, 0);
         theRestoreAsNetgameToggle->set_labels_stringset(kSingleOrNetworkStringSetID);
-	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("Resume as"), d);
+	resume_as_placer->dual_add(theRestoreAsNetgameToggle->label("以下で再開："), d);
 	resume_as_placer->dual_add(theRestoreAsNetgameToggle, d);
 
 	placer->add(resume_as_placer, true);
@@ -3376,8 +3387,8 @@ size_t should_restore_game_networked(FileSpecifier& file)
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button("RESUME", dialog_ok, &d), d);
-	button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("再開", dialog_ok, &d), d);
+	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 

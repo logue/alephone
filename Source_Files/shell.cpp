@@ -318,6 +318,8 @@ static void initialize_application(void)
 {
 #if defined(__WIN32__) && defined(__MINGW32__)
 	if (LoadLibraryW(L"exchndl.dll")) shell_options.debug = true;
+#else
+	setlocale(LC_ALL, "");
 #endif
 
 #if defined(__WIN32__)
@@ -686,14 +688,14 @@ static void main_event_loop(void)
 	short game_state;
 
 	while ((game_state = get_game_state()) != _quit_game) {
-		uint32 cur_time = SDL_GetTicks();
+		uint32 cur_time = machine_tick_count();
 		bool yield_time = false;
 		bool poll_event = false;
 
 		switch (game_state) {
 			case _game_in_progress:
 			case _change_level:
-			  if (Console::instance()->input_active() || cur_time - last_event_poll >= TICKS_BETWEEN_EVENT_POLL) {
+				if (get_fps_target() == 0 || Console::instance()->input_active() || cur_time - last_event_poll >= TICKS_BETWEEN_EVENT_POLL) {
 					poll_event = true;
 					last_event_poll = cur_time;
 			  } else {				  
@@ -731,11 +733,10 @@ static void main_event_loop(void)
 
 				if (yield_time) {
 					// The game is not in a "hot" state, yield time to other
-					// processes by calling SDL_Delay() but only try for a maximum
-					// of 30ms
+					// processes but only try for a maximum of 30ms
 					int num_tries = 0;
 					while (!found_event && num_tries < 3) {
-						SDL_Delay(10);
+						sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 100);
 						found_event = SDL_PollEvent(&event);
 						num_tries++;
 					}
@@ -748,12 +749,19 @@ static void main_event_loop(void)
 			}
 		}
 
-		execute_timer_tasks(SDL_GetTicks());
-		idle_game_state(SDL_GetTicks());
+		execute_timer_tasks(machine_tick_count());
+		idle_game_state(machine_tick_count());
 
-		if (game_state == _game_in_progress && !graphics_preferences->hog_the_cpu && (TICKS_PER_SECOND - (SDL_GetTicks() - cur_time)) > 10)
+		if (game_state == _game_in_progress &&
+			get_fps_target() != 0)
 		{
-			SDL_Delay(1);
+			int elapsed_machine_ticks = machine_tick_count() - cur_time;
+			int desired_elapsed_machine_ticks = MACHINE_TICKS_PER_SECOND / get_fps_target();
+
+			if (desired_elapsed_machine_ticks - elapsed_machine_ticks > desired_elapsed_machine_ticks / 3)
+			{
+				sleep_for_machine_ticks(1);
+			}
 		}
 	}
 }
@@ -1028,7 +1036,15 @@ static void handle_game_key(const SDL_Event &event)
 		{
 			if (!OGL_IsActive()) {
 				PlayInterfaceButtonSound(Sound_ButtonSuccess());
-				graphics_preferences->screen_mode.high_resolution = !graphics_preferences->screen_mode.high_resolution;
+				if (graphics_preferences->screen_mode.high_resolution) {
+					graphics_preferences->screen_mode.high_resolution = false;
+					graphics_preferences->screen_mode.draw_every_other_line = false;
+				} else if (!graphics_preferences->screen_mode.draw_every_other_line) {
+					graphics_preferences->screen_mode.draw_every_other_line = true;
+				} else {
+					graphics_preferences->screen_mode.high_resolution = true;
+					graphics_preferences->screen_mode.draw_every_other_line = false;
+				}
 				changed_screen_mode = changed_prefs = true;
 			} else
 				PlayInterfaceButtonSound(Sound_ButtonFailure());
@@ -1392,6 +1408,13 @@ static void process_event(const SDL_Event &event)
 				break;
 #endif
 			case SDL_WINDOWEVENT_EXPOSED:
+				if (Movie::instance()->IsRecording())
+				{
+					// movie recording reads back from the frame buffer so
+					// leave it alone
+					break;
+				}
+				
 #if !defined(__APPLE__) && !defined(__MACH__) // double buffering :)
 #ifdef HAVE_OPENGL
 				if (MainScreenIsOpenGL())

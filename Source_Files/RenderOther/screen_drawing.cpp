@@ -128,7 +128,6 @@ void set_about_alephone_rect(int width, int height)
 
 // Copied off of original 'finf' resource
 // static struct interface_font_info interface_fonts = 
-/*
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
 	{"Monaco",   9, styleBold,  0, "#4"},
@@ -139,18 +138,7 @@ static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 	{"Courier", 14, styleBold,  0, "#22"},
 	{"Monaco",   9, styleNormal,0, "#4"}
 };
-*/
-// HUDフォントではボールドを使わない
-static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
-{
-	{"Monaco",   9, styleNormal,  0, "#4"},
-	{"Monaco",   9, styleNormal,  0, "#4"},
-	{"Monaco",   9, styleNormal,  0, "#4"},
-	{"Monaco",   9, styleNormal,  0, "#4"},
-	{"Courier", 12, styleNormal,  0, "#22"},
-	{"Courier", 14, styleBold,    0, "#22"},
-	{"Monaco",   9, styleNormal,  0, "#4"}
-};
+
 // LP change: hardcoding the interface and player colors,
 // so as to banish the 'clut' resources
 const int NumInterfaceColors = 26;
@@ -533,7 +521,7 @@ int sdl_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, i
 		MainScreenUpdateRect(x, y - ascent, text_width(text, style, false), rect_height);
 	return width;
 }
-#include "converter.h"
+
 int ttf_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, int x, int y, uint32 pixel, uint16 style, bool utf8) const
 {
 	int clip_top, clip_bottom, clip_left, clip_right;
@@ -552,24 +540,6 @@ int ttf_font_info::_draw_text(SDL_Surface *s, const char *text, size_t length, i
 	SDL_GetRGB(pixel, s->format, &c.r, &c.g, &c.b);
 	c.a = 0xff;
 	SDL_Surface *text_surface = 0;
-	/*
-	if (utf8) 
-	{
-		char *temp = process_printable(text, length);
-		if (environment_preferences->smooth_text)
-			text_surface = TTF_RenderUTF8_Blended(get_ttf(style), temp, c);	
-		else
-			text_surface = TTF_RenderUTF8_Solid(get_ttf(style), temp, c);
-	}
-	else
-	{
-		uint16 *temp = process_macroman(text, length);
-		if (environment_preferences->smooth_text)
-			text_surface = TTF_RenderUNICODE_Blended(get_ttf(style), temp, c);
-		else
-			text_surface = TTF_RenderUNICODE_Solid(get_ttf(style), temp, c);
-	}
-	*/
 	if (environment_preferences->smooth_text)
 		text_surface = TTF_RenderUTF8_Blended(get_ttf(style), text, c);	
 	else

@@ -424,6 +424,8 @@ std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> picture_to_surface(Load
 	SDL_RWseek(p, 6, SEEK_CUR);		// picSize/top/left
 	int pic_height = SDL_ReadBE16(p);
 	int pic_width = SDL_ReadBE16(p);
+	s.reset( SDL_CreateRGBSurface(SDL_SWSURFACE, pic_width, pic_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0) );
+	SDL_SetSurfaceBlendMode(s.get(),SDL_BLENDMODE_NONE);
 	//printf("pic_width %d, pic_height %d\n", pic_width, pic_height);
 
 	// Read and parse picture opcodes
@@ -528,6 +530,16 @@ std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> picture_to_surface(Load
 				uint16 left = SDL_ReadBE16(p);
 				uint16 height = SDL_ReadBE16(p) - top;
 				uint16 width = SDL_ReadBE16(p) - left;
+				if( pic_height < height+top || pic_width < width+left ) {
+					// resize
+					pic_height = height+top;
+					pic_width = width+left;
+					SDL_Surface* s2 = SDL_CreateRGBSurface(SDL_SWSURFACE, pic_width, pic_height,  32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+					SDL_SetSurfaceBlendMode(s2,SDL_BLENDMODE_NONE);
+					SDL_BlitSurface(s.get(), NULL, s2, NULL);
+					s.reset( s2 );
+						
+				}
 				uint16 pack_type, pixel_size;
 				if (is_pixmap) {
 					SDL_RWseek(p, 2, SEEK_CUR);			// pmVersion
@@ -619,12 +631,12 @@ std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> picture_to_surface(Load
 				// only way to do this is to decode the image data).
 				// So we only draw the first image we encounter.
 				if (s) {
+					SDL_Rect dst = { left, top, bm->w, bm->h };
+					SDL_BlitSurface(bm, NULL, s.get(), &dst);
 					SDL_FreeSurface(bm);
-				}
-				else {
+				} else {
 					s.reset(bm);
 				}
-
 				break;
 			}
 
@@ -716,7 +728,7 @@ std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> picture_to_surface(Load
 				break;
 		}
 	}
-
+	
 	// Close stream, return surface
 	SDL_RWclose(p);
 	return s;
@@ -942,10 +954,10 @@ void scroll_full_screen_pict_resource_from_scenario(int pict_resource_number, bo
 
 		// Scroll loop
 		bool done = false, aborted = false;
-		uint32 start_tick = SDL_GetTicks();
+		uint32 start_tick = machine_tick_count();
 		do {
 
-			int32 delta = (SDL_GetTicks() - start_tick) / (text_block ? (2 * SCROLLING_SPEED) : SCROLLING_SPEED);
+			int32 delta = (machine_tick_count() - start_tick) / (text_block ? (2 * SCROLLING_SPEED) : SCROLLING_SPEED);
 			if (scroll_horizontal && delta > picture_width - screen_width) {
 				delta = picture_width - screen_width;
 				done = true;
@@ -965,7 +977,7 @@ void scroll_full_screen_pict_resource_from_scenario(int pict_resource_number, bo
 
 			// Give system time
 			global_idle_proc();
-			SDL_Delay(10);
+			yield();
 
 			// Check for events to abort
 			SDL_Event event;

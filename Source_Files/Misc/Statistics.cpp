@@ -80,9 +80,9 @@ void StatsManager::Finish()
 	{
 		dialog d;
 		vertical_placer* placer = new vertical_placer;
-		placer->dual_add(new w_static_text("状況をアップロードしています。"), d);
+		placer->dual_add(new w_static_text("Uploading stats"), d);
 		placer->add(new w_spacer, true);
-		w_button *button = new w_button("キャンセル", dialog_cancel, &d);
+		w_button *button = new w_button("CANCEL", dialog_cancel, &d);
 		placer->dual_add(button, d);
 		d.set_widget_placer(placer);
 		d.activate_widget(button);
@@ -154,7 +154,7 @@ int StatsManager::Run(void *pv)
 		}
 		else
 		{
-			SDL_Delay(200);
+			sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 5);
 		}
 		
 	}

@@ -47,17 +47,9 @@ using std::map;
 
 #include <boost/tuple/tuple_comparison.hpp>
 #include "preferences.h" // smooth_font
-/*
-#include "AlephSansMono-Bold.h"
-#include "ProFontAO.h"
-
-#include "CourierPrime.h"
-#include "CourierPrimeBold.h"
-#include "CourierPrimeItalic.h"
-#include "CourierPrimeBoldItalic.h"
-*/
 #include "jp-fonts/AlephJPSansMono-Bold.h"
 #include "jp-fonts/k8x12L.h"
+
 #include "jp-fonts/SourceHanMono-Regular.h"
 #include "jp-fonts/SourceHanMono-RegularIt.h"
 #include "jp-fonts/SourceHanMono-Bold.h"
@@ -87,14 +79,6 @@ typedef struct builtin_font
 } builtin_font_t;
 
 static builtin_font_t builtin_fontspecs[] = {
-/*
-	{ "mono", aleph_sans_mono_bold, sizeof(aleph_sans_mono_bold) },
-	{ "Monaco", pro_font_ao, sizeof(pro_font_ao) },
-	{ "Courier Prime", courier_prime, sizeof(courier_prime) },
-	{ "Courier Prime Bold", courier_prime_bold, sizeof(courier_prime_bold) },
-	{ "Courier Prime Italic", courier_prime_italic, sizeof(courier_prime_italic) },
-	{" Courier Prime Bold Italic", courier_prime_bold_italic, sizeof(courier_prime_bold_italic) }
-*/
 	{ "mono", AlephJPSansMonoBold, AlephJPSansMonoBold_size },
 	{ "Monaco", k8x12L, k8x12L_size },
 	{ "Courier Prime", SourceHanMonoRegular, SourceHanMonoRegular_size },
@@ -331,6 +315,16 @@ font_info *load_font(const TextSpec &spec) {
 			info->m_adjust_height = spec.adjust_height;
 			info->m_styles[styleNormal] = font;
 			info->m_keys[styleNormal] = ttf_font_key_t(file, 0, spec.size);
+
+			// SDL_TTF doesn't do a great job determining the height of fonts...
+			int height;
+			TTF_SizeText(font, "Ag", nullptr, &height);
+			
+			info->m_line_height = std::max({
+					TTF_FontLineSkip(font),
+					TTF_FontHeight(font),
+					height
+				});							
 
 			// load bold face
 			file = locate_font(spec.bold);

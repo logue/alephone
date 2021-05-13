@@ -561,8 +561,8 @@ const int JoinDialog::JoinNetworkGameByRunning ()
 	join_result = kNetworkJoinFailedUnjoined;
 	
 	vector<string> chat_choice_labels;
-	chat_choice_labels.push_back ("参加者／募集者");
-	chat_choice_labels.push_back ("ネット上のプレイヤー");
+	chat_choice_labels.push_back ("with joiners/gatherer");
+	chat_choice_labels.push_back ("with Internet players");
 	m_chatChoiceWidget->set_labels (chat_choice_labels);
 
 	m_colourWidget->set_labels (kTeamColorsStringSetID);
@@ -776,27 +776,27 @@ void JoinDialog::getJoinAddressFromMetaserver ()
 		char message[1024];
 		if (e.code() == MetaserverClient::LoginDeniedException::BadUserOrPassword)
 		{
-			strcpy(message, "ログイン拒否：不正なユーザ名もしくは、パスワードです。");
+			strncpy(message, "Login denied: bad username or password.", 1024);
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::UserAlreadyLoggedIn)
 		{
-			strcpy(message, "ログイン拒否：そのユーザは、すでにログインしています。");
+			strncpy(message, "Login denied: that user is already logged in.", 1024);
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::AccountAlreadyLoggedIn)
 		{
-			strcpy(message, "ログイン拒否：そのアカウントは、すでにログインしています。");
+			strncpy(message, "Login denied: that account is already logged in.", 1024);
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::RoomFull)
 		{
-			strcpy(message, "ログイン拒否：ルームが満席！？");
+			strncpy(message, "Login denied: room is full!?", 1024);
 		}
 		else if (e.code() == MetaserverClient::LoginDeniedException::AccountLocked)
 		{
-			strcpy(message, "ログイン拒否：あなたのアカウントはロックされています。");
+			strncpy(message, "Login denied: your account is locked.", 1024);
 		}
 		else
 		{
-			sprintf(message, "インターネット上のサーバーへの接続時に問題が発生しました：%s　お手数ですが、しばらくたってからもう一度やり直してください。", e.what());
+			sprintf(message, "There was a problem connecting to the server that tracks Internet games (%s). Please try again later.", e.what());
 		}
 
 		alert_user(message, 0);
@@ -2683,7 +2683,7 @@ public:
 	{
 		vertical_placer *placer = new vertical_placer;
 
-		placer->dual_add(new w_title("ネットワークゲームのセットアップ"), m_dialog);
+		placer->dual_add(new w_title("SETUP NETWORK GAME"), m_dialog);
 		placer->add(new w_spacer(), true);
 
 		table_placer *table = new table_placer(2, 10);

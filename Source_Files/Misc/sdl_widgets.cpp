@@ -371,7 +371,7 @@ void w_button_base::click(int /*x*/, int /*y*/)
 {
 	// simulate a mouse press
 	mouse_down(0, 0);
-	SDL_Delay(1000 / 12);
+	sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 12);
 	mouse_up(0, 0);
 }
 
@@ -742,7 +742,7 @@ void w_select_button::place(const SDL_Rect &r, placement_flags flags)
 // if no valid labels, returns -1 when asked for selection
 // draw(), get_selection() check num_labels directly instead of trying to keep selection set at -1
 
-static const char* sNoValidOptionsString = "（無効な選択）"; // XXX should be moved outside compiled code e.g. to MML
+static const char* sNoValidOptionsString = "(no valid options)"; // XXX should be moved outside compiled code e.g. to MML
 
 w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), we_own_labels(false), selection(s), selection_changed_callback(NULL), utf8(false)
 {
@@ -1481,8 +1481,8 @@ void w_password_entry::draw(SDL_Surface *s) const
  *  Key name widget
  */
 
-static const std::vector<std::string> WAITING_TEXT = { "キー入力待ち", "ボタン入力待ち", "ボタン入力待ち" };
-static const std::vector<std::string> UNBOUND_TEXT = { "なし", "なし", "なし" };
+static const std::vector<std::string> WAITING_TEXT = { "waiting for key", "waiting for button", "waiting for button" };
+static const std::vector<std::string> UNBOUND_TEXT = { "none", "none", "none" };
 
 w_key::w_key(SDL_Scancode key, w_key::Type event_type) : widget(LABEL_WIDGET), binding(false), event_type(event_type)
 {
@@ -1513,20 +1513,41 @@ static const char* sMouseButtonKeyName[NUM_SDL_MOUSE_BUTTONS] = {
         "ホイールダウン"
 };
 
-static const char* sJoystickButtonKeyName[NUM_SDL_JOYSTICK_BUTTONS] = {
-	"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
-	"左スティックボタン", "右スティックボタン", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
-	"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
-	"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
-};
+static const char* get_joystick_button_key_name(int offset)
+{
+	static_assert(SDL_CONTROLLER_BUTTON_MAX <= 21 &&
+				  SDL_CONTROLLER_AXIS_MAX <= 12,
+				  "SDL changed the number of buttons/axes again!");
+
+	static const char* buttons[] = {
+		"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
+		"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
+		// new in SDL 2.0.14
+		"Misc", "パドル1", "パドル 2", "パドル3", "パドル4", "タッチパットボタン",
+	};
+
+	static const char* axes[] = {
+		"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
+		"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
+	};
+
+	if (offset < SDL_CONTROLLER_BUTTON_MAX)
+	{
+		return buttons[offset];
+	}
+	else
+	{
+		return axes[offset - SDL_CONTROLLER_BUTTON_MAX];
+	}
+}
 
 // ZZZ: this injects our phony key names but passes along the rest.
-static const char*
+const char*
 GetSDLKeyName(SDL_Scancode inKey) {
 	if (w_key::event_type_for_key(inKey) == w_key::MouseButton)
         return sMouseButtonKeyName[inKey - AO_SCANCODE_BASE_MOUSE_BUTTON];
 	else if (w_key::event_type_for_key(inKey) == w_key::JoystickButton)
-	    return sJoystickButtonKeyName[inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON];
+	    return get_joystick_button_key_name(inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON);
     else
         return SDL_GetScancodeName(inKey);
 }

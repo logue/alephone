@@ -1,11 +1,5 @@
 /*
  *  converter.h
- *  AlephOne-OSX10.4
- *
- *  Created by みちあき on 08/06/24.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
- *
- *  Modified by Logue on 19/04/09
  */
 #ifndef _CSERIES_CONVERTER_
 #define _CSERIES_CONVERTER_
@@ -42,6 +36,25 @@ inline bool isJChar(unsigned char text)
 inline bool is2ndJChar(unsigned char text)
 {
     return (((0x7F != text) && (0x40 <= text)) || ((text >= 0xe0) && (text <= 0xfc))) ? true : false;
+}
+
+inline std::pair<int, uint16_t> next_utf8(const char *c)
+{
+    const unsigned char *p = reinterpret_cast<const unsigned char *>(c);
+    if (p[0] < 0x80)
+    {
+        return std::pair<int, uint16_t>(1, p[0]);
+    }
+    else if (p[0] < 0xe0)
+    {
+        return std::pair<int, uint16_t>(2, (p[0] & 0x1f) << 6 | (p[1] & 0x3f));
+    }
+    else
+    {
+        return std::pair<int, uint16_t>(3, (p[0] & 0xf) << 12 |
+                                               (p[1] & 0x3f) << 6 |
+                                               (p[2] & 0x3f));
+    }
 }
 
 class utf8_iter
@@ -107,5 +120,4 @@ uint16 sjisChar(char *in, int *step);
 void sjisChar(const char *in, int *step, char *dst);
 std::vector<std::string> line_wrap(TTF_Font *t, const std::string &str, int size);
 const char *line_wrap_term(TTF_Font *t, const char *begin, const char *end, int size);
-
 #endif

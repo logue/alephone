@@ -588,9 +588,14 @@ void check_m1_exploration(void)
 		explore_view.origin_polygon_index = explore_player->camera_polygon_index;
 
 		update_view_data(&explore_view);
+		
+		std::vector<uint16_t> saved_render_flags{RenderFlagList};
 		objlist_clear(render_flags, RENDER_FLAGS_BUFFER_SIZE);
+		
         // build_render_tree() actually marks the polygons
 		explore_tree.build_render_tree();
+
+		RenderFlagList = std::move(saved_render_flags);
 	}
 }
 
@@ -754,18 +759,19 @@ static void update_render_effect(
 	}
 	else
 	{
+		float interpolated_phase = MAX(0, phase - 1 + view->heartbeat_fraction);
 		switch (effect)
 		{
 			case _render_effect_explosion:
-				shake_view_origin(view, EXPLOSION_EFFECT_RANGE - ((EXPLOSION_EFFECT_RANGE/2)*phase)/period);
+				shake_view_origin(view, EXPLOSION_EFFECT_RANGE - ((EXPLOSION_EFFECT_RANGE/2)*interpolated_phase)/period);
 				break;
 			
 			case _render_effect_fold_in:
-				phase= period-phase;
+				interpolated_phase= period-interpolated_phase;
 			case _render_effect_fold_out:
 				/* calculate world_to_screen based on phase */
-				view->world_to_screen_x= view->real_world_to_screen_x + (4*view->real_world_to_screen_x*phase)/period;
-				view->world_to_screen_y= view->real_world_to_screen_y - (view->real_world_to_screen_y*phase)/(period+period/4);
+				view->world_to_screen_x= view->real_world_to_screen_x + (4*view->real_world_to_screen_x*interpolated_phase)/period;
+				view->world_to_screen_y= view->real_world_to_screen_y - (view->real_world_to_screen_y*interpolated_phase)/(period+period/4);
 				break;
 		}
 	}

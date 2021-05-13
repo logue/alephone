@@ -42,8 +42,6 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "converter.h"
-
 using namespace std;
 
 extern bool game_is_networked;
@@ -241,11 +239,8 @@ void Console::delete_word() {
 }
 
 void Console::textEvent(const SDL_Event &e) {
-	// std::string input_utf8 = e.text.text;
-	// std::string input_roman = utf8_to_mac_roman(input_utf8);
-	const char *input = e.text.text;
-	std::string input_roman = std::string(_SJIS(input));
-
+	std::string input_utf8 = e.text.text;
+	std::string input_roman = utf8_to_mac_roman(input_utf8);
 	m_buffer.insert(m_cursor_position, input_roman);
 	m_displayBuffer.insert(cursor_position(), input_roman);
 	m_cursor_position += input_roman.length();
@@ -416,7 +411,7 @@ struct save_level
 	void operator() (const std::string& arg) const {
 		if (!NetAllowSavingLevel())
 		{
-			screen_printf("レベルの保存は無効化されています。");
+			screen_printf("Level saving disabled");
 			return;
 		}
 
@@ -445,7 +440,7 @@ struct save_level
 		if (export_level(fs))
 			screen_printf("Saved %s", utf8_to_mac_roman(fs.GetPath()).c_str());
 		else
-			screen_printf("レベル保存時にエラーが発生しました。");
+			screen_printf("An error occurred while saving the level");
 	}
 };
 

@@ -139,7 +139,7 @@ dnl AX_CHECK_BOOST_HEADER([boost/uuid/uuid_generators.hpp])
 dnl AX_CHECK_BOOST_HEADER([boost/uuid/uuid_io.hpp])
 
 dnl Check for library functions.
-AC_CHECK_FUNCS([snprintf vsnprintf], , AC_MSG_ERROR([You need snprintf and vsnprintf to run Aleph One.]))
+AC_CHECK_FUNCS([snprintf vsnprintf], , AC_MSG_ERROR([You need snprintf and vsnprintf to run Aleph One.]))     
 AC_CHECK_FUNCS([sysconf sysctlbyname])
 AC_CHECK_FUNC([mkstemp],
               [AC_DEFINE([LUA_USE_MKSTEMP], [1], [mkstemp() available])])
@@ -255,7 +255,7 @@ AC_DEFUN([AX_CHECK_FEATURE_PKG],
                                        AC_DEFINE([HAVE_$2], [1], [${desc_$1} enabled]) ],
                                      [AS_IF([test "x${with_$1}" = "xyes"],
                                             [AC_MSG_ERROR([${desc_$1} requested but not available])])])
-
+           
                  ])
             AM_CONDITIONAL([HAVE_$2], [test "x${have_$1}" = "xtrue"])
           ])

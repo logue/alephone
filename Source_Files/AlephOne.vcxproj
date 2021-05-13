@@ -112,7 +112,10 @@
   <ItemGroup>
     <ClCompile Include="CSeries\BStream.cpp" />
     <ClCompile Include="CSeries\byte_swapping.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="CSeries\converter.cpp" />
+=======
+>>>>>>> remotes/pfhore/master
     <ClCompile Include="CSeries\csalerts_sdl.cpp" />
     <ClCompile Include="CSeries\cscluts_sdl.cpp" />
     <ClCompile Include="CSeries\csdialogs_sdl.cpp" />
@@ -329,7 +332,10 @@
   <ItemGroup>
     <ClInclude Include="CSeries\BStream.h" />
     <ClInclude Include="CSeries\byte_swapping.h" />
+<<<<<<< HEAD
     <ClInclude Include="CSeries\converter.h" />
+=======
+>>>>>>> remotes/pfhore/master
     <ClInclude Include="CSeries\csalerts.h" />
     <ClInclude Include="CSeries\cscluts.h" />
     <ClInclude Include="CSeries\csdialogs.h" />
@@ -402,11 +408,22 @@
     <ClInclude Include="Lua\lua_serialize.h" />
     <ClInclude Include="Lua\lua_templates.h" />
     <ClInclude Include="Misc\ActionQueues.h" />
+<<<<<<< HEAD
+=======
+    <ClInclude Include="Misc\AlephSansMono-Bold.h" />
+>>>>>>> remotes/pfhore/master
     <ClInclude Include="Misc\alephversion.h" />
     <ClInclude Include="Misc\binders.h" />
     <ClInclude Include="Misc\CircularByteBuffer.h" />
     <ClInclude Include="Misc\CircularQueue.h" />
     <ClInclude Include="Misc\Console.h" />
+<<<<<<< HEAD
+=======
+    <ClInclude Include="Misc\CourierPrime.h" />
+    <ClInclude Include="Misc\CourierPrimeBold.h" />
+    <ClInclude Include="Misc\CourierPrimeBoldItalic.h" />
+    <ClInclude Include="Misc\CourierPrimeItalic.h" />
+>>>>>>> remotes/pfhore/master
     <ClInclude Include="Misc\DefaultStringSets.h" />
     <ClInclude Include="Misc\game_errors.h" />
     <ClInclude Include="Misc\interface.h" />
@@ -433,12 +450,15 @@
     <ClInclude Include="Misc\vbl_definitions.h" />
     <ClInclude Include="Misc\VecOps.h" />
     <ClInclude Include="Misc\WindowedNthElementFinder.h" />
+<<<<<<< HEAD
     <ClInclude Include="Misc\jp-fonts\AlephJPSansMono-Bold.h" />
     <ClInclude Include="Misc\jp-fonts\k8x12L.h" />
     <ClInclude Include="Misc\jp-fonts\SourceHanMono-Bold.h" />
     <ClInclude Include="Misc\jp-fonts\SourceHanMono-BoldIt.h" />
     <ClInclude Include="Misc\jp-fonts\SourceHanMono-Regular.h" />
     <ClInclude Include="Misc\jp-fonts\SourceHanMono-RegularIt.h" />
+=======
+>>>>>>> remotes/pfhore/master
     <ClInclude Include="ModelView\Dim3_Loader.h" />
     <ClInclude Include="ModelView\Model3D.h" />
     <ClInclude Include="ModelView\ModelRenderer.h" />

@@ -50,6 +50,7 @@ public:
 	}
 
 	void Clear() { m_entries.clear(); m_size = 0; }
+	void Release(short index); // sound must be loaded
 
 private:
 	struct Entry {
@@ -72,7 +73,6 @@ private:
 	};
 
 	void ReleaseOldestSound();
-	void Release(short index);
 	std::map<short, Entry> m_entries;
 	std::size_t m_size;
 	std::size_t m_max_size;
@@ -256,7 +256,7 @@ void SoundManager::TestVolume(float db, short sound_index)
 			PlaySound(sound_index, 0, NONE);
 			Mixer::instance()->SetVolume(db);
 			while (SoundIsPlaying(sound_index))
-				SDL_Delay(10);
+			yield();
 			Mixer::instance()->SetVolume(parameters.volume_db);
 		}
 	}	
@@ -337,6 +337,15 @@ void SoundManager::OrphanSound(short identifier)
 				channel->identifier = NONE;
 			}
 		}
+	}
+}
+
+void SoundManager::UnloadSound(short sound_index)
+{
+	StopSound(NONE, sound_index);
+	if (sounds->IsLoaded(sound_index))
+	{
+		sounds->Release(sound_index);
 	}
 }
 
@@ -1442,7 +1451,7 @@ void parse_mml_sounds(const InfoTree& root)
 			std::string filename;
 			if (external.read_attr("file", filename))
 				data.File.SetNameWithPath(filename.c_str());
-			
+
 			SoundReplacements::instance()->Add(data, index, slot);
 		}
 	}

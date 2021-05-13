@@ -65,14 +65,14 @@ setupAndConnectClient(MetaserverClient& client)
 		
 		if (first_check)
 		{
-			uint32 ticks = SDL_GetTicks();
+			uint32 ticks = machine_tick_count();
 
 			// if we get an update in a short amount of time, don't display progress
-			while (Update::instance()->GetStatus() == Update::CheckingForUpdate && SDL_GetTicks() - ticks < 500);
+			while (Update::instance()->GetStatus() == Update::CheckingForUpdate && machine_tick_count() - ticks < 500);
 
 			// check another couple seconds, but with a progress dialog
 			open_progress_dialog(_checking_for_updates);
-			while (Update::instance()->GetStatus() == Update::CheckingForUpdate && SDL_GetTicks() - ticks < 2500);
+			while (Update::instance()->GetStatus() == Update::CheckingForUpdate && machine_tick_count() - ticks < 2500);
 			close_progress_dialog();
 			first_check = false;
 		}
@@ -83,17 +83,17 @@ setupAndConnectClient(MetaserverClient& client)
 			dialog d;
 			vertical_placer *placer = new vertical_placer;
 
-			placer->dual_add(new w_title("更新が利用可能です"), d);
+			placer->dual_add(new w_title("UPDATE AVAILABLE"), d);
 			placer->add(new w_spacer(), true);
 
-			placer->dual_add(new w_static_text(expand_app_variables("$appName$のアップデートが利用可能です。").c_str()), d);
-			placer->dual_add(new w_static_text("オンラインで遊ぶ前に"), d);
+			placer->dual_add(new w_static_text(expand_app_variables("An update for $appName$ is available.").c_str()), d);
 #ifdef MAC_APP_STORE
-			placer->dual_add(new w_static_text("App Storeからダウンロードしてください。"), d);
+			placer->dual_add(new w_static_text("Please download it from the App Store"), d);
 #else
-			placer->dual_add(new w_static_text("以下のアドレスからダウンロードしてください。"), d);
+			placer->dual_add(new w_static_text("Please download it from"), d);
 			placer->dual_add(new w_hyperlink(A1_HOMEPAGE_URL), d);
 #endif
+			placer->dual_add(new w_static_text("before playing games online."), d);
 			
 			placer->add(new w_spacer(), true);
 			placer->dual_add(new w_button("OK", dialog_ok, &d), d);
@@ -120,7 +120,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	description.m_timeLimit = (info.time_limit > 7 * 24 * 3600 * TICKS_PER_SECOND) ? -1 : info.time_limit;
 	description.m_difficulty = info.difficulty_level;
 	description.m_mapName = string(info.level_name);
-	description.m_name = gMetaserverClient->playerName() + "のゲーム";
+	description.m_name = gMetaserverClient->playerName() + "'s Game";
 	description.m_teamsAllowed = !(info.game_options & _force_unique_teams);
 	
 	// description's constructor gets scenario info, aleph one's protocol ID for us
@@ -140,7 +140,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	}
 	else if (HasLua)
 	{
-		description.m_netScript = "埋め込み";
+		description.m_netScript = "Embedded";
 	} // else constructor's blank string is desirable
 
 	description.m_hasGameOptions = true;
@@ -150,7 +150,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 
 	if (HasPhysics)
 	{
-		description.m_physicsName = "埋め込み";
+		description.m_physicsName = "Embedded";
 	}
 	else
 	{
@@ -322,7 +322,7 @@ void MetaserverClientUi::GameSelected(GameListMessage::GameListEntry game)
 {
 	if (gMetaserverClient->game_target() == game.id())
 	{
-		if (SDL_GetTicks() - m_lastGameSelected < 333 && (!game.running() && Scenario::instance()->IsCompatible(game.m_description.m_scenarioID)))
+		if (machine_tick_count() - m_lastGameSelected < 333 && (!game.running() && Scenario::instance()->IsCompatible(game.m_description.m_scenarioID)))
 		{
 			JoinClicked();
 		}
@@ -333,7 +333,7 @@ void MetaserverClientUi::GameSelected(GameListMessage::GameListEntry game)
 	}
 	else
 	{
-		m_lastGameSelected = SDL_GetTicks();
+		m_lastGameSelected = machine_tick_count();
 		gMetaserverClient->game_target(game.id());
 	}
 

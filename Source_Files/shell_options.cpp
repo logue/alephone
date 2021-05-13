@@ -5,6 +5,8 @@
 #include <sstream>
 
 #include "FileHandler.h"
+#include "Logging.h"
+
 #include "csstrings.h"
 
 #ifdef __WIN32__
@@ -100,21 +102,21 @@ struct ShellOptionsString : public ShellOptionsOption {
 };
 
 static const std::vector<ShellOptionsCommand> shell_options_commands {
-	{"h", "help", "このヘルプメッセージを表示します。", print_usage},
-	{"v", "version", "ゲームのバージョンを表示します。", print_version}
+	{"h", "help", "このヘルプメッセージを表示します", print_usage},
+	{"v", "version", "ゲームのバージョンを表示します", print_version}
 };
 
 static const std::vector<ShellOptionsFlag> shell_options_flags {
-	{"d", "debug", "コアダンプファイルを出力するようにします。", shell_options.debug},
-	{"f", "fullscreen", "ゲームをフルスクリーンで起動します。", shell_options.force_fullscreen},
-	{"w", "windowed", "ゲームをウィンドウモードで起動します。", shell_options.force_windowed},
-	{"g", "nogl", "OpenGLを無効化します。", shell_options.nogl},
-	{"s", "nosound", "サウンドカードを使用を無効化します。", shell_options.nosound},
+	{"d", "debug", "コアダンプを出力するようにします", shell_options.debug},
+	{"f", "fullscreen", "ゲームをフルスクリーンで起動します", shell_options.force_fullscreen},
+	{"w", "windowed", "ゲームをウィンドウモードで起動します", shell_options.force_windowed},
+	{"g", "nogl", "OpenGLを使用せずに起動します", shell_options.nogl},
+	{"s", "nosound", "サウンドを無効化します", shell_options.nosound},
 	{"m", "nogamma", "ガンマエフェクトを無効化します。（メニュー画面のフェードなど）", shell_options.nogamma},
-	{"j", "nojoystick", "ジョイスティックの初期化を行いません。", shell_options.nojoystick},
+	{"j", "nojoystick", "ジョイスティックの初期化を行いません", shell_options.nojoystick},
 	{"i", "insecure_lua", "", shell_options.insecure_lua},
 	{"Q", "skip-intro", "イントロスクリーンをスキップします。", shell_options.skip_intro},
-	{"e", "editor", "編集用オプションです。直接マップにジャンプします。", shell_options.editor}
+	{"e", "editor", "エディタ設定を使い、マップに直接ジャンプします", shell_options.editor}
 };
 
 static const std::vector<ShellOptionsString> shell_options_strings {
@@ -177,9 +179,10 @@ bool ShellOptions::parse(int argc, char** argv)
                 }
                 else
                 {
+					logFatal("%s requires an additional argument", it->c_str());
                     printf("%s は追加の引数が必要です。\n", it->c_str());
                     print_usage();
-                    exit(0);
+                    exit(1);
                 }
 			}
 		}
@@ -200,10 +203,10 @@ bool ShellOptions::parse(int argc, char** argv)
 			}
 			else
 			{
-				
-				printf("不明な引数'%s'が入力されました。\n", it->c_str());
+				logFatal("Unrecognized argument '%s'.", it->c_str());
+				printf("不明な引数'%s'が入力されました。'%s'.\n", it->c_str());
 				print_usage();
-				exit(0);
+				exit(1);
 			}
 		}
 	}
@@ -243,11 +246,11 @@ void print_usage()
 		oss << option;
 	}
 
-	oss << "\tディレクトリ" << spaces(help_tab_stop - strlen("directory") - 8)
-		<< "データファイルが含まれているディレクトリ\n"
+	oss << "\tディレクトリ" << spaces(help_tab_stop - 12 - 8)
+		<< "データが含まれているディレクトリ\n"
 		
-		<< "\tファイル" << spaces(help_tab_stop - strlen("file") - 8)
-		<< "保存されたゲームや映画の再生\n"
+		<< "\tfile" << spaces(help_tab_stop - 8 - 8)
+		<< "保存されたゲームやフィルムの再生\n"
 		<< "\n"
 		<< "この他にも、環境変数「ALEPHONE_DATA」の値を変更することで、\n"
 		<< "読み込ませたいデータディレクトリを指定することができます。\n";
