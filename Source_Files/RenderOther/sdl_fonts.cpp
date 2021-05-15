@@ -318,7 +318,8 @@ font_info *load_font(const TextSpec &spec) {
 
 			// SDL_TTF doesn't do a great job determining the height of fonts...
 			int height;
-			TTF_SizeText(font, "Ag", nullptr, &height);
+			// TTF_SizeText(font, "Ag", nullptr, &height);
+			TTF_SizeUTF8(font, "あAg", nullptr, &height);
 			
 			info->m_line_height = std::max({
 					TTF_FontLineSkip(font),

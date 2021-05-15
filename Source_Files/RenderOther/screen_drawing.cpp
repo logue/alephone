@@ -130,9 +130,9 @@ void set_about_alephone_rect(int width, int height)
 // static struct interface_font_info interface_fonts = 
 static FontSpecifier InterfaceFonts[NUMBER_OF_INTERFACE_FONTS] =
 {
-	{"Monaco",   9, styleBold,  0, "#4"},
-	{"Monaco",   9, styleBold,  0, "#4"},
-	{"Monaco",   9, styleBold,  0, "#4"},
+	{"Monaco",   9, styleNormal,0, "#4"},
+	{"Monaco",   9, styleNormal,0, "#4"},
+	{"Monaco",   9, styleNormal,0, "#4"},
 	{"Monaco",   9, styleNormal,0, "#4"},
 	{"Courier", 12, styleNormal,0, "#22"},
 	{"Courier", 14, styleBold,  0, "#22"},

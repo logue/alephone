@@ -4,13 +4,13 @@
 family = "AlephJPSansMono"
 
 
-Open("mplus-1mn-bold.otf")
+Open("Mplus1Code-Bold.ttf")
 
 # IPAゴシックの高さをDejaVu Sans Monoに揃える
 ScaleToEm(2048)
 
 # 別ファイルとして保存
-Generate("mplus-1mn-bold-scaled.ttf")
+Generate("Mplus1Code-Bold-scaled.ttf")
 
 Close()
 
@@ -24,7 +24,7 @@ SetWidth(1024)
 SelectNone()
 
 # 高さを揃えたIPAゴシックをマージ
-MergeFonts("mplus-1mn-bold-scaled.ttf")
+MergeFonts("Mplus1Code-Bold-scaled.ttf")
 
 #フォント名等を指定して保存
 SetFontNames(family, "AlephJP Sans Mono", family, "Bold")
