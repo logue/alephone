@@ -48,7 +48,7 @@ using std::map;
 #include <boost/tuple/tuple_comparison.hpp>
 #include "preferences.h" // smooth_font
 #include "jp-fonts/AlephJPSansMono-Bold.h"
-#include "jp-fonts/k8x12L.h"
+#include "jp-fonts/DotGothic16Regular.h"
 
 #include "jp-fonts/SourceHanMono-Regular.h"
 #include "jp-fonts/SourceHanMono-RegularIt.h"
@@ -80,7 +80,7 @@ typedef struct builtin_font
 
 static builtin_font_t builtin_fontspecs[] = {
 	{ "mono", AlephJPSansMonoBold, AlephJPSansMonoBold_size },
-	{ "Monaco", k8x12L, k8x12L_size },
+	{ "Monaco", DotGothic16Regular, DotGothic16Regular_size },
 	{ "Courier Prime", SourceHanMonoRegular, SourceHanMonoRegular_size },
 	{ "Courier Prime Bold", SourceHanMonoBold, SourceHanMonoBold_size },
 	{ "Courier Prime Italic", SourceHanMonoRegularIt, SourceHanMonoRegularIt_size },

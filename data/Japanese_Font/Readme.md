@@ -4,7 +4,7 @@ AlephOne日本語版ではターミナルテキストなどゲーム内で使用
 
 |ID |オリジナル版       |英語版                     |日本語版                   |備考
 |---|-------------------|---------------------------|---------------------------|------------------------------------------
-|4  |Monaco             |ProFontAO                  |k8x12L                     |HUD向けフォント
+|4  |Monaco             |ProFontAO                  |DotGothic16                |HUD向けフォント
 |22 |Courier            |Courier Prime              |源ノ等幅                   |汎用フォント（ターミナルテキストなどで使用）
 |   |Courier(Bold)      |Courier Prime Bold         |源ノ等幅ボールド           |汎用ボールドフォント
 |   |Courier(Italic)    |Courier Prime Italic       |源ノ等幅イタリック
@@ -52,9 +52,9 @@ bin2h.exe -cz SourceHanMonoRegular <SourceHanMono-Regular-subset.otf> SourceHanM
 ## リンク
 
 * フォント
-  * [M+ Font](https://mplus-fonts.osdn.jp/)
+  * [M+ Font](https://mplusfonts.github.io/)
   * [源ノ等幅](https://github.com/adobe-fonts/source-han-mono)
-  * [k8x12](http://littlelimit.net/k8x12.htm)
+  * [DotGothic16](https://github.com/fontworks-fonts/DotGothic16)
 * ツール
   * [FontForge](https://fontforge.sf.net/)
   * [サブセットフォントメーカー](https://opentype.jp/subsetfontmk.htm)
