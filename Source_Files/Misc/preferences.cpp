@@ -974,7 +974,7 @@ static const char* ephemera_quality_labels[5] = {
 };
 
 static const char *fps_target_labels[] = {
-	"30", "60 (interpolated)", "120 (interpolated)", "Unlimited (interpolated)", NULL
+	"30", "60（フレーム補間）", "120（フレーム補間）", "無制限（フレーム補間）", NULL
 };
 static const int16_t fps_target_values[] = {
 	30, 60, 120, 0
@@ -1217,7 +1217,7 @@ static void graphics_dialog(void *arg)
 			fps_target_w->set_selection(i);
 		}
 	}
-	table->dual_add(fps_target_w->label("Framerate Target"), d);
+	table->dual_add(fps_target_w->label("目標フレームレート"), d);
 	table->dual_add(fps_target_w, d);
 
 	table->add_row(new w_spacer(), true);
@@ -1718,18 +1718,18 @@ static key_binding_map default_shell_key_bindings = {
 };
 
 static const char* hotkey_action_name[NUMBER_OF_HOTKEYS] = {
-	"Hotkey 1",
-	"Hotkey 2",
-	"Hotkey 3",
-	"Hotkey 4",
-	"Hotkey 5",
-	"Hotkey 6",
-	"Hotkey 7",
-	"Hotkey 8",
-	"Hotkey 9",
-	"Hotkey 10",
-	"Hotkey 11",
-	"Hotkey 12",
+	"ホットキー1",
+	"ホットキー2",
+	"ホットキー3",
+	"ホットキー4",
+	"ホットキー5",
+	"ホットキー6",
+	"ホットキー7",
+	"ホットキー8",
+	"ホットキー9",
+	"ホットキー10",
+	"ホットキー11",
+	"ホットキー12",
 };
 
 static key_binding_map default_hotkey_bindings = {
@@ -2358,7 +2358,7 @@ static void controls_dialog(void *arg)
 	
 	tab_placer* tabs = new tab_placer();
 	
-	std::vector<std::string> labels = { "照準", "移動", "アクション", "インターフェイス", "その他" };
+	std::vector<std::string> labels = { "照準", "移動", "アクション", "ホットキー", "インターフェイス", "その他" };
 	w_tab *tab_w = new w_tab(labels, tabs);
 	
 	placer->dual_add(tab_w, d);
@@ -2576,9 +2576,9 @@ static void controls_dialog(void *arg)
 	hotkey_table->col_flags(2, placeable::kAlignLeft);
 	hotkey_table->col_flags(3, placeable::kAlignLeft);
 	hotkey_table->add(new w_spacer(), true);
-	hotkey_table->dual_add(new w_label("Keyboard"), d);
-	hotkey_table->dual_add(new w_label("Mouse"), d);
-	hotkey_table->dual_add(new w_label("Controller"), d);
+	hotkey_table->dual_add(new w_label("キーボード"), d);
+	hotkey_table->dual_add(new w_label("マウス"), d);
+	hotkey_table->dual_add(new w_label("コントローラー"), d);
 
 	for (auto i = 0; i < NUMBER_OF_HOTKEYS; ++i)
 	{
@@ -2597,8 +2597,8 @@ static void controls_dialog(void *arg)
 	hotkeys->add(hotkey_table, true);
 
 	hotkeys->add(new w_spacer(), true);
-	hotkeys->dual_add(new w_static_text("Hotkeys 1-9 are used to switch weapons, but can be overriden by Lua scripts"), d);
-	hotkeys->dual_add(new w_static_text("Hotkeys 10-12 are reserved for Lua scripts"), d);
+	hotkeys->dual_add(new w_static_text("ホットキー1〜9は武器の切り替えに使用されますが、Luaスクリプトで上書きされることがあります。"), d);
+	hotkeys->dual_add(new w_static_text("ホットキー10〜12はLuaスクリプト用に予約されています。"), d);
 
 	vertical_placer *iface = new vertical_placer();
 	table_placer *interface_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);

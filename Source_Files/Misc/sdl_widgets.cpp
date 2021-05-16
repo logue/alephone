@@ -742,7 +742,7 @@ void w_select_button::place(const SDL_Rect &r, placement_flags flags)
 // if no valid labels, returns -1 when asked for selection
 // draw(), get_selection() check num_labels directly instead of trying to keep selection set at -1
 
-static const char* sNoValidOptionsString = "(no valid options)"; // XXX should be moved outside compiled code e.g. to MML
+static const char* sNoValidOptionsString = "（無効なオプション）"; // XXX should be moved outside compiled code e.g. to MML
 
 w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), we_own_labels(false), selection(s), selection_changed_callback(NULL), utf8(false)
 {
@@ -1481,8 +1481,8 @@ void w_password_entry::draw(SDL_Surface *s) const
  *  Key name widget
  */
 
-static const std::vector<std::string> WAITING_TEXT = { "waiting for key", "waiting for button", "waiting for button" };
-static const std::vector<std::string> UNBOUND_TEXT = { "none", "none", "none" };
+static const std::vector<std::string> WAITING_TEXT = { "キー入力待ち", "ボタン入力待ち", "ボタン入力待ち" };
+static const std::vector<std::string> UNBOUND_TEXT = { "なし", "なし", "なし" };
 
 w_key::w_key(SDL_Scancode key, w_key::Type event_type) : widget(LABEL_WIDGET), binding(false), event_type(event_type)
 {
@@ -1517,13 +1517,13 @@ static const char* get_joystick_button_key_name(int offset)
 {
 	static_assert(SDL_CONTROLLER_BUTTON_MAX <= 21 &&
 				  SDL_CONTROLLER_AXIS_MAX <= 12,
-				  "SDL changed the number of buttons/axes again!");
+				  "SDLはボタン/軸の数を再び変更しました！");
 
 	static const char* buttons[] = {
 		"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
 		"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
 		// new in SDL 2.0.14
-		"Misc", "パドル1", "パドル 2", "パドル3", "パドル4", "タッチパットボタン",
+		"その他", "パドル1", "パドル 2", "パドル3", "パドル4", "タッチパットボタン",
 	};
 
 	static const char* axes[] = {
@@ -2265,9 +2265,9 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
 	char str[256];
 
     if(show_level_numbers)
-    	sprintf(str, "%d - %s", i->level_number + 1, i->level_name);
+    	sprintf(str, "%d - %s", i->level_number + 1, _UTF8(i->level_name));
     else
-        sprintf(str, "%s", i->level_name);
+        sprintf(str, "%s", _UTF8(i->level_name));
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
 	draw_text(s, str, x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
@@ -2360,7 +2360,7 @@ void w_select_popup::gotSelected ()
 }
 
 
-static const char* const sFileChooserInvalidFileString = "(no valid selection)";
+static const char* const sFileChooserInvalidFileString = "（無効な選択）";
 
 w_file_chooser::w_file_chooser(const char* inDialogPrompt, Typecode inTypecode)
 	: w_select_button("", NULL, NULL, true), typecode(inTypecode)
@@ -2479,16 +2479,16 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		{
 			if (item.minutes_remaining() == 1)
 			{
-				time_or_ping << "~1 Minute";
+				time_or_ping << "1分未満";
 			}
 			else
 			{
-				time_or_ping << item.minutes_remaining() << " Minutes";
+				time_or_ping << item.minutes_remaining() << "分";
 			}
 		}
 		else
 		{
-			time_or_ping << "Untimed";
+			time_or_ping << "無制限";
 		}
 	}
 	else
@@ -2515,7 +2515,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_and_map << "|i" << item.m_description.m_scenarioName;
 		if (item.m_description.m_scenarioVersion != "")
 		{
-			game_and_map << ", Version " << item.m_description.m_scenarioVersion;
+			game_and_map << ", バージョン " << item.m_description.m_scenarioVersion;
 		}
 	} 
 	else
@@ -2537,11 +2537,11 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	{
 		if (item.m_description.m_numPlayers == 1)
 		{
-			game_settings << "1 Player";
+			game_settings << "1プレイヤー";
 		}
 		else
 		{
-			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " Players";
+			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << "プレイヤー";
 		}
 	}
 	else
@@ -2549,19 +2549,19 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_settings << static_cast<uint16>(item.m_description.m_numPlayers)
 			      << "/"
 			      << item.m_description.m_maxPlayers
-			      << " Players";
+			      << "プレイヤー";
 	}
 
 	if (item.m_description.m_timeLimit && !(item.m_description.m_timeLimit == INT32_MAX || item.m_description.m_timeLimit == -1))
 	{
 		game_settings << ", " 
 			      << item.m_description.m_timeLimit / 60 / TICKS_PER_SECOND 
-			      << " Minutes";
+			      << "分";
 	}
 
 	if (item.m_description.m_teamsAllowed)
 	{
-		game_settings << ", Teams";
+		game_settings << ", チーム";
 	}
 
 	draw_text(s, game_settings.str().c_str(), x, y, fg, font, game_style);
