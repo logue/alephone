@@ -249,7 +249,7 @@ cd vcpkg
 
 ビルドされたライブラリは `vcpkg/installed-arm64-osx/` に静的ライブラリとして配置されます。
 
-#### 2. Xcodeでビルド
+#### 2. Xcodeでビルド（推奨）
 
 ```bash
 open PBProjects/AlephOne.xcodeproj
@@ -260,7 +260,11 @@ Xcodeで以下を設定：
 - **日本語版**: Build SettingsでPreprocessor Macrosに `ENABLE_JAPANESE=1` を追加
 - **英語版**: デフォルト設定のまま
 
-#### 3. autotools（Linux互換性確認用）
+**注意**: macOSでのビルドはXcodeが推奨です。autotoolsはシステムフレームワークとvcpkgライブラリの競合により問題が発生します。
+
+#### 3. autotools（非推奨・Linux開発者向けのみ）
+
+**警告**: macOSでのautotoolsビルドは技術的な問題があります。Xcodeを使用してください。
 
 ```bash
 # 依存パッケージのインストール（開発用、配布には不要）
