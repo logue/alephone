@@ -2551,7 +2551,7 @@
 		AEC3C7BF09AD68AC003258E4 /* shared_widgets.h in Headers */ = {isa = PBXBuildFile; fileRef = AE437C8B08779BC900038E30 /* shared_widgets.h */; };
 		AEC3C7C009AD68AC003258E4 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = AEC6C89E0879A6020055EC57 /* Console.h */; };
 		AEC3C7C309AD68AC003258E4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
-		AEC3C7C409AD68AC003258E4 /* AlephOne.icns in Resources */ = {isa = PBXBuildFile; fileRef = F53AB44B01F3CB1D01EF2901 /* AlephOne.icns */; };
+		AEC3C7C409AD68AC003258E4 /* AlephOneJP.icns in Resources */ = {isa = PBXBuildFile; fileRef = F53AB44B01F3CB1D01EF2901 /* AlephOneJP.icns */; };
 		AEC3C7C509AD68AC003258E4 /* ImagesIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F56AEB6B01F8AA1201780311 /* ImagesIcon.icns */; };
 		AEC3C7C609AD68AC003258E4 /* ShapesIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F56AEB6C01F8AA1201780311 /* ShapesIcon.icns */; };
 		AEC3C7C709AD68AC003258E4 /* SoundsIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F56AEB6D01F8AA1201780311 /* SoundsIcon.icns */; };
@@ -3312,7 +3312,7 @@
 		AE83423E2C5B22BE00A4A530 /* ScenarioChooser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScenarioChooser.h; path = ../Source_Files/Misc/ScenarioChooser.h; sourceTree = "<group>"; };
 		AE83423F2C5B22EA00A4A530 /* ScenarioChooser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScenarioChooser.cpp; path = ../Source_Files/Misc/ScenarioChooser.cpp; sourceTree = "<group>"; };
 		AE8729C12BD1FBEA00426095 /* Classic Marathon Launcher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Classic Marathon Launcher"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AE941DE713E783F30077218A /* Info-AlephOne-Xcode4.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AlephOne-Xcode4.plist"; sourceTree = "<group>"; };
+		AE941DE713E783F30077218A /* Info-AlephOneJP-Xcode4.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AlephOneJP-Xcode4.plist"; sourceTree = "<group>"; };
 		AE96370A2A39577800DE43FF /* lua_music.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lua_music.h; sourceTree = "<group>"; };
 		AE96370B2A39578600DE43FF /* lua_music.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lua_music.cpp; sourceTree = "<group>"; };
 		AE9974FD2661D49E00DDD370 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -3431,7 +3431,7 @@
 		F522138E0136ABAE01000001 /* network_udp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network_udp.cpp; path = ../Source_Files/Network/network_udp.cpp; sourceTree = SOURCE_ROOT; };
 		F522138F0136ABAE01000001 /* network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network.cpp; path = ../Source_Files/Network/network.cpp; sourceTree = SOURCE_ROOT; };
 		F52213900136ABAE01000001 /* network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = network.h; path = ../Source_Files/Network/network.h; sourceTree = SOURCE_ROOT; };
-		F53AB44B01F3CB1D01EF2901 /* AlephOne.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AlephOne.icns; sourceTree = "<group>"; };
+		F53AB44B01F3CB1D01EF2901 /* AlephOneJP.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AlephOneJP.icns; sourceTree = "<group>"; };
 		F53DC61D022179A801A80001 /* network_dialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = network_dialogs.h; path = ../Source_Files/Network/network_dialogs.h; sourceTree = SOURCE_ROOT; };
 		F5574EEE01F4EB1E01FEABBD /* csdialogs_sdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = csdialogs_sdl.cpp; path = ../Source_Files/CSeries/csdialogs_sdl.cpp; sourceTree = SOURCE_ROOT; };
 		F5574EEF01F4EB1E01FEABBD /* mytm_sdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mytm_sdl.cpp; path = ../Source_Files/CSeries/mytm_sdl.cpp; sourceTree = SOURCE_ROOT; };
@@ -3816,7 +3816,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				AE941DE713E783F30077218A /* Info-AlephOne-Xcode4.plist */,
+				AE941DE713E783F30077218A /* Info-AlephOneJP-Xcode4.plist */,
 				AE0E4EC0141D144000AAA02F /* Marathon */,
 				AE505D0F141D466F00915344 /* Marathon 2 */,
 				AEB4A2B114296D8800537AE7 /* Marathon Infinity */,
@@ -3824,7 +3824,7 @@
 				F56AEB6B01F8AA1201780311 /* ImagesIcon.icns */,
 				F56AEB6C01F8AA1201780311 /* ShapesIcon.icns */,
 				F56AEB6D01F8AA1201780311 /* SoundsIcon.icns */,
-				F53AB44B01F3CB1D01EF2901 /* AlephOne.icns */,
+				F53AB44B01F3CB1D01EF2901 /* AlephOneJP.icns */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				F5CFAD3D0200FA6B01D80110 /* FilmIcon.icns */,
 				F5CFAD3E0200FA6B01D80110 /* MapIcon.icns */,
@@ -6199,9 +6199,9 @@
 			productReference = AEBDC6DA2C4DF0780026DFF1 /* Classic Marathon Infinity Steam.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AEC3C6FE09AD68AC003258E4 /* Aleph One */ = {
+		AEC3C6FE09AD68AC003258E4 /* Aleph One JP */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AEC3C87B09AD68AC003258E4 /* Build configuration list for PBXNativeTarget "Aleph One" */;
+			buildConfigurationList = AEC3C87B09AD68AC003258E4 /* Build configuration list for PBXNativeTarget "Aleph One JP" */;
 			buildPhases = (
 				AEC3C6FF09AD68AC003258E4 /* Headers */,
 				AEC3C7C209AD68AC003258E4 /* Resources */,
@@ -6214,7 +6214,7 @@
 			);
 			dependencies = (
 			);
-			name = "Aleph One";
+			name = "Aleph One JP";
 			productName = "SDL Application";
 			productReference = AEC3C89609AD68AE003258E4 /* Aleph One.app */;
 			productType = "com.apple.product-type.application";
@@ -6273,7 +6273,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */;
+			buildConfigurationList = AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */;
 			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
@@ -6285,7 +6285,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AEC3C6FE09AD68AC003258E4 /* Aleph One */,
+				AEC3C6FE09AD68AC003258E4 /* Aleph One JP */,
 				AEFD85E813EB84CF00C1E687 /* Marathon */,
 				AE505B3A141D45E600915344 /* Marathon 2 */,
 				AEB4A0DA14296CAE00537AE7 /* Marathon Infinity */,
@@ -6398,7 +6398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEC3C7C309AD68AC003258E4 /* InfoPlist.strings in Resources */,
-				AEC3C7C409AD68AC003258E4 /* AlephOne.icns in Resources */,
+				AEC3C7C409AD68AC003258E4 /* AlephOneJP.icns in Resources */,
 				AEC3C7C509AD68AC003258E4 /* ImagesIcon.icns in Resources */,
 				AEC3C7C609AD68AC003258E4 /* ShapesIcon.icns in Resources */,
 				AED959B62BC23591008EFCA2 /* m1_achievements.lua in Resources */,
@@ -8199,7 +8199,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8212,7 +8212,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon;
 				PRODUCT_NAME = "Classic Marathon Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8226,7 +8226,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8239,7 +8239,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon;
 				PRODUCT_NAME = "Classic Marathon Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8252,7 +8252,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8265,7 +8265,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon2;
 				PRODUCT_NAME = "Classic Marathon 2 Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8278,7 +8278,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8291,7 +8291,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon2;
 				PRODUCT_NAME = "Classic Marathon 2 Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8303,16 +8303,17 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
 					HAVE_BUNDLE_NAME,
 					HAVE_CONFIG_H,
 				);
-				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
+				INFOPLIST_FILE = "Info-AlephOneJP-Xcode4.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOneJP;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8447,16 +8448,17 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
 					HAVE_BUNDLE_NAME,
 					HAVE_CONFIG_H,
 				);
-				INFOPLIST_FILE = "Info-AlephOne-Xcode4.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.AlephOne;
+				INFOPLIST_FILE = "Info-AlephOneJP-Xcode4.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOneJP;
 				PRODUCT_NAME = "Aleph One";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8591,7 +8593,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Marathon 2.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8605,7 +8607,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon2;
 				PRODUCT_NAME = "Classic Marathon 2";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8618,7 +8620,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Marathon 2.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8632,7 +8634,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon2;
 				PRODUCT_NAME = "Classic Marathon 2";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8657,7 +8659,7 @@
 				CODE_SIGN_ENTITLEMENTS = Steamshim.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -8694,7 +8696,7 @@
 				CODE_SIGN_ENTITLEMENTS = Steamshim.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -8723,7 +8725,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Marathon Infinity.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8737,7 +8739,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.MarathonInfinity;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.MarathonInfinity;
 				PRODUCT_NAME = "Classic Marathon Infinity";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8750,7 +8752,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Marathon Infinity.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8764,7 +8766,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.MarathonInfinity;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.MarathonInfinity;
 				PRODUCT_NAME = "Classic Marathon Infinity";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8777,7 +8779,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8790,7 +8792,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.MarathonInfinity;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.MarathonInfinity;
 				PRODUCT_NAME = "Classic Marathon Infinity Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8803,7 +8805,7 @@
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					SDL,
@@ -8816,7 +8818,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.MarathonInfinity;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.MarathonInfinity;
 				PRODUCT_NAME = "Classic Marathon Infinity Steam";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8828,8 +8830,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8843,7 +8846,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon;
 				PRODUCT_NAME = "Classic Marathon";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8855,8 +8858,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Marathon.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E8K89CXZE7;
+				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					PREFER_APP_NAME_TO_BUNDLE_ID,
@@ -8870,7 +8874,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.bungie.source.Marathon;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.Marathon;
 				PRODUCT_NAME = "Classic Marathon";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -8880,7 +8884,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOne" */ = {
+		AE097FDD08800A9F00C690F9 /* Build configuration list for PBXProject "AlephOneJP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE2A41770B5EFEA000C567E6 /* Release */,
@@ -8943,7 +8947,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AEC3C87B09AD68AC003258E4 /* Build configuration list for PBXNativeTarget "Aleph One" */ = {
+		AEC3C87B09AD68AC003258E4 /* Build configuration list for PBXNativeTarget "Aleph One JP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE2A41760B5EFEA000C567E6 /* Release */,
