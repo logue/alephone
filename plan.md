@@ -223,7 +223,89 @@
 
 ---
 
-## ビルド時の切り替え
+## ビルド方法
+
+### macOS（推奨: vcpkg + Xcode）
+
+上流プロジェクトは現在vcpkgを使用して依存ライブラリを管理しています。
+
+#### 1. vcpkgで依存関係をビルド
+
+```bash
+cd vcpkg
+./install-arm-osx.sh  # Apple Siliconの場合
+# または
+./install-x64-osx.sh  # Intel Macの場合
+```
+
+これにより以下がビルドされます：
+
+- Boost (algorithm, uuid, property-tree, iostreams, filesystem, lockfree, dll, **locale**)
+- SDL2, SDL2_ttf, SDL2_image
+- OpenAL, libsndfile
+- asio, zziplib, miniupnpc
+- **libiconv** (Shift_JIS変換用)
+- その他
+
+ビルドされたライブラリは `vcpkg/installed-arm64-osx/` に静的ライブラリとして配置されます。
+
+#### 2. Xcodeでビルド
+
+```bash
+open PBProjects/AlephOne.xcodeproj
+```
+
+Xcodeで以下を設定：
+
+- **日本語版**: Build SettingsでPreprocessor Macrosに `ENABLE_JAPANESE=1` を追加
+- **英語版**: デフォルト設定のまま
+
+#### 3. autotools（Linux互換性確認用）
+
+```bash
+# 依存パッケージのインストール（開発用、配布には不要）
+brew install autoconf automake libtool autoconf-archive
+
+# ビルドシステム生成
+autoreconf -i
+
+# 日本語版
+./configure --enable-japanese \
+  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/lib"
+make
+
+# 英語版（デフォルト）
+./configure \
+  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/lib"
+make
+```
+
+### Linux
+
+```bash
+cd vcpkg
+./install-x64-linux.sh  # 依存関係をビルド
+
+cd ..
+autoreconf -i
+./configure --enable-japanese \
+  CPPFLAGS="-I$(pwd)/vcpkg/installed-x64-linux/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-x64-linux/lib"
+make
+```
+
+### Windows
+
+Visual Studioプロジェクト（`VisualStudio/AlephOne.sln`）を使用。
+vcpkgの依存関係は自動的に統合されます。
+
+---
+
+## ビルド時の切り替え（旧方式・非推奨）
+
+以下はHomebrew依存の方法で、配布時に問題があるため非推奨です。
 
 ### 日本語版ビルド
 

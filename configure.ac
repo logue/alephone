@@ -53,7 +53,7 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 
 dnl Require C++17 or newer and enable C++17 if needed.
-AX_CXX_COMPILE_STDCXX([17], [], [mandatory])
+AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 
 dnl Some platform specific stuff.
 AS_CASE([$target],
