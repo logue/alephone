@@ -115,10 +115,7 @@ if test "x$enable_japanese" = "xyes" ; then
   AS_IF([ test "x$BOOST_LOCALE_LIB" != "x" ],
         [ LIBS="$BOOST_LOCALE_LIB $LIBS" ],
         [AC_MSG_ERROR([You need the Boost::Locale library for Japanese support.])])
-  dnl Check for iconv
-  AM_ICONV
-  AS_IF([ test "x$am_cv_func_iconv" != "xyes" ],
-        [AC_MSG_ERROR([You need iconv for Japanese support.])])
+  dnl Check for iconv (done later with AC_CHECK_LIB)
 fi
 
 AC_DEFUN([AX_CHECK_BOOST_HEADER],
@@ -172,9 +169,11 @@ dnl Check for libraries.
 
 dnl On some systems iconv is in a separate library, and may actually be named
 dnl libiconv.
-AC_CHECK_LIB(iconv, libiconv)
-if test $ac_cv_lib_iconv_libiconv = no; then
-	AC_CHECK_LIB(iconv, iconv , AC_MSG_ERROR([You need iconv to run Aleph One JP.]))
+if test x$enable_japanese = xyes; then
+  AC_CHECK_LIB(iconv, libiconv)
+  if test $ac_cv_lib_iconv_libiconv = no; then
+    AC_CHECK_LIB(iconv, iconv, , AC_MSG_ERROR([You need iconv for Japanese support (--enable-japanese).]))
+  fi
 fi
 
 dnl AX_REQUIRE_PKG(desc, define, modules)
