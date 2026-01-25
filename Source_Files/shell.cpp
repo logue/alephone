@@ -319,7 +319,9 @@ static void initialize_application(void)
 #if defined(__WIN32__) && defined(__MINGW32__)
 	if (LoadLibraryW(L"exchndl.dll")) shell_options.debug = true;
 #else
+#ifdef ENABLE_JAPANESE
 	setlocale(LC_ALL, "");
+#endif
 #endif
 
 #if defined(__WIN32__)

@@ -31,6 +31,7 @@ AC_DEFUN([AX_ARG_WITH],
 
 AX_ARG_ENABLE([opengl], [OpenGL rendering])
 AX_ARG_ENABLE([lua], [built-in Lua scripting])
+AX_ARG_ENABLE([japanese], [Japanese language support with Shift_JIS conversion])
 
 AX_ARG_WITH([sdl_image], [SDL2_image support])
 AX_ARG_WITH([ffmpeg], [FFmpeg playback and film export])
@@ -95,10 +96,19 @@ AX_BOOST_FILESYSTEM
 AS_IF([ test "x$BOOST_FILESYSTEM_LIB" != "x" ],
       [ LIBS="$BOOST_FILESYSTEM_LIB $LIBS" ],
       [AC_MSG_ERROR([You need the Boost::Filesystem library to run Aleph One.])])
-AX_BOOST_LOCALE
-AS_IF([ test "x$BOOST_LOCALE_LIB" != "x" ],
-      [ LIBS="$BOOST_LOCALE_LIB $LIBS" ],
-      [AC_MSG_ERROR([You need the Boost::Locale library to run Aleph One JP.])])
+
+dnl Check for Japanese language support dependencies
+if test "x$enable_japanese" = "xyes" ; then
+  AC_DEFINE([ENABLE_JAPANESE], [1], [Define to enable Japanese language support])
+  AX_BOOST_LOCALE
+  AS_IF([ test "x$BOOST_LOCALE_LIB" != "x" ],
+        [ LIBS="$BOOST_LOCALE_LIB $LIBS" ],
+        [AC_MSG_ERROR([You need the Boost::Locale library for Japanese support.])])
+  dnl Check for iconv
+  AM_ICONV
+  AS_IF([ test "x$am_cv_func_iconv" != "xyes" ],
+        [AC_MSG_ERROR([You need iconv for Japanese support.])])
+fi
 
 AC_DEFUN([AX_CHECK_BOOST_HEADER],
          [ AC_LANG_PUSH(C++)

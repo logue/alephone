@@ -109,6 +109,8 @@ const int kFontIDCourier = 22;
 #include "cspaths.h"
 #include "csmisc.h"
 
+#ifdef ENABLE_JAPANESE
 #include "converter.h"
+#endif
 
 #endif
