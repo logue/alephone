@@ -91,10 +91,6 @@
 #include "OGL_Headers.h"
 #endif
 
-#if !defined(DISABLE_NETWORKING)
-#include <SDL_net.h>
-#endif
-
 #ifdef HAVE_PNG
 #include "IMG_savepng.h"
 #endif
@@ -518,14 +514,6 @@ static void initialize_application(void)
 // 	SDL_WM_SetIcon(IMG_ReadXPMFromArray(const_cast<char**>(alephone_xpm)), 0);
 // #endif
 	atexit(shutdown_application);
-
-#if !defined(DISABLE_NETWORKING)
-	// Initialize SDL_net
-	if (SDLNet_Init () < 0) {
-		fprintf (stderr, "SDL_netの初期化に失敗しました。（%s）\n", SDLNet_GetError());
-		exit(1);
-	}
-#endif
 
 	if (TTF_Init() < 0) {
 		fprintf (stderr, "SDL_ttfの初期化に失敗しました。（%s）\n", TTF_GetError());
