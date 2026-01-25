@@ -423,4 +423,125 @@ make
 
 ---
 
+## マージ実施履歴
+
+### 2026年1月25日 - 上流マージ作業完了
+
+#### Phase 1-2: 条件付きコンパイル対応（完了）
+
+**Commit:** `e6c8e0d4`, `13970bef`, `5cc7532c`
+
+1. **converter層の条件化**
+   - `Source_Files/CSeries/converter.h/cpp` を `#ifdef ENABLE_JAPANESE` でラップ
+   - `configure.ac` に `--enable-japanese` オプション追加
+   - `config.h.in` に `ENABLE_JAPANESE` マクロ定義追加
+
+2. **日本語フォントの条件化**
+   - `Source_Files/RenderOther/sdl_fonts.cpp` の日本語フォント読み込みを条件化
+   - 7つの日本語フォントヘッダー（jp-fonts/*.h）を条件付きコンパイル
+
+3. **ビルドシステム修正**
+   - `configure.ac`: AM_ICONV → AC_CHECK_LIB(iconv) に変更（gettext依存を削除）
+   - `configure.ac`: AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory]) でC++17サポート
+   - `vcpkg.json`: boost-locale, libiconv 依存を追加（静的リンク対応）
+
+#### Phase 3-4: 上流マージとコンフリクト解決（完了）
+
+**Merge Commit:** `3767346f`
+
+1. **マージ実施**
+   - ブランチ: `merge-upstream-2026`
+   - 上流コミット数: 916 commits ahead
+   - コンフリクト数: 約25ファイル
+
+2. **コンフリクト解決方針**
+   - マルチバイト処理関連: `--ours` で日本語実装を維持
+     - `Source_Files/RenderOther/computer_interface.cpp` - ターミナルテキスト描画
+     - `Source_Files/RenderOther/FontHandler.cpp/h` - OpenGLフォントレンダリング
+     - `Source_Files/shell.cpp` - setlocale() 初期化（条件付き）
+   - UI関連: `--theirs` で上流の英語版を採用
+     - `Source_Files/Misc/interface.cpp`
+     - `Source_Files/Misc/DefaultStringSets.cpp`
+     - その他UIファイル多数
+
+3. **削除された上流機能への対応**
+   - `network_sound.h` 削除（Commit: `f9c0d673`）
+     - オーディオオーバーネットワーク機能が上流で削除
+     - `Source_Files/shell.cpp`, `Source_Files/Network/network_dialogs.cpp` からinclude削除
+   - SDL_net削除（Commit: `8fd61d7d`）
+     - 上流はasioベースのネットワーキングに移行
+     - `Source_Files/shell.cpp` からSDL_net初期化コード削除
+   - IMG_savepng.h削除（Commit: `898fdd2d`）
+     - IMG_SavePNG関数はSDL2_imageに標準搭載
+     - カスタムヘッダー不要に
+
+#### ビルド環境構築
+
+1. **vcpkg依存関係インストール**
+   - Triplet: `arm64-osx`
+   - 主要パッケージ: SDL2, SDL2-image, SDL2-ttf, OpenAL-soft, Boost 1.88.0, asio, libiconv
+   - 静的リンク設定により、Homebrewランタイム依存を回避
+
+2. **Xcodeプロジェクト設定**
+   - Bundle Identifier変更推奨: `dev.logue.AlephOneJP`
+   - Code Signing: Apple Developer アカウントまたは "Sign to Run Locally"
+   - Preprocessor Macros: `ENABLE_JAPANESE=1` を追加必須（Debug/Release両方）
+   - Header Search Paths: vcpkg_installed/arm64-osx/include を確認
+
+3. **autotools（非推奨）**
+   - macOSではCoreFoundation frameworkの検索順序問題により、autotoolsビルドは非推奨
+   - Xcodeビルドを推奨
+
+#### 保存された主要機能
+
+**マルチバイト文字処理（computer_interface.cpp）:**
+```cpp
+// calculate_line() でsjisChar()を使用
+if (sjisChar(text_to_draw[*current_line_start + i])) {
+    i++;  // 2バイト文字なら次の1バイトもスキップ
+}
+
+// draw_line() でsjis2utf8()を使用
+std::string utf8 = sjis2utf8(text_to_draw);
+```
+
+**OpenGLフォントレンダリング（FontHandler.cpp）:**
+```cpp
+// UTF-8マルチバイト文字のイテレーション
+const char *start = text;
+while (*start) {
+    uint32 c;
+    start = next_utf8_char(start, &c);
+    // 文字ごとの描画処理
+}
+```
+
+#### 既知の課題
+
+1. **Phase 3未完了**: UI日本語翻訳はスキップ
+   - 理由: マージを優先、後で必要に応じて再適用可能
+   - 影響: メニュー、ダイアログ、ヘルプが英語表示
+
+2. **ビルドテスト未実施**: Xcodeビルドで最終確認が必要
+   - 必須設定: `ENABLE_JAPANESE=1` プリプロセッサマクロ
+   - vcpkgインクルードパスの確認
+
+3. **ランタイムテスト未実施**: 日本語テキスト描画の動作確認が必要
+   - ターミナル画面での日本語表示
+   - フォント読み込み
+
+#### 技術的な変更点まとめ
+
+| 項目 | 変更前 | 変更後 |
+|------|--------|--------|
+| エンコーディング | 常時有効 | `#ifdef ENABLE_JAPANESE` |
+| 日本語フォント | 常時組み込み | `#ifdef ENABLE_JAPANESE` |
+| ネットワーク | SDL_net | asio |
+| PNG保存 | IMG_savepng.h | SDL_image.h標準 |
+| ビルドシステム | autotools | autotools + vcpkg |
+| macOSビルド | autotools | **Xcode推奨** |
+| 依存管理 | Homebrew | vcpkg（静的リンク） |
+
+---
+
 _最終更新: 2026年1月25日_
