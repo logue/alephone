@@ -91,10 +91,6 @@
 #include "OGL_Headers.h"
 #endif
 
-#ifdef HAVE_PNG
-#include "IMG_savepng.h"
-#endif
-
 #ifdef HAVE_SDL_IMAGE
 #include <SDL_image.h>
 #if defined(__WIN32__)
