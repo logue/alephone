@@ -271,14 +271,16 @@ autoreconf -i
 
 # 日本語版
 ./configure --enable-japanese \
-  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/include" \
-  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/lib"
+  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/lib" \
+  PKG_CONFIG_PATH="$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/lib/pkgconfig"
 make
 
 # 英語版（デフォルト）
 ./configure \
-  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/include" \
-  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/lib"
+  CPPFLAGS="-I$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/lib" \
+  PKG_CONFIG_PATH="$(pwd)/vcpkg/installed-arm64-osx/arm64-osx/lib/pkgconfig"
 make
 ```
 
@@ -289,8 +291,9 @@ cd vcpkg
 ./install-x64-linux.sh  # 依存関係をビルド
 
 cd ..
-autoreconf -i
-./configure --enable-japanese \
+autoreconf -ix64-linux/include" \
+  LDFLAGS="-L$(pwd)/vcpkg/installed-x64-linux/x64-linux/lib" \
+  PKG_CONFIG_PATH="$(pwd)/vcpkg/installed-x64-linux/x64-linux/lib/pkgconfig
   CPPFLAGS="-I$(pwd)/vcpkg/installed-x64-linux/include" \
   LDFLAGS="-L$(pwd)/vcpkg/installed-x64-linux/lib"
 make
