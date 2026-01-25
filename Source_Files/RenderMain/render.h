@@ -101,8 +101,7 @@ struct view_data
 	angle half_cone; /* often ==field_of_view/2 (when screen_width==standard_screen_width) */
 	angle half_vertical_cone;
 
-	world_vector2d untransformed_left_edge, untransformed_right_edge;
-	world_vector2d left_edge, right_edge, top_edge, bottom_edge;
+	long_vector2d left_edge, right_edge; // view cone edges as world directions
 
 	short ticks_elapsed;
 	uint32 tick_count; /* for effects and transfer modes */
@@ -139,6 +138,9 @@ struct view_data
 	
 	// whether to mimic software renderer when looking up/down
 	bool mimic_sw_perspective;
+
+	// whether to correct sprite parallax when not mimicking software
+	bool billboard_xy;
 };
 
 /* ---------- render flags */
@@ -154,7 +156,7 @@ struct view_data
 enum /* render flags */
 {
 	_polygon_is_visible_bit, /* some part of this polygon is horizontally in the view cone */
-	_endpoint_has_been_visited_bit, /* weÕve already tried to cast a ray out at this endpoint */
+	_endpoint_has_been_visited_bit, /* weâ€™ve already tried to cast a ray out at this endpoint */
 	_endpoint_is_visible_bit, /* this endpoint is horizontally in the view cone */
 	_side_is_visible_bit, /* this side was crossed while building the tree and should be drawn */
 	_line_has_clip_data_bit, /* this line has a valid clip entry */

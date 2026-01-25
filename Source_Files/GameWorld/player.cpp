@@ -27,7 +27,7 @@ Wednesday, October 26, 1994 3:18:59 PM (Jason)
 Wednesday, November 30, 1994 6:56:20 PM  (Jason)
 	oxygen is used up faster by running and by firing.
 Thursday, January 12, 1995 11:18:18 AM  (Jason')
-	dead players donÕt continue to use up oxygen.
+	dead players donâ€™t continue to use up oxygen.
 Thursday, July 6, 1995 4:53:52 PM
 	supports multi-player cooperative games. (Ryan)
 
@@ -402,7 +402,6 @@ void allocate_player_memory(
 {
 	/* allocate space for all our players */
 	players= new player_data[MAXIMUM_NUMBER_OF_PLAYERS];
-	assert(players);
 
 #ifdef BETA
 	dprintf("#%d players at %p (%x bytes each) ---------------------------------------;g;", MAXIMUM_NUMBER_OF_PLAYERS, players, sizeof(struct player_data));
@@ -539,7 +538,7 @@ reset_player_queues()
 {
 	sRealActionQueues->reset();
 	reset_recording_and_playback_queues();
-	sync_heartbeat_count(); //¥¥ÊMY ADDITION...
+	sync_heartbeat_count(); //â€¢â€¢Â MY ADDITION...
 }
 
 // ZZZ addition: need to reset (potentially) multiple sets of ActionQueues, not just the RealActionQueues.
@@ -617,7 +616,10 @@ void decode_hotkeys(ModifiableActionQueues& action_queues)
 			player->hotkey_sequence <<= 2;
 			player->hotkey_sequence |= (action_flags >> _cycle_weapons_forward_bit) & 0x03;
 
-			player->hotkey = 1 + (player->hotkey_sequence & 0x03) + 4 * (((player->hotkey_sequence >> 2) & 0x03) - 1);
+			if (!film_profile.hotkey_fix || !PLAYER_IS_DEAD(player))
+			{
+				player->hotkey = 1 + (player->hotkey_sequence & 0x03) + 4 * (((player->hotkey_sequence >> 2) & 0x03) - 1);
+			}
 			player->hotkey_sequence = 0;
 		}
 		else if ((action_flags & hotkey_mask) == hotkey_mask)
@@ -634,7 +636,7 @@ void decode_hotkeys(ModifiableActionQueues& action_queues)
 	}
 }
 
-/* assumes ¶t==1 tick */
+/* assumes âˆ‚t==1 tick */
 void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 {
 	struct player_data *player;
@@ -684,9 +686,11 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 			action_flags= 0;
 		}
 		
+		player->run_key = action_flags & _run_dont_walk;
+		
 		bool IsSwimming = TEST_FLAG(player->variables.flags,_HEAD_BELOW_MEDIA_BIT) && player_settings.CanSwim;
 
-		// if weÕve got the ball we canÕt run (that sucks)
+		// if weâ€™ve got the ball we canâ€™t run (that sucks)
 		// Benad: also works with _game_of_rugby and _game_of_capture_the_flag
 		// LP change: made it possible to swim under a liquid if one has the ball
 		// START Benad changed oct. 1st (works with ANY ball color, d'uh...)
@@ -699,9 +703,9 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 		
 		// if (GET_GAME_TYPE()==_game_of_kill_man_with_ball && dynamic_world->game_player_index==player_index) action_flags&= ~_run_dont_walk;
 		
-		// if our head is under media, we canÕt run (that sucks, too)
+		// if our head is under media, we canâ€™t run (that sucks, too)
 		if (IsSwimming && (action_flags&_run_dont_walk)) action_flags&= ~_run_dont_walk, action_flags|= _swim;
-		
+
 		update_player_physics_variables(player_index, action_flags, inPredictive);
 
 		if(!inPredictive)
@@ -748,36 +752,22 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 
 			// if ((static_world->environment_flags&_environment_vacuum) || (player->variables.flags&_HEAD_BELOW_MEDIA_BIT)) handle_player_in_vacuum(player_index, action_flags);
 
-#if !defined(DISABLE_NETWORKING)
-			/* handle arbitration of the communications channel (i.e., dynamic_world->speaking_player_index) */
-			if (action_flags&_microphone_button)
-			{
-				if (dynamic_world->speaking_player_index==NONE)
-				{
-					if (GET_GAME_OPTIONS() & _force_unique_teams || (get_player_data(player_index)->team == get_player_data(local_player_index)->team))
-					{
-						dynamic_world->speaking_player_index= player_index;
-					} 
-
-					if (player_index==local_player_index) set_interface_microphone_recording_state(true);
-				}
-			}
-			else
-			{
-				if (dynamic_world->speaking_player_index==player_index)
-				{
-					dynamic_world->speaking_player_index= NONE;
-					if (player_index==local_player_index) set_interface_microphone_recording_state(false);
-				}
-			}
-#endif // !defined(DISABLE_NETWORKING)
-
 			if (PLAYER_IS_DEAD(player))
 			{
 				/* do things dead players do (sit around and check for self-reincarnation) */
 				if (PLAYER_HAS_MAP_OPEN(player))
 					SET_PLAYER_MAP_STATUS(player, false);
-				if (PLAYER_IS_TOTALLY_DEAD(player) && (action_flags&_action_trigger_state) && (player->variables.action==_player_stationary||dynamic_world->player_count==1))
+
+				auto player_is_stationary =
+					(player->variables.action == _player_stationary) ||
+					(dynamic_world->player_count == 1) ||
+					(film_profile.finally_respawn &&
+					 dynamic_world->tick_count >
+					 player->ticks_at_death + 15 * TICKS_PER_SECOND);
+
+				if (PLAYER_IS_TOTALLY_DEAD(player) &&
+					(action_flags&_action_trigger_state) &&
+					player_is_stationary)
 				{
 					// ZZZ: let the player know why he's not respawning
 					if(player->reincarnation_delay)
@@ -922,7 +912,7 @@ void damage_player(
 						{
 							short action= definition->death_action;
 							
-							play_object_sound(player->object_index, definition->death_sound);
+							play_object_sound(player->object_index, definition->death_sound, player_index == current_player_index);
 
 							if (action==NONE)
 							{
@@ -971,7 +961,7 @@ void damage_player(
 	}
 	
 	{
-		if (!PLAYER_IS_DEAD(player)) play_object_sound(player->object_index, definition->sound);
+		if (!PLAYER_IS_DEAD(player)) play_object_sound(player->object_index, definition->sound, player_index == current_player_index);
 		if (player_index==current_player_index)
 		{
 			if (definition->fade!=NONE) start_fade((definition->damage_threshhold!=NONE&&damage_amount>definition->damage_threshhold) ? (definition->fade+1) : definition->fade);
@@ -1101,6 +1091,12 @@ bool legal_player_powerup(
 {
 	struct player_data *player= get_player_data(player_index);
 	bool legal= true;
+
+	if ((static_world->environment_flags & _environment_m1_weapons)
+		&& film_profile.m1_bce_pickup)
+	{
+		return true;
+	}
 
 	if (item_index == player_powerups.Powerup_Invincibility)
 	{
@@ -1270,10 +1266,19 @@ static void handle_player_in_vacuum(
 		{
 			player->suit_oxygen -= 1;
 			oxygenChange += 1;
-			if (!(player->suit_oxygen%breathing_frequency)) 
-				SoundManager::instance()->PlayLocalSound(Sound_Breathing());
-			if ((player->suit_oxygen+OXYGEN_WARNING_OFFSET)<OXYGEN_WARNING_LEVEL && !((player->suit_oxygen+OXYGEN_WARNING_OFFSET)%OXYGEN_WARNING_FREQUENCY)) 
-				SoundManager::instance()->PlayLocalSound(Sound_OxygenWarning());
+			if (player->suit_oxygen % breathing_frequency == 0 &&
+				player_index == current_player_index)
+			{
+				SoundManager::instance()->PlaySound(Sound_Breathing(), nullptr, NONE);
+			}
+
+			const auto offset_o2 = player->suit_oxygen + OXYGEN_WARNING_OFFSET;
+			if (offset_o2 < OXYGEN_WARNING_LEVEL &&
+				offset_o2 % OXYGEN_WARNING_FREQUENCY == 0 &&
+				player_index == current_player_index)
+			{
+				SoundManager::instance()->PlaySound(Sound_OxygenWarning(), nullptr, NONE);
+			}
 		}
 				
 		if (player->suit_oxygen<=0)
@@ -1309,6 +1314,8 @@ static void ReplenishPlayerOxygen(short player_index, uint32 action_flags)
 	}
 }
 
+extern bool shapes_file_is_m1();
+
 static void update_player_teleport(
 	short player_index)
 {
@@ -1336,12 +1343,15 @@ static void update_player_teleport(
 			/*  after the level transition */
 			case PLAYER_TELEPORTING_MIDPOINT+1:
 				/* Either the player is teleporting, or everyone is. (level change) */
-				if(player_index==current_player_index)
+				if (View_DoInterlevelTeleportInEffects()) 
 				{
-					if (View_DoInterlevelTeleportInEffects()) {
+					if (player_index == current_player_index) 
+					{
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn()); 
+						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
+
+					play_object_sound(player->object_index, Sound_TeleportIn(), player_index == current_player_index);
 				}
 				player->teleporting_destination= NO_TELEPORTATION_DESTINATION;
 				break;
@@ -1391,16 +1401,25 @@ static void update_player_teleport(
 
 			case PLAYER_TELEPORTING_MIDPOINT+1:
 				 /* Interlevel or my intralevel.. */
-				if(player_index==current_player_index)
+				if (player->teleporting_destination >= 0 || View_DoInterlevelTeleportInEffects())
 				{
-					if (player->teleporting_destination >= 0 || View_DoInterlevelTeleportInEffects()) {
+					if (player_index == current_player_index)
+					{
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn()); 
+						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
-				} 
-				player->teleporting_destination= NO_TELEPORTATION_DESTINATION;
-				break;
+
+					play_object_sound(player->object_index, Sound_TeleportIn(), player_index == current_player_index);
+				}
+				else {
+					player->teleporting_phase = PLAYER_TELEPORTING_DURATION;
+				}
+
+				player->teleporting_destination = NO_TELEPORTATION_DESTINATION;
+
+				if (player->teleporting_phase != PLAYER_TELEPORTING_DURATION) break;
 			
+				[[fallthrough]];
 			case PLAYER_TELEPORTING_DURATION:
 				monster->action= _monster_is_moving;
 				SET_PLAYER_TELEPORTING_STATUS(player, false);
@@ -1448,7 +1467,7 @@ static void update_player_teleport(
 					{
 						start_teleporting_effect(true);
 					}
-					play_object_sound(player->object_index, Sound_TeleportOut());
+					play_object_sound(player->object_index, Sound_TeleportOut(), player_index == current_player_index);
 				}
 				else /* Level change */
 				{
@@ -1457,7 +1476,7 @@ static void update_player_teleport(
 					/* Everyone plays the teleporting effect out. */
 					if (View_DoInterlevelTeleportOutEffects()) {
 						start_teleporting_effect(true);
-						play_object_sound(current_player->object_index, Sound_TeleportOut());
+						play_object_sound(current_player->object_index, Sound_TeleportOut(), player_index == current_player_index);
 					}
 					
 					/* Every players object plays the sound, and everyones monster responds. */
@@ -1465,7 +1484,7 @@ static void update_player_teleport(
 					{
 						player= get_player_data(other_player_index);
 
-						/* Set them to be teleporting if the already arenÕt, or if they are but it */
+						/* Set them to be teleporting if the already arenâ€™t, or if they are but it */
 						/*  is a simple teleport (intralevel) */
 						if (player_index!=other_player_index)
 						{
@@ -1473,7 +1492,7 @@ static void update_player_teleport(
 					
 							/* Tell everyone else to use the teleporting junk... */
 							SET_PLAYER_INTERLEVEL_TELEPORTING_STATUS(player, true);
-							player->interlevel_teleport_phase= 0;
+							player->interlevel_teleport_phase= other_player_index < player_index ? 0 : -1;
 						
 							monster->action= _monster_is_teleporting;
 						}
@@ -1521,7 +1540,7 @@ static void update_player_media(
 			struct media_data *media= get_media_data(polygon->media_index); // should be valid
 			{
 			world_distance current_magnitude= (player->variables.old_flags&_HEAD_BELOW_MEDIA_BIT) ? media->current_magnitude : (media->current_magnitude>>1);
-			world_distance external_magnitude= FIXED_TO_WORLD(GUESS_HYPOTENUSE(ABS(player->variables.external_velocity.i), ABS(player->variables.external_velocity.j)));
+			world_distance external_magnitude= FIXED_TO_WORLD(GUESS_HYPOTENUSE(std::abs(player->variables.external_velocity.i), std::abs(player->variables.external_velocity.j)));
 			struct damage_definition *damage= get_media_damage(polygon->media_index, (player->variables.flags&_HEAD_BELOW_MEDIA_BIT) ? FIXED_ONE : FIXED_ONE/4);
 			
 			// apply current if possible
@@ -1546,7 +1565,7 @@ static void update_player_media(
 		
 		if (sound_type!=NONE)
 		{
-			play_object_sound(monster->object_index, get_media_sound(polygon->media_index, sound_type));
+			play_object_sound(monster->object_index, get_media_sound(polygon->media_index, sound_type), player_index == current_player_index);
 		}
 	}
 
@@ -1565,7 +1584,7 @@ static void update_player_media(
 		
 		if (sound_index!=NONE)
 		{
-			play_object_sound(monster->object_index, sound_index);
+			play_object_sound(monster->object_index, sound_index, player_index == current_player_index);
 		}
 	}
 }
@@ -1584,7 +1603,7 @@ static void set_player_shapes(
 	
 	get_player_transfer_mode(player_index, &transfer_mode, &transfer_period);
 	
-	/* if weÕre not dead, handle changing shapes (if we are dead, the correct dying shape has
+	/* if weâ€™re not dead, handle changing shapes (if we are dead, the correct dying shape has
 		already been set and we just have to wait for the animation to finish) */
 	if (!PLAYER_IS_DEAD(player))
 	{
@@ -1619,11 +1638,11 @@ static void set_player_shapes(
 	
 	if (animate)
 	{
-		/* animate the player only if weÕre not airborne and not totally dead */
+		/* animate the player only if weâ€™re not airborne and not totally dead */
 		if ((variables->action!=_player_airborne || (PLAYER_IS_TELEPORTING(player) || PLAYER_IS_INTERLEVEL_TELEPORTING(player)))&&!PLAYER_IS_TOTALLY_DEAD(player)) animate_object(monster->object_index);
 		if (PLAYER_IS_DEAD(player) && !PLAYER_IS_TELEPORTING(player) && (GET_OBJECT_ANIMATION_FLAGS(legs)&_obj_last_frame_animated) && !PLAYER_IS_TOTALLY_DEAD(player))
 		{
-			/* weÕve finished the animation; let the player reincarnate if he wants to */
+			/* weâ€™ve finished the animation; let the player reincarnate if he wants to */
 			SET_PLAYER_TOTALLY_DEAD_STATUS(player, true);
 			set_player_dead_shape(player_index, false);
 
@@ -1649,13 +1668,13 @@ void revive_player(
 
 	monster->action= _monster_is_moving; /* was probably _dying or something */
 
-	/* remove only the playerÕs torso, which should be invisible anyway, and turn his legs
+	/* remove only the playerâ€™s torso, which should be invisible anyway, and turn his legs
 		into garbage */
 	remove_parasitic_object(monster->object_index);
 	turn_object_to_shit(monster->object_index);
 
-	/* create a new pair of legs, and (completely behind MONSTERS.CÕs back) reattach it to
-		itÕs monster (shape will be set by set_player_shapes, below) */
+	/* create a new pair of legs, and (completely behind MONSTERS.Câ€™s back) reattach it to
+		itâ€™s monster (shape will be set by set_player_shapes, below) */
 	player->object_index= monster->object_index= new_map_object(&location, 0);
 	object= get_object_data(monster->object_index);
 	SET_OBJECT_SOLIDITY(object, true);
@@ -1729,7 +1748,7 @@ static void recreate_player(
 		player_teleported_dead= true;
 	}
 
-	/* Clear the transient flags, leave the persistant flags, like Player has cheated */
+	/* Clear the transient flags, leave the persistant flags */
 	player->flags &= (_player_is_teleporting_flag | _player_is_interlevel_teleporting_flag | PLAYER_PERSISTANT_FLAGS );
 	player->monster_index= monster_index;
 	player->object_index= monster->object_index;
@@ -1808,6 +1827,8 @@ static void kill_player(
 	if (aggressor_player_index==player_index && (GET_GAME_OPTIONS()&_suicide_is_penalized)) player->reincarnation_delay+= SUICIDE_REINCARNATION_DELAY;
 
 	kill_player_physics_variables(player_index);
+
+	player->ticks_at_death = dynamic_world->tick_count;
 }
 
 static void give_player_initial_items(
@@ -1888,7 +1909,7 @@ static void remove_dead_player_items(
 			short item_kind= get_item_kind(item_type);
 			bool dropped= false;
 			
-			// if weÕre not set to burn items or this is an important item (i.e., repair chip) drop it
+			// if weâ€™re not set to burn items or this is an important item (i.e., repair chip) drop it
 			if (!(GET_GAME_OPTIONS()&_burn_items_on_death) ||
 				(item_kind==_item && dynamic_world->player_count>1))
 			{
@@ -1948,9 +1969,9 @@ static void get_player_transfer_mode(
 	} 
 	else if (PLAYER_IS_INTERLEVEL_TELEPORTING(player))
 	{
-		if (player->teleporting_destination >= 0 || (player->teleporting_phase < PLAYER_TELEPORTING_MIDPOINT && View_DoInterlevelTeleportOutEffects()) || (player->teleporting_phase >= PLAYER_TELEPORTING_MIDPOINT && View_DoInterlevelTeleportInEffects()))
+		if (player->teleporting_destination >= 0 || (player->interlevel_teleport_phase < PLAYER_TELEPORTING_MIDPOINT && View_DoInterlevelTeleportOutEffects()) || (player->interlevel_teleport_phase >= PLAYER_TELEPORTING_MIDPOINT && View_DoInterlevelTeleportInEffects()))
 		{
-			*transfer_mode= player->teleporting_phase<PLAYER_TELEPORTING_MIDPOINT ? _xfer_fold_out : _xfer_fold_in;
+			*transfer_mode= player->interlevel_teleport_phase <PLAYER_TELEPORTING_MIDPOINT ? _xfer_fold_out : _xfer_fold_in;
 			*transfer_period= PLAYER_TELEPORTING_MIDPOINT+1;
 		}
 	}
@@ -2439,7 +2460,7 @@ void parse_mml_player(const InfoTree& root)
 	root.read_attr("triple_energy", player_settings.TripleEnergy);
 	root.read_attr("can_swim", player_settings.CanSwim);
 	
-	BOOST_FOREACH(InfoTree item, root.children_named("item"))
+	for (const InfoTree &item : root.children_named("item"))
 	{
 		int16 index;
 		if (!item.read_indexed("index", index, NUMBER_OF_PLAYER_INITIAL_ITEMS))
@@ -2447,7 +2468,7 @@ void parse_mml_player(const InfoTree& root)
 		item.read_indexed("type", player_initial_items[index], NUMBER_OF_DEFINED_ITEMS);
 	}
 	
-	BOOST_FOREACH(InfoTree dmg, root.children_named("damage"))
+	for (const InfoTree &dmg : root.children_named("damage"))
 	{
 		int16 index;
 		if (!dmg.read_indexed("index", index, NUMBER_OF_DAMAGE_RESPONSE_DEFINITIONS))
@@ -2461,7 +2482,7 @@ void parse_mml_player(const InfoTree& root)
 		dmg.read_attr("death_action", def.death_action);
 	}
 	
-	BOOST_FOREACH(InfoTree assign, root.children_named("powerup_assign"))
+	for (const InfoTree &assign : root.children_named("powerup_assign"))
 	{
 		assign.read_indexed("invincibility", player_powerups.Powerup_Invincibility, NUMBER_OF_DEFINED_ITEMS, true);
 		assign.read_indexed("invisibility", player_powerups.Powerup_Invisibility, NUMBER_OF_DEFINED_ITEMS, true);
@@ -2473,7 +2494,7 @@ void parse_mml_player(const InfoTree& root)
 		assign.read_indexed("oxygen", player_powerups.Powerup_Oxygen, NUMBER_OF_DEFINED_ITEMS, true);
 	}
 	
-	BOOST_FOREACH(InfoTree powerup, root.children_named("powerup"))
+	for (const InfoTree &powerup : root.children_named("powerup"))
 	{
 		powerup.read_attr_bounded<int16>("invincibility", kINVINCIBILITY_DURATION, 0, SHRT_MAX);
 		powerup.read_attr_bounded<int16>("invisibility", kINVISIBILITY_DURATION, 0, SHRT_MAX);
@@ -2481,7 +2502,7 @@ void parse_mml_player(const InfoTree& root)
 		powerup.read_attr_bounded<int16>("extravision", kEXTRAVISION_DURATION, 0, SHRT_MAX);
 	}
 	
-	BOOST_FOREACH(InfoTree shp, root.children_named("shape"))
+	for (const InfoTree &shp : root.children_named("shape"))
 	{
 		int16 type;
 		if (!shp.read_indexed("type", type, 5))

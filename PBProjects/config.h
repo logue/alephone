@@ -19,8 +19,11 @@
 /* ${desc_curl} enabled */
 #define HAVE_CURL 1
 
-/* ${desc_ffmpeg} enabled */
-#define HAVE_FFMPEG 1
+/* define if you have all film export libraries */
+#define FILM_EXPORT 1
+
+/* define to 1 if you have the `libyuv' library (-lyuv). */
+#define HAVE_LIBYUV 1
 
 /* Define to 1 if you have the <GL/glext.h> header file. */
 #define HAVE_GL_GLEXT_H 1
@@ -31,9 +34,6 @@
 /* Define to 1 if you have the `asound' library (-lasound). */
 /* #undef HAVE_LIBASOUND */
 
-/* Define to 1 if you have the `mad' library (-lmad). */
-/* #undef HAVE_LIBMAD */
-
 /* Define to 1 if you have the `SDL_image' library (-lSDL_image). */
 #define HAVE_LIBSDL_IMAGE 1
 
@@ -43,32 +43,17 @@
 /* Define to 1 if you have the `SDL_ttf' library (-lSDL_ttf). */
 #define HAVE_LIBSDL_TTF 1
 
-/* Define to 1 if you have the `smpeg' library (-lsmpeg). */
-/* #undef HAVE_LIBSMPEG */
-
-/* Define to 1 if you have the `sndfile' library (-lsndfile). */
-/* #undef HAVE_LIBSNDFILE */
-
-/* Define to 1 if you have the `speex' library (-lspeex). */
-#define HAVE_LIBSPEEX 1
-
-/* Define to 1 if you have the `speexdsp' library (-lspeexdsp). */
-/* #undef HAVE_LIBSPEEXDSP */
-
 /* Define to 1 if you have the `z' library (-lz). */
 #define HAVE_LIBZ 1
 
-/* Lua support enabled */
-#define HAVE_LUA 1
-
-/* ${desc_mad} enabled */
-/* #undef HAVE_MAD */
-
-/* Define to 1 if you have the <mad.h> header file. */
-/* #undef HAVE_MAD_H */
-
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
+
+/* ${desc_miniupnpc} enabled */
+#define HAVE_MINIUPNPC 1
+
+/* Define to 1 if you have the <miniupnpc/miniupnpc.h> header file. */
+#define HAVE_MINIUPNPC_MINIUPNPC_H 1
 
 /* OpenGL support enabled */
 #define HAVE_OPENGL 1
@@ -97,26 +82,8 @@
 /* Define to 1 if you have the <SDL_ttf.h> header file. */
 #define HAVE_SDL_TTF_H 1
 
-/* ${desc_smpeg} enabled */
-/* #undef HAVE_SMPEG */
-
-/* Define to 1 if you have the <smpeg/smpeg.h> header file. */
-/* #undef HAVE_SMPEG_SMPEG_H */
-
-/* ${desc_sndfile} enabled */
-/* #undef HAVE_SNDFILE */
-
-/* Define to 1 if you have the <sndfile.h> header file. */
-/* #undef HAVE_SNDFILE_H */
-
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1
-
-/* ${desc_speex} enabled */
-#define HAVE_SPEEX 1
-
-/* Define to 1 if you have the <speex/speex.h> header file. */
-#define HAVE_SPEEX_SPEEX_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -144,9 +111,6 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
-
-/* ${desc_vorbis} enabled */
-/* #undef HAVE_VORBISFILE */
 
 /* Define to 1 if you have the `vsnprintf' function. */
 #define HAVE_VSNPRINTF 1
@@ -195,3 +159,5 @@
 
 /* Win32 music disabled */
 /* #undef WIN32_DISABLE_MUSIC */
+
+#define HAVE_NFD 1

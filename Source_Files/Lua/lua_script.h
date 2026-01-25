@@ -57,6 +57,8 @@ void L_Call_Player_Damaged(short player_index, short aggressor_player_index, sho
 void L_Call_Projectile_Detonated(short type, short owner_index, short polygon, world_point3d location, uint16_t flags, int16_t obstruction_index, int16_t line_index);
 void L_Call_Projectile_Created(short projectile_index);
 void L_Call_Item_Created(short item_index);
+bool L_Calculate_Completion_State(short& completion_state);
+void L_Call_Monster_Kamikazed(short monster_index);
 
 void L_Invalidate_Effect(short effect_index);
 void L_Invalidate_Monster(short monster_index);
@@ -68,12 +70,13 @@ enum ScriptType {
 	_embedded_lua_script,
 	_lua_netscript,
 	_solo_lua_script,
-	_stats_lua_script
+	_stats_lua_script,
+	_achievements_lua_script,
 };
 
 void *L_Persistent_Table_Key();
 
-bool LoadLuaScript(const char *buffer, size_t len, ScriptType type);
+void LoadLuaScript(const char *buffer, size_t len, ScriptType type);
 bool RunLuaScript();
 void CloseLuaScript();
 void ResetPassedLua();
@@ -81,6 +84,9 @@ void ResetPassedLua();
 void ExecuteLuaString(const std::string&);
 void LoadSoloLua();
 void LoadReplayNetLua();
+
+void LoadAchievementsLua();
+void InvalidateAchievements();
 
 void LoadStatsLua();
 bool CollectLuaStats(std::map<std::string, std::string>& table, std::map<std::string, std::string>& parameters);
@@ -157,6 +163,17 @@ struct lua_camera //an expanded version of script_camera; uses Lua's path scheme
     lua_path path;
     int32 time_elapsed;
     int player_active;
+};
+
+class LuaMutabilityInterface
+{
+public:
+	virtual bool ephemera_mutable() const = 0;
+	virtual bool fog_mutable() const = 0;
+	virtual bool music_mutable() const = 0;
+	virtual bool overlays_mutable() const = 0;
+	virtual bool sound_mutable() const = 0;
+	virtual bool world_mutable() const = 0; // includes the others
 };
 
 #endif

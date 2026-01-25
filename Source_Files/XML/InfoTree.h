@@ -31,13 +31,13 @@
 #include "world.h"
 #include <string>
 #include <sstream>
+#include <type_traits>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/foreach.hpp>
 #include <boost/range/any_range.hpp>
 
-class InfoTree : public boost::property_tree::ptree
+class InfoTree : public boost::property_tree::iptree
 {
 public:
 	typedef boost::property_tree::xml_parser_error parse_error;
@@ -47,8 +47,8 @@ public:
 	typedef boost::property_tree::ptree_error unexpected_error;
 	
 	InfoTree() {}
-	explicit InfoTree(const data_type &data) : boost::property_tree::ptree(data) {}
-	InfoTree(const boost::property_tree::ptree &rhs) : boost::property_tree::ptree(rhs) {}
+	explicit InfoTree(const data_type &data) : boost::property_tree::iptree(data) {}
+	InfoTree(const boost::property_tree::iptree &rhs) : boost::property_tree::iptree(rhs) {}
 	
 	static InfoTree load_xml(FileSpecifier filename);
 	static InfoTree load_xml(std::istringstream& stream);
@@ -65,7 +65,7 @@ public:
 		try {
 			value = get_child(path).get_value<T>();
 			return true;
-		} catch (path_error ep) {} catch (data_error ed) {}
+		} catch (const path_error& ep) {} catch (const data_error& ed) {}
 		return false;
 	}
 
@@ -74,12 +74,25 @@ public:
 		return read(std::string("<xmlattr>.") + path, value);
 	}
 
-	template<typename T> bool read_attr_bounded(std::string path, T& value, const T min, const T max) const
+	template<typename T, typename std::enable_if_t<!std::is_enum<T>::value, bool>* = nullptr> bool read_attr_bounded(std::string path, T& value, const T min, const T max) const
 	{
 		T temp;
 		if (read_attr(path, temp) && temp >= min && temp <= max)
 		{
 			value = temp;
+			return true;
+		}
+		return false;
+	}
+
+	template<typename T, typename std::enable_if_t<std::is_enum<T>::value, bool>* = nullptr> bool read_attr_bounded(std::string path, T& value, const T min, const T max) const
+	{
+		std::underlying_type_t<T> temp;
+		if (read_attr(path, temp) &&
+			temp >= static_cast<std::underlying_type_t<T>>(min) &&
+			temp <= static_cast<std::underlying_type_t<T>>(max))
+		{
+			value = static_cast<T>(temp);
 			return true;
 		}
 		return false;

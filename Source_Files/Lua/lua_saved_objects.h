@@ -25,7 +25,6 @@ LUA_SAVED_OBJECTS.H
 
 #include "cseries.h"
 
-#ifdef HAVE_LUA
 extern "C"
 {
 #include "lua.h"
@@ -66,8 +65,6 @@ typedef L_Class<Lua_SoundObject_Name> Lua_SoundObject;
 extern char Lua_SoundObjects_Name[]; // "SoundObjects"
 typedef L_Container<Lua_SoundObjects_Name, Lua_SoundObject> Lua_SoundObjects;
 
-int Lua_Saved_Objects_register(lua_State* L);
-
-#endif
+int Lua_Saved_Objects_register(lua_State* L, const LuaMutabilityInterface& m);
 
 #endif

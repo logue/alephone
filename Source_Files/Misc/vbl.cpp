@@ -29,9 +29,9 @@ Thursday, November 19, 1992 1:27:23 AM
 	the enumeration 'turning_head' had to be changed to '_turn_not_rotate' to make this
 	file compile.  go figure.
 Wednesday, December 2, 1992 2:31:05 PM
-	the world doesnÕt change while the mouse button is pressed.
+	the world doesnâ€™t change while the mouse button is pressed.
 Friday, January 15, 1993 11:19:11 AM
-	the world doesnÕt change after 14 ticks have passed without a screen refresh.
+	the world doesnâ€™t change after 14 ticks have passed without a screen refresh.
 Friday, January 22, 1993 3:06:32 PM
 	world_ticks was never being initialized to zero.  hmmm.
 Saturday, March 6, 1993 12:23:48 PM
@@ -47,7 +47,7 @@ Sunday, May 22, 1994 8:51:15 PM
 	distribute a circular queue of keyboard flags (we're the keyboard_controller, not the
 	movement_controller).
 Thursday, June 2, 1994 12:55:52 PM
-	gee, now we donÕt even maintain the queue we just send our actions to PLAYER.C.
+	gee, now we donâ€™t even maintain the queue we just send our actions to PLAYER.C.
 Tuesday, July 5, 1994 9:27:49 PM
 	nuked most of the shit in here. changed the vbl task to a time
 	manager task. the only functions from the old vbl.c that remain are precalculate_key_information()
@@ -79,6 +79,8 @@ Feb 20, 2002 (Woody Zenfell):
 #include "cseries.h"
 #include <string.h>
 #include <stdlib.h>
+
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "map.h"
 #include "interface.h"
@@ -146,7 +148,7 @@ ActionQueue *get_player_recording_queue(
 static void remove_input_controller(void);
 static void save_recording_queue_chunk(short player_index);
 static void read_recording_queue_chunks(void);
-static bool pull_flags_from_recording(short count);
+static short pull_flags_from_recording(short count);
 // LP modifications for object-oriented file handling; returns a test for end-of-file
 static bool vblFSRead(OpenedFile& File, int32 *count, void *dest, bool& HitEOF);
 static void record_action_flags(short player_identifier, const uint32 *action_flags, short count);
@@ -154,6 +156,9 @@ static short get_recording_queue_size(short which_queue);
 
 static uint8 *unpack_recording_header(uint8 *Stream, recording_header *Objects, size_t Count);
 static uint8 *pack_recording_header(uint8 *Stream, recording_header *Objects, size_t Count);
+static uint8* unpack_recording_extension_header(uint8* Stream, recording_extension_header* Objects, size_t Count);
+static uint8* pack_recording_extension_header(uint8* Stream, recording_extension_header* Objects, size_t Count);
+static bool handle_replay_extension();
 
 // #define DEBUG_REPLAY
 
@@ -172,8 +177,6 @@ void initialize_keyboard_controller(
 	
 //	vassert(NUMBER_OF_KEYS == NUMBER_OF_STANDARD_KEY_DEFINITIONS,
 //		csprintf(temporary, "NUMBER_OF_KEYS == %d, NUMBER_OF_KEY_DEFS = %d. Not Equal!", NUMBER_OF_KEYS, NUMBER_OF_STANDARD_KEY_DEFINITIONS));
-	assert(NUMBER_OF_STANDARD_KEY_DEFINITIONS==NUMBER_OF_LEFT_HANDED_KEY_DEFINITIONS);
-	assert(NUMBER_OF_LEFT_HANDED_KEY_DEFINITIONS==NUMBER_OF_POWERBOOK_KEY_DEFINITIONS);
 	
 	// get globals initialized
 	heartbeat_count= 0;
@@ -187,8 +190,6 @@ void initialize_keyboard_controller(
 	
 	/* Allocate the recording queues */	
 	replay.recording_queues = new ActionQueue[MAXIMUM_NUMBER_OF_PLAYERS];
-	assert(replay.recording_queues);
-	if(!replay.recording_queues) alert_out_of_memory();
 	
 	/* Allocate the individual ones */
 	for (player_index= 0; player_index<MAXIMUM_NUMBER_OF_PLAYERS; player_index++)
@@ -196,7 +197,6 @@ void initialize_keyboard_controller(
 		queue= get_player_recording_queue(player_index);
 		queue->read_index= queue->write_index = 0;
 		queue->buffer= new uint32[MAXIMUM_QUEUE_SIZE];
-		if(!queue->buffer) alert_out_of_memory();
 	}
 	enter_mouse(0);
 }
@@ -254,6 +254,11 @@ void decrement_replay_speed(
 	if (replay.replay_speed > MINIMUM_REPLAY_SPEED) replay.replay_speed--;
 }
 
+void set_replay_speed(short speed)
+{
+	replay.replay_speed = speed;
+}
+
 int get_replay_speed()
 {
 	return replay.replay_speed;
@@ -262,6 +267,12 @@ int get_replay_speed()
 bool game_is_being_replayed()
 {
 	return replay.game_is_being_replayed;
+}
+
+bool is_saved_game_replay()
+{
+	return game_is_being_replayed() && 
+		replay.extension_header.extension_type == recording_extension_type::saved_game_wad;
 }
 
 void increment_heartbeat_count(int value)
@@ -275,13 +286,15 @@ bool has_recording_file(void)
 	return get_recording_filedesc(File);
 }
 
+bool first_frame_rendered = true;
+
 /* Called by the time manager task in vbl_macintosh.c */
 bool input_controller(
 	void)
 {
 	if (input_task_active || Movie::instance()->IsRecording())
 	{
-		if((heartbeat_count-dynamic_world->tick_count) < MAXIMUM_TIME_DIFFERENCE)
+		if((heartbeat_count-dynamic_world->tick_count) < ((first_frame_rendered || game_is_networked) ? MAXIMUM_TIME_DIFFERENCE : 1))
 		{
 			if (game_is_networked) // input from network
 			{
@@ -297,8 +310,9 @@ bool input_controller(
 					if (replay.replay_speed > 0 || (--phase<=0))
 					{
 						short flag_count= MAX(replay.replay_speed, 1);
+						flag_count = pull_flags_from_recording(flag_count);
 					
-						if (!pull_flags_from_recording(flag_count)) // oops. silly me.
+						if (!flag_count) // oops. silly me.
 						{
 							if (replay.have_read_last_chunk)
 							{
@@ -447,48 +461,34 @@ void save_recording_queue_chunk(
  *
  * Function: pull_flags_from_recording
  * Purpose:  remove one flag from each queue from the recording buffer.
- * Returns:  true if it pulled the flags, false if it didn't
+ * Returns:  number of flags actually pulled
  *
  *********************************************************************************************/
-static bool pull_flags_from_recording(
+static short pull_flags_from_recording(
 	short count)
 {
-	short player_index;
-	bool success= true;
-	
-	// first check that we can pull something from each playerÕs queue
-	// (at the beginning of the game, we wonÕt be able to)
-	// i'm not sure that i really need to do this check. oh well.
-	for (player_index = 0; success && player_index<dynamic_world->player_count; player_index++)
+	short true_count = count;
+	for (short player_index = 0; player_index < dynamic_world->player_count; player_index++)
 	{
-		if(get_recording_queue_size(player_index)==0) success= false;
-	}
-
-	if(success)
-	{
-		for (player_index = 0; player_index < dynamic_world->player_count; player_index++)
+		ActionQueue* queue = get_player_recording_queue(player_index);
+		for (short index = 0; index < count; index++)
 		{
-			short index;
-			ActionQueue  *queue;
-		
-			queue= get_player_recording_queue(player_index);
-			for (index= 0; index<count; index++)
+			if (get_recording_queue_size(player_index) != 0)
 			{
-				if (queue->read_index != queue->write_index)
-				{
 #ifdef DEBUG_REPLAY
-					debug_stream_of_flags(*(queue->buffer+queue->read_index), player_index);
+				debug_stream_of_flags(*(queue->buffer + queue->read_index), player_index);
 #endif
-                    GetRealActionQueues()->enqueueActionFlags(player_index, queue->buffer + queue->read_index, 1);
-					INCREMENT_QUEUE_COUNTER(queue->read_index);
-				} else {
-					dprintf("Dropping flag?");
-				}
+				GetRealActionQueues()->enqueueActionFlags(player_index, queue->buffer + queue->read_index, 1);
+				INCREMENT_QUEUE_COUNTER(queue->read_index);
+			}
+			else {
+				true_count = index;
+				break;
 			}
 		}
 	}
 	
-	return success;
+	return true_count;
 }
 
 static short get_recording_queue_size(
@@ -542,6 +542,7 @@ void get_recording_header_data(
 }
 
 extern int movie_export_phase;
+extern bool load_saved_game_from_flat_data(byte* saved_flat_data);
 
 bool setup_for_replay_from_file(
 	FileSpecifier& File,
@@ -568,13 +569,19 @@ bool setup_for_replay_from_file(
 		FilmFile.Read(SIZEOF_recording_header,Header);
 		unpack_recording_header(Header,&replay.header,1);
 		replay.header.game_information.cheat_flags = _allow_crosshair | _allow_tunnel_vision | _allow_behindview | _allow_overlay_map;
+
+		replay.extension_header.extension_type = recording_extension_type::none;
+		replay.extension_header.length = 0;
+
+		int file_length;
+		FilmFile.GetLength(file_length);
+
+		successful = file_length > replay.header.length ? handle_replay_extension() : use_map_file(replay.header.map_checksum);
 	
 		/* Set to the mapfile this replay came from.. */
-		if(use_map_file(replay.header.map_checksum))
+		if (successful)
 		{
-			replay.fsread_buffer= new char[DISK_CACHE_SIZE]; 
-			assert(replay.fsread_buffer);
-			
+			replay.fsread_buffer= new char[DISK_CACHE_SIZE];
 			replay.location_in_cache= NULL;
 			replay.bytes_in_cache= 0;
 			replay.replay_speed= 1;
@@ -584,7 +591,6 @@ bool setup_for_replay_from_file(
 #endif
 			if (prompt_to_export)
 				Movie::instance()->PromptForRecording();
-			successful= true;
 		} else {
 			/* Tell them that this map wasn't found.  They lose. */
 			alert_user(infoError, strERRORS, cantFindReplayMap, 0);
@@ -595,6 +601,11 @@ bool setup_for_replay_from_file(
 	}
 	
 	return successful;
+}
+
+void set_recording_saved_wad_data(const std::vector<byte>& saved_wad_data)
+{
+	replay.saved_wad_data = saved_wad_data;
 }
 
 /* Note that we _must_ set the header information before we start recording!! */
@@ -648,14 +659,72 @@ void stop_recording(
 		// in 'normal operation' too, not just when we screwed something up in writing the program?
 		bool successfulWrite = FilmFile.Write(SIZEOF_recording_header,Header);
 		assert(successfulWrite);
+
+		bool has_extension_header = false;
+		replay.extension_header.length = 0;
+		replay.extension_header.extension_type = recording_extension_type::none;
+
+		int extension_data_length = 0;
+		byte* extension_data = nullptr;
+
+		if (replay.saved_wad_data.size())
+		{
+			extension_data_length = replay.saved_wad_data.size();
+			extension_data = replay.saved_wad_data.data();
+			replay.extension_header.extension_type = recording_extension_type::saved_game_wad;
+			replay.extension_header.length = SIZEOF_recording_extension_header + replay.saved_wad_data.size();
+			has_extension_header = true;
+		}
+
+		if (has_extension_header)
+		{
+			FilmFile.SetPosition(replay.header.length);
+			byte extension_header[SIZEOF_recording_extension_header];
+			pack_recording_extension_header(extension_header, &replay.extension_header, 1);
+
+			successfulWrite = FilmFile.Write(SIZEOF_recording_extension_header, extension_header);
+			assert(successfulWrite);
+
+			FilmFile.SetPosition(replay.header.length + SIZEOF_recording_extension_header);
+			successfulWrite = FilmFile.Write(extension_data_length, extension_data);
+			assert(successfulWrite);
+		}
 		
 		FilmFile.GetLength(total_length);
-		assert(total_length==replay.header.length);
+		assert(total_length==replay.header.length + replay.extension_header.length);
 		
 		FilmFile.Close();
 	}
 
+	replay.saved_wad_data.clear();
 	replay.valid= false;
+}
+
+bool handle_replay_extension()
+{
+	bool successful = false;
+	FilmFile.SetPosition(replay.header.length);
+	byte extension_header[SIZEOF_recording_extension_header];
+	FilmFile.Read(SIZEOF_recording_extension_header, extension_header);
+	unpack_recording_extension_header(extension_header, &replay.extension_header, 1);
+
+	switch (replay.extension_header.extension_type)
+	{
+		case recording_extension_type::saved_game_wad:
+		{
+			auto saved_wad = (byte*)malloc(replay.extension_header.length);
+			FilmFile.Read(replay.extension_header.length, saved_wad);
+			successful = load_saved_game_from_flat_data(saved_wad);
+			break;
+		}
+
+		default:
+			assert(false);
+			break;
+	}
+
+	FilmFile.SetPosition(SIZEOF_recording_header);
+	return successful;
 }
 
 void rewind_recording(
@@ -702,19 +771,12 @@ void check_recording_replaying(
 		
 		if(enough_data_to_save)
 		{
-			bool success;
-			uint32 freespace = 0;
 			FileSpecifier FilmFile_Check;
-			
 			get_recording_filedesc(FilmFile_Check);
 
-			success= FilmFile_Check.GetFreeSpace(freespace);
-			if (success && freespace>(RECORD_CHUNK_SIZE*sizeof(int16)*sizeof(uint32)*dynamic_world->player_count))
+			for (player_index= 0; player_index<dynamic_world->player_count; player_index++)
 			{
-				for (player_index= 0; player_index<dynamic_world->player_count; player_index++)
-				{
-					save_recording_queue_chunk(player_index);
-				}
+				save_recording_queue_chunk(player_index);
 			}
 		}
 	}
@@ -962,33 +1024,6 @@ static void remove_input_controller(
 	replay.valid= false;
 }
 
-
-void reset_mml_keyboard()
-{
-	// no reset
-}
-
-void parse_mml_keyboard(const InfoTree& root)
-{
-	int16 which_set;
-	if (!root.read_indexed("set", which_set, NUMBER_OF_KEY_SETUPS))
-		return;
-	
-	BOOST_FOREACH(InfoTree ktree, root.children_named("key"))
-	{
-		int16 index;
-		if (!ktree.read_indexed("index", index, NUMBER_OF_STANDARD_KEY_DEFINITIONS))
-			continue;
-		
-		int16 keycode;
-		if (!ktree.read_attr("sdl", keycode))
-			continue;
-		
-		all_key_definitions[which_set][index].offset = static_cast<SDL_Scancode>(keycode);
-	}
-}
-
-
 static void StreamToPlayerStart(uint8* &S, player_start_data& Object)
 {
 	StreamToValue(S,Object.team);
@@ -1028,6 +1063,37 @@ static void GameDataToStream(uint8* &S, game_data& Object)
 	ListToStream(S,Object.parameters,2);
 }
 
+uint8* pack_recording_extension_header(uint8* Stream, recording_extension_header* Objects, size_t Count)
+{
+	uint8* S = Stream;
+	recording_extension_header* ObjPtr = Objects;
+
+	for (size_t k = 0; k < Count; k++, ObjPtr++)
+	{
+		ValueToStream(S, ObjPtr->length);
+		ValueToStream(S, static_cast<int>(ObjPtr->extension_type));
+	}
+
+	assert(static_cast<size_t>(S - Stream) == (Count * SIZEOF_recording_extension_header));
+	return S;
+}
+
+uint8* unpack_recording_extension_header(uint8* Stream, recording_extension_header* Objects, size_t Count)
+{
+	uint8* S = Stream;
+	recording_extension_header* ObjPtr = Objects;
+
+	for (size_t k = 0; k < Count; k++, ObjPtr++)
+	{
+		StreamToValue(S, ObjPtr->length);
+		int extension_type;
+		StreamToValue(S, extension_type);
+		ObjPtr->extension_type = static_cast<recording_extension_type>(extension_type);
+	}
+
+	assert(static_cast<size_t>(S - Stream) == (Count * SIZEOF_recording_extension_header));
+	return S;
+}
 
 uint8 *unpack_recording_header(uint8 *Stream, recording_header *Objects, size_t Count)
 {
@@ -1171,6 +1237,8 @@ uint32 parse_keymap(void)
 	memset(key_map, 0, sizeof(key_map));
       } else {
 		  memcpy(key_map, SDL_GetKeyboardState(NULL), sizeof(key_map));
+		  auto mod_state = SDL_GetModState();
+		  key_map[SDL_SCANCODE_CAPSLOCK] = mod_state & KMOD_CAPS ? 1 : 0;
       }
       
       // ZZZ: let mouse code simulate keypresses
@@ -1180,7 +1248,7 @@ uint32 parse_keymap(void)
       // Parse the keymap
 		for (int i = 0; i < NUMBER_OF_STANDARD_KEY_DEFINITIONS; ++i)
 		{
-			BOOST_FOREACH(const SDL_Scancode& code, input_preferences->key_bindings[i])
+			for (const SDL_Scancode& code : input_preferences->key_bindings[i])
 			{
 				if (key_map[code])
 					flags |= standard_key_definitions[i].action_flag;
@@ -1242,23 +1310,60 @@ uint32 parse_keymap(void)
 		  hotkey_sequence[2] = 0;
 	  }
 
-      bool do_interchange =
-	      (local_player->variables.flags & _HEAD_BELOW_MEDIA_BIT) ?
-	      (input_preferences->modifiers & _inputmod_interchange_swim_sink) != 0:
-	      (input_preferences->modifiers & _inputmod_interchange_run_walk) != 0;
-      
-      // Handle the selected input controller
-      if (input_preferences->input_device == _mouse_yaw_pitch) {
-          flags = process_aim_input(flags, pull_mouselook_delta());
-      }
-        int joyflags = process_joystick_axes(flags, heartbeat_count);
-        if (joyflags != flags) {
-            flags = joyflags;
-        }
+	  if (input_preferences->input_device == _mouse_yaw_pitch) {
+		  flags = process_aim_input(flags, pull_mouselook_delta());
+	  }
 
-          // Modify flags with run/walk and swim/sink
-        if (do_interchange)
-	    flags ^= _run_dont_walk;
+	  flags = process_joystick_axes(flags);
+
+      // if the user prefers to toggle run/swim, the flag becomes latched
+      if (input_preferences->modifiers & _inputmod_run_key_toggle)
+      {
+          static bool persistence = false;
+          if (flags & _run_dont_walk)
+          {
+              if (persistence)
+              {
+                  flags &= ~_run_dont_walk;
+              }
+
+              persistence = true;
+          }
+          else
+          {
+              persistence = false;
+          }
+      }
+
+      if (input_preferences->modifiers & _inputmod_run_key_toggle)
+      {
+          static bool run_swim = false;
+          if (flags & _run_dont_walk)
+          {
+              run_swim = !run_swim;
+          }
+
+          if (run_swim)
+          {
+              flags |= _run_dont_walk;
+          }
+          else
+          {
+              flags &= ~_run_dont_walk;
+          }
+      }
+      else
+      {
+          bool do_interchange =
+              (local_player->variables.flags & _HEAD_BELOW_MEDIA_BIT) ?
+              (input_preferences->modifiers & _inputmod_interchange_swim_sink) != 0:
+              (input_preferences->modifiers & _inputmod_interchange_run_walk) != 0;
+
+           if (do_interchange)
+           {
+               flags ^= _run_dont_walk;
+           }
+      }
 		
       
       if (player_in_terminal_mode(local_player_index))
@@ -1268,13 +1373,53 @@ uint32 parse_keymap(void)
   return flags;
 }
 
-
+extern std::vector<DirectorySpecifier> data_search_path;
 /*
  *  Get random demo replay from map
  */
 
-bool setup_replay_from_random_resource(uint32 map_checksum)
+bool setup_replay_from_random_resource()
 {
+	std::vector<FileSpecifier> demos;
+	
+	// search the Demos/ folder for *.filA files
+	for (auto& dir : data_search_path)
+	{
+		DirectorySpecifier scripts = dir + "Demos";
+
+		auto entries = scripts.ReadDirectory();
+		for (auto& entry : entries)
+		{
+			if (entry.is_directory)
+			{
+				continue;
+			}
+
+			if (boost::algorithm::ends_with(entry.name, ".filA"))
+			{
+				FileSpecifier demo = scripts + entry.name;
+				demos.push_back(demo);
+			}
+		}
+	}
+
+	if (demos.size())
+	{
+		static auto last_played_index = -1;
+		auto index = 0;
+		if (demos.size() > 1)
+		{
+			do
+			{
+				index = local_random() % demos.size();
+			}
+			while (index == last_played_index);
+		}
+		
+		last_played_index = index;
+		return setup_for_replay_from_file(demos[index], 0, false);
+	}
+	
 	// not supported in SDL version
 	return false;
 }
@@ -1287,8 +1432,8 @@ bool setup_replay_from_random_resource(uint32 map_checksum)
 typedef bool (*timer_func)(void);
 
 static timer_func tm_func = NULL;	// The installed timer task
-static uint32 tm_period;			// Ticks between two calls of the timer task
-static uint32 tm_last = 0, tm_accum = 0;
+static uint64_t tm_period;			// Ticks between two calls of the timer task
+static uint64_t tm_last = 0, tm_accum = 0;
 
 timer_task_proc install_timer_task(short tasks_per_second, timer_func func)
 {
@@ -1305,7 +1450,7 @@ void remove_timer_task(timer_task_proc proc)
 	tm_func = NULL;
 }
 
-void execute_timer_tasks(uint32 time)
+void execute_timer_tasks(uint64_t time)
 {
 	if (tm_func) {
 		if (Movie::instance()->IsRecording()) {
@@ -1317,7 +1462,7 @@ void execute_timer_tasks(uint32 time)
 			return;
 		}
 		
-		uint32 now = time;
+		auto now = time;
 		tm_accum += now - tm_last;
 		tm_last = now;
 		bool first_time = true;

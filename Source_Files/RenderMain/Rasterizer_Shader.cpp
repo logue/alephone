@@ -6,10 +6,6 @@
  *  http://www.gnu.org/licenses/gpl.html
  */
 
-#if defined (_MSC_VER) && !defined (M_PI)
-#define _USE_MATH_DEFINES
-#endif 
-
 #include "OGL_Headers.h"
 
 #include <iostream>
@@ -29,6 +25,8 @@
 #include "preferences.h"
 #include "fades.h"
 #include "screen.h"
+
+#ifdef HAVE_OPENGL
 
 #define MAXIMUM_VERTICES_PER_WORLD_POLYGON (MAXIMUM_VERTICES_PER_POLYGON+4)
 
@@ -86,9 +84,7 @@ void Rasterizer_Shader_Class::SetView(view_data& view) {
 	float farVal = 128.0 * 1024.0;
 	float x = xtan * nearVal;
 	float y = ytan * nearVal;
-	float yoff = 0.0;
-	if (view.mimic_sw_perspective)
-		yoff = y * tan(pitch * M_PI/360.0) * 4.8;
+	float yoff = view.mimic_sw_perspective ? tan(pitch * deg2rad) * nearVal : 0;
 	glFrustum(-x, x, -y + yoff, y + yoff, nearVal, farVal);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -172,3 +168,4 @@ void Rasterizer_Shader_Class::End()
 	Rasterizer_OGL_Class::End();
 }
 
+#endif

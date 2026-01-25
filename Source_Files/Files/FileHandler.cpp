@@ -26,7 +26,7 @@
  */
 
 #if defined _MSC_VER 
- //not #if defined(_WIN32) || defined(_WIN64) because we have strcasecmp in mingw
+ //not #if defined(_WIN32) because we have strcasecmp in mingw
 #define strcasecmp _stricmp
 #endif
 
@@ -36,6 +36,7 @@
 
 #include "shell.h"
 #include "interface.h"
+#include "screen.h"
 #include "tags.h"
 
 #include <stdio.h>
@@ -43,9 +44,12 @@
 #include <errno.h>
 #include <limits.h>
 #include <string>
+#include <sstream>
 #include <vector>
+#include <functional>
+#include <map>
 
-#include <SDL_endian.h>
+#include <SDL2/SDL_endian.h>
 
 #ifdef HAVE_UNISTD_H
 #include <sys/stat.h>
@@ -54,7 +58,6 @@
 #endif
 
 #ifdef HAVE_ZZIP
-#include <zzip/lib.h>
 #include "SDL_rwops_zzip.h"
 #endif
 
@@ -74,10 +77,13 @@
 
 #include "preferences.h"
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
+
+#ifdef HAVE_NFD
+#include "nfd.h"
+#include <SDL2/SDL_syswm.h>
+#endif
 
 namespace io = boost::iostreams;
 namespace sys = boost::system;
@@ -381,7 +387,7 @@ bool FileSpecifier::Create(Typecode Type)
 }
 
 // Create directory
-bool FileSpecifier::CreateDirectory()
+bool FileSpecifier::MakeDirectory()
 {
 	sys::error_code ec;
 	const bool created_dir = fs::create_directory(utf8_to_path(name), ec);
@@ -590,6 +596,8 @@ static extension_mapping extensions[] =
 
 	{ "mpg", false, _typecode_movie },
 
+	{ "appl", false, _typecode_application },
+
 	{0, false, _typecode_unknown}
 };
 
@@ -679,16 +687,6 @@ not_shapes: ;
 
 	// Not identified
 	return _typecode_unknown;
-}
-
-// Get free space on disk
-bool FileSpecifier::GetFreeSpace(uint32 &FreeSpace)
-{
-	// This is impossible to do in a platform-independant way, so we
-	// just return 16MB which should be enough for everything
-	FreeSpace = 16 * 1024 * 1024;
-	err = 0;
-	return true;
 }
 
 // Delete file
@@ -809,13 +807,13 @@ void FileSpecifier::SetTempName(const FileSpecifier& other)
 }
 
 // Get last element of path
-void FileSpecifier::GetName(char *part) const
+std::string FileSpecifier::GetName() const
 {
 	string::size_type pos = name.rfind(PATH_SEP);
 	if (pos == string::npos)
-		strcpy(part, name.c_str());
+		return name;
 	else
-		strcpy(part, name.substr(pos + 1).c_str());
+		return name.substr(pos + 1);
 }
 
 // Add part to path name
@@ -1076,7 +1074,7 @@ public:
 
 	const FileSpecifier& get_file() { return current_directory; }
 	
-	boost::function<void(const std::string&)> file_selected;
+	std::function<void(const std::string&)> file_selected;
 	
 private:
 	vector<dir_entry>	entries;
@@ -1127,8 +1125,8 @@ private:
 };
 
 const char* sort_by_labels[] = {
-	"名前",
-	"日付",
+	"name",
+	"date",
 	0
 };
 
@@ -1155,8 +1153,8 @@ public:
 protected:
 	void Init(const FileSpecifier& dir, w_directory_browsing_list::SortOrder default_order, std::string filename) {
 		m_sort_by_w = new w_select(static_cast<size_t>(default_order), sort_by_labels);
-		m_sort_by_w->set_selection_changed_callback(boost::bind(&FileDialog::on_change_sort_order, this));
-		m_up_button_w = new w_button("上の階層へ", boost::bind(&FileDialog::on_up, this));
+		m_sort_by_w->set_selection_changed_callback(std::bind(&FileDialog::on_change_sort_order, this));
+		m_up_button_w = new w_button("UP", std::bind(&FileDialog::on_up, this));
 		if (filename.empty()) 
 		{
 			m_list_w = new w_directory_browsing_list(dir, &m_dialog);
@@ -1166,10 +1164,9 @@ protected:
 			m_list_w = new w_directory_browsing_list(dir, &m_dialog, filename);
 		}
 		m_list_w->sort_by(default_order);
-		m_list_w->set_directory_changed_callback(boost::bind(&FileDialog::on_directory_changed, this));
+		m_list_w->set_directory_changed_callback(std::bind(&FileDialog::on_directory_changed, this));
 
-		dir.GetName(temporary);
-		m_directory_name_w = new w_static_text(temporary);
+		m_directory_name_w = new w_static_text(dir.GetName().c_str());
 	}
 
 	dialog m_dialog;
@@ -1183,8 +1180,7 @@ private:
 
 
 	void on_directory_changed() {
-		m_list_w->get_file().GetName(temporary);
-		m_directory_name_w->set_text(temporary);
+		m_directory_name_w->set_text(m_list_w->get_file().GetName().c_str());
 
 		m_up_button_w->set_enabled(m_list_w->can_move_up_a_level());
 
@@ -1212,13 +1208,13 @@ public:
 			switch(type) 
 			{
 			case _typecode_savegame:
-				m_prompt = "ゲーム再開";
+				m_prompt = "CONTINUE SAVED GAME";
 				break;
 			case _typecode_film:
-				m_prompt = "映画をリプレイ";
+				m_prompt = "REPLAY SAVED FILM";
 				break;
 			default:
-				m_prompt = "ファイルを開く";
+				m_prompt = "OPEN FILE";
 				break;
 			}
 		}
@@ -1251,7 +1247,7 @@ public:
 
 		Init(dir, default_order, filename);
 
-		m_list_w->file_selected = boost::bind(&ReadFileDialog::on_file_selected, this);
+		m_list_w->file_selected = std::bind(&ReadFileDialog::on_file_selected, this);
 	}
 	virtual ~ReadFileDialog() = default;
 	void Layout() {
@@ -1267,7 +1263,7 @@ public:
 
 		horizontal_placer* top_row_placer = new horizontal_placer;
 
-		top_row_placer->dual_add(m_sort_by_w->label("ソート順："), m_dialog);
+		top_row_placer->dual_add(m_sort_by_w->label("Sorted by: "), m_dialog);
 		top_row_placer->dual_add(m_sort_by_w, m_dialog);
 		top_row_placer->add_flags(placeable::kFill);
 		top_row_placer->add(new w_spacer, true);
@@ -1284,7 +1280,7 @@ public:
 		placer->add(new w_spacer, true);
 
 		horizontal_placer* button_placer = new horizontal_placer;
-		button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &m_dialog), m_dialog);
+		button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &m_dialog), m_dialog);
 		
 		placer->add(button_placer, true);
 		
@@ -1305,18 +1301,194 @@ private:
 	std::string m_filename;
 };
 
-bool FileSpecifier::ReadDialog(Typecode type, const char *prompt)
+#ifdef HAVE_NFD
+static std::map<Typecode, std::vector<nfdu8filteritem_t>> typecode_filters {
+	{_typecode_scenario, { {"Map file", "sceA"} }},
+	{_typecode_savegame, { {"Saved game file", "sgaA"} }},
+	{_typecode_film,     { {"Recording file", "filA"} }},
+	{_typecode_physics,  { {"Physics file", "phyA"} }},
+	{_typecode_shapes,   { {"Shapes file", "shpA"} }},
+	{_typecode_sounds,   { {"Sounds file", "sndA"} }},
+	{_typecode_patch,    { {"Patch file", "ShPa"} }},
+	{_typecode_images,   { {"Images file", "imgA"} }},
+	{_typecode_music,    { {"Music file", "aif,ogg,wav"} }},
+	{_typecode_movie,    { {"Video file", "webm"} }} 
+};
+
+// from nativefiledialog-extended nfd_sdl2.h
+// we copied it because nfd_sdl2.h is including SDL2 headers directly and we would have to adjust the include paths
+static bool GetNativeWindowFromSDLWindowForNFD(SDL_Window* sdlWindow, nfdwindowhandle_t* nativeWindow)
 {
-	ReadFileDialog d(*this, type, prompt);
-	if (d.Run()) 
-	{
-		*this = d.GetFile();
-		return true;
-	} 
-	else 
-	{
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	if (!SDL_GetWindowWMInfo(sdlWindow, &info)) {
 		return false;
 	}
+	switch (info.subsystem) {
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+	case SDL_SYSWM_WINDOWS:
+		nativeWindow->type = NFD_WINDOW_HANDLE_TYPE_WINDOWS;
+		nativeWindow->handle = (void*)info.info.win.window;
+		return true;
+#endif
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+	case SDL_SYSWM_COCOA:
+		nativeWindow->type = NFD_WINDOW_HANDLE_TYPE_COCOA;
+		nativeWindow->handle = (void*)info.info.cocoa.window;
+		return true;
+#endif
+#if defined(SDL_VIDEO_DRIVER_X11)
+	case SDL_SYSWM_X11:
+		nativeWindow->type = NFD_WINDOW_HANDLE_TYPE_X11;
+		nativeWindow->handle = (void*)info.info.x11.window;
+		return true;
+#endif
+	default:
+		return false;
+	}
+}
+#endif
+
+bool FileSpecifier::ReadDirectoryDialog() //needs native file dialog to work
+{
+#ifdef HAVE_NFD
+#if defined(_WIN32)
+	auto fullscreen = get_screen_mode()->fullscreen;
+	if (fullscreen)
+	{
+		toggle_fullscreen(false);
+	}
+#endif
+	nfdchar_t* outpath;
+	nfdpickfolderu8args_t params = {};
+	if (GetNativeWindowFromSDLWindowForNFD(MainScreenWindow(), &params.parentWindow))
+	{
+		// we ignore the "window focus lost + gained" events to prevent pausing the game on "focus lost"
+		// otherwise, a user input would be necessary to resume the game
+		SDL_EventState(SDL_WINDOWEVENT, SDL_DISABLE);
+	}
+
+	auto result = NFD_PickFolderU8_With(&outpath, &params);
+	SDL_EventState(SDL_WINDOWEVENT, SDL_ENABLE);
+#if defined(_WIN32)
+	if (fullscreen)
+	{
+		toggle_fullscreen(true);
+	}
+#endif
+
+	if (result == NFD_OKAY)
+	{
+		name = outpath;
+		NFD_FreePathU8(outpath);
+		return true;
+	}
+	
+#endif
+	return false;
+}
+
+
+bool FileSpecifier::ReadDialog(Typecode type, const char *prompt)
+{
+#ifdef HAVE_NFD
+	if (environment_preferences->use_native_file_dialogs)
+	{
+		// TODO: DRY (this is mostly copied from ReadFileDialog)
+		FileSpecifier dir = *this;
+		switch (type)
+		{
+		case _typecode_savegame:
+			dir.SetToSavedGamesDir();
+			break;
+		case _typecode_film:
+			dir.SetToRecordingsDir();
+			break;
+		case _typecode_scenario:
+		case _typecode_netscript:
+			// I think these should be in ReadFileDialog too, it's just never
+			// called on them
+		case _typecode_physics:
+		case _typecode_shapes:
+		case _typecode_sounds:
+		case _typecode_images:
+		case _typecode_unknown: // used for external resources
+		{
+			std::string filename;
+			DirectorySpecifier theDirectory;
+			dir.SplitPath(theDirectory, filename);
+			dir.FromDirectory(theDirectory);
+			if (!dir.Exists())
+			{
+				dir.SetToLocalDataDir();
+			}
+			break;
+		}
+		default:
+			dir.SetToLocalDataDir();
+			break;
+		}
+
+#if (defined(__APPLE__) && defined(__MACH__))
+		// NFD doesn't append a wildcard filter on mac, so if you set ANY
+		// filter here, anything without that extension gets grayed out. So, I
+		// guess just accept any files
+		std::vector<nfdu8filteritem_t> filters = {};
+#else
+		auto& filters = typecode_filters[type];
+#endif
+
+		nfdchar_t* outpath;
+#if defined(_WIN32)
+		auto fullscreen = get_screen_mode()->fullscreen;
+		if (fullscreen)
+		{
+			toggle_fullscreen(false);
+		}
+#endif
+		nfdopendialogu8args_t params = { filters.data(), static_cast<nfdfiltersize_t>(filters.size()), dir.GetPath() };
+		if (GetNativeWindowFromSDLWindowForNFD(MainScreenWindow(), &params.parentWindow))
+		{
+			// we ignore the "window focus lost + gained" events to prevent pausing the game on "focus lost"
+			// otherwise, a user input would be necessary to resume the game
+			SDL_EventState(SDL_WINDOWEVENT, SDL_DISABLE);
+		}
+
+		auto result = NFD_OpenDialogU8_With(&outpath, &params);
+		SDL_EventState(SDL_WINDOWEVENT, SDL_ENABLE);
+#if defined(_WIN32)
+		if (fullscreen)
+		{
+			toggle_fullscreen(true);
+		}
+#endif
+		if (result == NFD_OKAY)
+		{
+			name = outpath;
+			NFD_FreePathU8(outpath);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+#endif
+    ReadFileDialog d(*this, type, prompt);
+    if (d.Run()) 
+    {
+        *this = d.GetFile();
+        return true;
+    } 
+    else 
+    {
+        return false;
+    }
+#ifdef HAVE_NFD
+	}
+#endif
 }
 
 class w_file_name : public w_text_entry {
@@ -1345,16 +1517,16 @@ public:
 			switch (type)
 			{
 			case _typecode_savegame:
-				m_prompt = "ゲーム保存";
+				m_prompt = "SAVE GAME";
 				break;
 			case _typecode_film:
-				m_prompt = "映画を保存";
+				m_prompt = "SAVE FILM";
 				break;
 			case _typecode_movie:
-				m_prompt = "映画をエクスポート";
+				m_prompt = "EXPORT FILM";
 				break;
 			default:
-				m_prompt = "ファイル保存";
+				m_prompt = "SAVE FILE";
 				break;
 			}
 		}
@@ -1401,7 +1573,7 @@ public:
 
 		Init(dir, default_order, m_default_name);
 
-		m_list_w->file_selected = boost::bind(&WriteFileDialog::on_file_selected, this, _1);
+		m_list_w->file_selected = std::bind(&WriteFileDialog::on_file_selected, this, std::placeholders::_1);
 	}
 	virtual ~WriteFileDialog() = default;
 	void Layout() {
@@ -1417,7 +1589,7 @@ public:
 
 		horizontal_placer* top_row_placer = new horizontal_placer;
 
-		top_row_placer->dual_add(m_sort_by_w->label("ソート順："), m_dialog);
+		top_row_placer->dual_add(m_sort_by_w->label("Sorted by: "), m_dialog);
 		top_row_placer->dual_add(m_sort_by_w, m_dialog);
 		top_row_placer->add_flags(placeable::kFill);
 		top_row_placer->add(new w_spacer, true);
@@ -1438,9 +1610,9 @@ public:
 		horizontal_placer* file_name_placer = new horizontal_placer;
 		m_name_w = new w_file_name(&m_dialog, m_default_name.c_str());
 #ifdef MAC_APP_STORE
-		file_name_placer->dual_add(m_name_w->label("名前："), m_dialog);
+		file_name_placer->dual_add(m_name_w->label("Name:"), m_dialog);
 #else
-		file_name_placer->dual_add(m_name_w->label("ファイル名："), m_dialog);
+		file_name_placer->dual_add(m_name_w->label("File Name:"), m_dialog);
 #endif
 		file_name_placer->add_flags(placeable::kFill);
 		file_name_placer->dual_add(m_name_w, m_dialog);
@@ -1452,7 +1624,7 @@ public:
 
 		horizontal_placer* button_placer = new horizontal_placer;
 		button_placer->dual_add(new w_button("OK", dialog_ok, &m_dialog), m_dialog);
-		button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &m_dialog), m_dialog);
+		button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &m_dialog), m_dialog);
 		
 		placer->add(button_placer, true);
 		
@@ -1500,6 +1672,71 @@ static bool confirm_save_choice(FileSpecifier & file);
 
 bool FileSpecifier::WriteDialog(Typecode type, const char *prompt, const char *default_name)
 {
+#ifdef HAVE_NFD
+	if (environment_preferences->use_native_file_dialogs)
+	{
+		// TODO: DRY (this is copied from WriteDialog)
+		DirectorySpecifier dir = *this;
+		switch (type)
+		{
+		case _typecode_savegame:
+		{
+			std::string base;
+			std::string part;
+			dir.SplitPath(base, part);
+			if (part != std::string())
+			{
+				dir = base;
+			}
+			break;
+		}
+		case _typecode_film:
+		case _typecode_movie:
+			dir.SetToRecordingsDir();
+			break;
+		default:
+			dir.SetToLocalDataDir();
+			break;
+		}
+		
+		nfdchar_t* outpath;
+#if defined(_WIN32)
+		auto fullscreen = get_screen_mode()->fullscreen;
+		if (fullscreen)
+		{
+			toggle_fullscreen(false);
+		}
+#endif
+		nfdsavedialogu8args_t params = { typecode_filters[type].data(), static_cast<nfdfiltersize_t>(typecode_filters[type].size()), dir.GetPath(), default_name };
+		if (GetNativeWindowFromSDLWindowForNFD(MainScreenWindow(), &params.parentWindow))
+		{
+			// we ignore the "window focus lost + gained" events to prevent pausing the game on "focus lost"
+			// otherwise, a user input would be necessary to resume the game
+			SDL_EventState(SDL_WINDOWEVENT, SDL_DISABLE);
+		}
+
+		auto result = NFD_SaveDialogU8_With(&outpath, &params);
+		SDL_EventState(SDL_WINDOWEVENT, SDL_ENABLE);
+#if defined(_WIN32)
+		if (fullscreen)
+		{
+			toggle_fullscreen(true);
+		}
+#endif
+		if (result == NFD_OKAY)
+		{
+			name = outpath;
+			NFD_FreePathU8(outpath);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+#endif
 again:
 	WriteFileDialog d(*this, type, prompt, default_name);
 	bool result = false;
@@ -1522,7 +1759,9 @@ again:
 	}
 		
 	return result;
-
+#ifdef HAVE_NFD
+	}
+#endif
 }
 
 bool FileSpecifier::WriteDialogAsync(Typecode type, char *prompt, char *default_name)
@@ -1537,22 +1776,20 @@ static bool confirm_save_choice(FileSpecifier & file)
 		return true;
 
 	// Construct message
-	char name[256];
-	file.GetName(name);
-	char message[512];
-	sprintf(message, "'%s' はすでに存在します.", FileSpecifier::HideExtension(std::string(name)).c_str());
+	std::ostringstream oss;
+	oss << "'" << FileSpecifier::HideExtension(file.GetName()) << "' alredy exists.";
 
 	// Create dialog
 	dialog d;
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_static_text(message), d);
-	placer->dual_add(new w_static_text("上書きしてもよろしいですか？"), d);
+	placer->dual_add(new w_static_text(oss.str().c_str()), d);
+	placer->dual_add(new w_static_text("Ok to overwrite?"), d);
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-	w_button *default_button = new w_button("はい", dialog_ok, &d);
+	w_button *default_button = new w_button("YES", dialog_ok, &d);
 	button_placer->dual_add(default_button, d);
-	button_placer->dual_add(new w_button("いいえ", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("NO", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
 
@@ -1564,12 +1801,14 @@ static bool confirm_save_choice(FileSpecifier & file)
 	return d.run() == 0;
 }
 
-ScopedSearchPath::ScopedSearchPath(const DirectorySpecifier& dir) 
+ScopedSearchPath::ScopedSearchPath(const DirectorySpecifier& dir) :
+	d{dir}
 {
 	data_search_path.insert(data_search_path.begin(), dir);
 }
 
 ScopedSearchPath::~ScopedSearchPath() 
 {
+	assert(data_search_path.size() && data_search_path.front() == d);
 	data_search_path.erase(data_search_path.begin());
 }

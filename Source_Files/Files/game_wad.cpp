@@ -136,8 +136,8 @@ Feb 15, 2002 (Br'fin (Jeremy Parsons)):
 FileSpecifier MapFileSpec;
 static bool file_is_set= false;
 
-// LP addition: was a physics model loaded from the previous level loaded?
-static bool PhysicsModelLoadedEarlier = false;
+static vector<polygon_data> PolygonListCopy;
+static vector<platform_data> PlatformListCopy;
 
 // The following local globals are for handling games that need to be restored.
 struct revert_game_info
@@ -232,13 +232,15 @@ void set_map_file(FileSpecifier& File, bool loadScripts)
 
 	MapFileSpec = File;
 	set_scenario_images_file(File);
+	file_is_set = true;
+
+	Plugins::instance()->set_map_checksum(get_current_map_checksum());
+	
 	// Only need to do this here
 	if(loadScripts) LoadLevelScripts(File);
 
 	// Don't care whether there was an error when checking on the file's scenario images
 	clear_game_error();
-
-	file_is_set= true;
 }
 
 /* Set to the default map.. (Only if no map doubleclicked upon on startup.. */
@@ -259,7 +261,11 @@ bool use_map_file(
 	FileSpecifier File;
 	bool success= false;
 
-	if(find_wad_file_that_has_checksum(File, _typecode_scenario, strPATHS, checksum))
+	if (file_is_set && get_current_map_checksum() == checksum)
+	{
+		success = true;
+	}
+	else if(find_wad_file_that_has_checksum(File, _typecode_scenario, strPATHS, checksum))
 	{
 		set_map_file(File);
 		success= true;
@@ -281,7 +287,8 @@ dynamic_data get_dynamic_data_from_save(FileSpecifier& File)
 			auto wad = read_indexed_wad_from_file(MapFile, &header, 0, true);
 			if (wad)
 			{
-				get_dynamic_data_from_wad(wad, &dynamic_data_return);
+				bool result = get_dynamic_data_from_wad(wad, &dynamic_data_return);
+				assert(result);
 				free_wad(wad);
 			}
 		}
@@ -469,6 +476,25 @@ uint32 get_current_map_checksum(
 	return header.checksum;
 }
 
+static void create_players_for_new_game(short number_of_players, player_start_data* player_start_information)
+{
+	const short intended_local_player_index = game_is_networked ? NetGetLocalPlayerIndex() : 0;
+
+	/* Initialize the players-> note there may be more than one player in a */
+	/* non-network game, for playback.. */
+	for (int i = 0; i < number_of_players; ++i)
+	{
+		new_player_flags flags = (i == intended_local_player_index ? new_player_make_local_and_current : 0);
+		auto player_index = new_player(player_start_information[i].team,
+			player_start_information[i].color, player_start_information[i].identifier, flags);
+		assert(player_index == i);
+
+		/* Now copy in the name of the player.. */
+		assert(strlen(player_start_information[i].name) <= MAXIMUM_PLAYER_NAME_LENGTH);
+		strncpy(players[i].name, player_start_information[i].name, MAXIMUM_PLAYER_NAME_LENGTH + 1);
+	}
+}
+
 // ZZZ: split this out from new_game for sharing
 void set_saved_game_name_to_default()
 {
@@ -486,10 +512,7 @@ bool new_game(
 	struct entry_point *entry_point)
 {
 	assert(!network || number_of_players == NetGetNumberOfPlayers());
-	
-	const short intended_local_player_index = network ? NetGetLocalPlayerIndex() : 0;
-	
-	short player_index, i;
+		
 	bool success= true;
 
 	ResetPassedLua();
@@ -519,22 +542,13 @@ bool new_game(
 
 	/* Load the level */	
 	assert(file_is_set);
-	success= goto_level(entry_point, true, number_of_players);
+	success= goto_level(entry_point, number_of_players, player_start_information);
 	/* If we were able to load the map... */
 	if(success)
 	{
-		/* Initialize the players-> note there may be more than one player in a */
-		/* non-network game, for playback.. */
-		for (i=0;i<number_of_players;++i)
+		if (!film_profile.network_items)
 		{
-			new_player_flags flags = (i == intended_local_player_index ? new_player_make_local_and_current : 0);
-			player_index= new_player(player_start_information[i].team,
-				player_start_information[i].color, player_start_information[i].identifier, flags);
-			assert(player_index==i);
-
-			/* Now copy in the name of the player.. */
-			assert(strlen(player_start_information[i].name)<=MAXIMUM_PLAYER_NAME_LENGTH);
-			strncpy(players[i].name, player_start_information[i].name, MAXIMUM_PLAYER_NAME_LENGTH+1);
+			create_players_for_new_game(number_of_players, player_start_information);
 		}
 
 		/* we need to alert the function that reverts the game of the game setup so that
@@ -752,6 +766,7 @@ bool get_entry_points(vector<entry_point> &vec, int32 type)
 extern void LoadSoloLua();
 extern void LoadReplayNetLua();
 extern void LoadStatsLua();
+extern void LoadAchievementsLua();
 extern bool RunLuaScript();
 
 /* This is called when the game level is changed somehow */
@@ -760,10 +775,11 @@ extern bool RunLuaScript();
 /* Returns a short that is an OSErr... */
 bool goto_level(
 	struct entry_point *entry, 
-	bool new_game,
-	short number_of_players)
+	short number_of_players,
+	player_start_data* player_start_information)
 {
 	bool success= true;
+	bool new_game = player_start_information;
 
 	if(!new_game)
 	{
@@ -812,14 +828,18 @@ bool goto_level(
 		{
 			LoadReplayNetLua();
 		}
+		LoadAchievementsLua();
 		LoadStatsLua();
 
-		Music::instance()->PreloadLevelMusic();
 		set_game_error(SavedType,SavedError);
 		
 		if (!new_game)
 		{
 			recreate_players_for_new_level();
+		}
+		else if (film_profile.network_items)
+		{
+			create_players_for_new_game(number_of_players, player_start_information);
 		}
 		
 		/* Load the collections */
@@ -959,36 +979,43 @@ void load_sides(
 {
 	size_t loop;
 
-	bool reserved_side_flag = false;
-	
 	// assert(count>=0 && count<=MAXIMUM_SIDES_PER_MAP);
 
 	unpack_side_data(sides,map_sides,count);
 
-	for(loop=0; loop<count; ++loop)
-	{
-		// whatever editor created Siege of Nor'Khor left all kinds of unused
-		// side flags set; try to detect them and clear them out
-		if (map_sides[loop].flags & _reserved_side_flag)
-		{
-			reserved_side_flag = true;
-		}
-		
-		if(version==MARATHON_ONE_DATA_VERSION)
-		{
-			map_sides[loop].transparent_texture.texture= UNONE;
-			map_sides[loop].ambient_delta= 0;
-			map_sides[loop].flags |= _side_item_is_optional;
-		}
-		++sides;
-	}
-
-	if (reserved_side_flag)
+	if (version == MARATHON_ONE_DATA_VERSION)
 	{
 		for (loop = 0; loop < count; ++loop)
 		{
-			static constexpr int m2_side_flags_mask = 0x007f;
-			map_sides[loop].flags &= m2_side_flags_mask;
+			// some editors set unused flags; clear them out
+			static constexpr int m1_side_flags_mask = 0x0007;
+			
+			map_sides[loop].transparent_texture.texture= UNONE;
+			map_sides[loop].ambient_delta= 0;
+			map_sides[loop].flags &= m1_side_flags_mask;
+			map_sides[loop].flags |= _side_item_is_optional;
+		}
+	}
+	else
+	{
+		bool editor_set_unused_flags = false;
+		for (loop = 0; loop < count; ++loop)
+		{
+			// some editors set unused flags; clear them out
+			if (map_sides[loop].flags & _reserved_side_flag)
+			{
+				editor_set_unused_flags = true;
+				break;
+			}
+		}
+			
+		if (editor_set_unused_flags)
+		{
+			for (loop = 0; loop < count; ++loop)
+			{
+				static constexpr int m2_side_flags_mask = 0x007f;
+				map_sides[loop].flags &= m2_side_flags_mask;
+			}
 		}
 	}
 
@@ -1045,6 +1072,12 @@ void load_polygons(
                         map_polygons[loop].type = _polygon_is_automatic_exit;
                         break;
                 }
+
+				// this is set on some m1 maps, but it's unknown what the flag
+				// does. Operating on the assumption that old m1 editors didn't
+				// clear out flags, just unset the flag. Otherwise the map will
+				// assert out later
+				map_polygons[loop].flags &= ~POLYGON_IS_DETACHED_BIT;
 			}
 			break;
 			
@@ -1229,7 +1262,7 @@ bool load_game_from_file(FileSpecifier& File, bool run_scripts)
 			set_map_file(map_parent, false);
 		else
 		{
-			/* Tell the user theyÕre screwed when they try to leave this level. */
+			/* Tell the user they’re screwed when they try to leave this level. */
 			alert_user(infoError, strERRORS, cantFindMap, 0);
 
 			// LP addition: makes the game look normal
@@ -1248,6 +1281,7 @@ bool load_game_from_file(FileSpecifier& File, bool run_scripts)
 			{
 				LoadSoloLua();
 			}
+			LoadAchievementsLua();
 			LoadStatsLua();
 			set_game_error(SavedType,SavedError);
 		}
@@ -1267,8 +1301,6 @@ void setup_revert_game_info(
 	obj_copy(revert_game_data.entry_point, *entry);
 }
 
-extern void reset_messages();
-
 bool revert_game(
 	void)
 {
@@ -1284,33 +1316,28 @@ bool revert_game(
 		successful= load_game_from_file(revert_game_data.SavedGame, true);
 		if (successful) 
 		{
-			Music::instance()->PreloadLevelMusic();
 			RunLuaScript();
 			
 			// LP: added for loading the textures if one had died on another level;
 			// this gets around WZ's moving of this line into make_restored_game_relevant()
 			successful = entering_map(true /*restoring game*/);
 		}
-
-		/* And they don't get to continue. */
-		stop_recording();
 	}
 	else
 	{
 		/* This was the totally evil line discussed above. */
 		successful= new_game(1, false, &revert_game_data.game_information, &revert_game_data.player_start, 
 			&revert_game_data.entry_point);
-			
-		/* And rewind so that the last player is used. */
-		rewind_recording();
 	}
+
+	/* And rewind so that the last player is used. */
+	rewind_recording();
 
 	if(successful)
 	{
 		update_interface(NONE);
 		ChaseCam_Reset();
 		ResetFieldOfView();
-		reset_messages();
 		ReloadViewContext();
 	}
 	
@@ -1414,6 +1441,8 @@ bool save_game_file(FileSpecifier& File, const std::string& metadata, const std:
 	int32 offset, wad_length;
 	struct directory_entry entries[2];
 	struct wad_data *wad, *meta_wad;
+
+	clear_game_error();
 
 	/* Save off the random seed. */
 	dynamic_world->random_seed= get_random_seed();
@@ -1520,7 +1549,7 @@ static void scan_and_add_platforms(
 	objlist_clear(platforms,count);
 
 	static_platforms.resize(count);
-	unpack_static_platform_data(platform_static_data, static_platforms.data(), count);
+	unpack_static_platform_data(platform_static_data, static_platforms.data(), count, version);
 
 	polygon= map_polygons;
 	for(loop=0; loop<dynamic_world->polygon_count; ++loop)
@@ -1535,7 +1564,7 @@ static void scan_and_add_platforms(
 			{
 				if (static_platforms[platform_static_data_index].polygon_index == loop)
 				{
-					new_platform(&static_platforms[platform_static_data_index], loop, version);
+					new_platform(&static_platforms[platform_static_data_index], loop);
 					break;
 				}
 			}
@@ -1544,7 +1573,7 @@ static void scan_and_add_platforms(
 			if(platform_static_data_index==count)
 			{
 				polygon->permutation= 1;
-				new_platform(get_defaults_for_platform_type(polygon->permutation), loop, version);
+				new_platform(get_defaults_for_platform_type(polygon->permutation), loop);
 			}	
 		}
 		++polygon;
@@ -1642,7 +1671,7 @@ bool process_map_wad(
 			load_lights(data, count, version);
 		}
 
-		//	HACK!!!!!!!!!!!!!!! vulcan doesnÕt NONE .first_object field after adding scenery
+		//	HACK!!!!!!!!!!!!!!! vulcan doesn’t NONE .first_object field after adding scenery
 		{
 			for (count= 0; count<static_cast<size_t>(dynamic_world->polygon_count); ++count)
 			{
@@ -1822,16 +1851,15 @@ bool process_map_wad(
 		unpack_weapon_definition(data,count);
 	}
 	
-	// LP addition: Reload the physics model if it had been loaded in the previous level,
-	// but not in the current level. This avoids the persistent-physics bug.
 	// ghs: always reload the physics model if there isn't one merged
-	if (PhysicsModelLoadedEarlier && !PhysicsModelLoaded && !game_is_networked)
+	if (!PhysicsModelLoaded && !game_is_networked)
 		import_definition_structures();
-	PhysicsModelLoadedEarlier = PhysicsModelLoaded;
 	
 	RunScriptChunks();
 
 	init_ephemera(dynamic_world->polygon_count);
+
+	PolygonListCopy = PolygonList; // must be done before polygons heights are modified below
 
 	/* If we are restoring the game, then we need to add the dynamic data */
 	if(restoring_game)
@@ -1843,13 +1871,11 @@ bool process_map_wad(
 		MapIndexList.resize(count);
 		StreamToList(data,map_indexes,count);
 		
-		data= (uint8 *)extract_type_from_wad(wad, PLAYER_STRUCTURE_TAG, &data_length);
-		count= data_length/SIZEOF_player_data;
-		assert(count*SIZEOF_player_data==data_length);
-		unpack_player_data(data,players,count);
-		team_damage_from_player_data();
+		bool result = get_player_data_from_wad(wad);
+		assert(result);
 		
-		get_dynamic_data_from_wad(wad, dynamic_world);
+		result = get_dynamic_data_from_wad(wad, dynamic_world);
+		assert(result);
 		
 		data= (uint8 *)extract_type_from_wad(wad, OBJECT_STRUCTURE_TAG, &data_length);
 		count= data_length/SIZEOF_object_data;
@@ -1876,7 +1902,7 @@ bool process_map_wad(
 		assert(count*SIZEOF_effect_data==data_length);
 		vassert(count <= MAXIMUM_EFFECTS_PER_MAP,
 			csprintf(temporary,"Number of effects %zu > limit %u",count,MAXIMUM_EFFECTS_PER_MAP));
-		unpack_effect_data(data,effects,count);
+		unpack_effect_data(data,EffectList.data(),count);
 
 		data= (uint8 *)extract_type_from_wad(wad, PROJECTILES_STRUCTURE_TAG, &data_length);
 		count= data_length/SIZEOF_projectile_data;
@@ -1934,17 +1960,28 @@ bool process_map_wad(
 			platform_structure_count, version);
 
 	}
-	
+
+	PlatformListCopy = PlatformList;
+
 	/* ... and bail */
 	return true;
 }
 
-void get_dynamic_data_from_wad(wad_data* wad, dynamic_data* dest)
+bool get_dynamic_data_from_wad(wad_data* wad, dynamic_data* dest)
 {
 	size_t data_length;
 	uint8* data = (uint8*)extract_type_from_wad(wad, DYNAMIC_STRUCTURE_TAG, &data_length);
-	assert(data_length == SIZEOF_dynamic_data);
-	unpack_dynamic_data(data, dest, 1);
+	return data && data_length == SIZEOF_dynamic_data ? (bool)unpack_dynamic_data(data, dest, 1) : false;
+}
+
+bool get_player_data_from_wad(wad_data* wad)
+{
+	size_t data_length;
+	auto data = (uint8*)extract_type_from_wad(wad, PLAYER_STRUCTURE_TAG, &data_length);
+	auto count = data_length / SIZEOF_player_data;
+	bool success = count * SIZEOF_player_data == data_length ? (bool)unpack_player_data(data, players, count) : false;
+	if (success) team_damage_from_player_data();
+	return success;
 }
 
 static void allocate_map_structure_for_map(
@@ -2441,7 +2478,7 @@ static uint8 *tag_to_global_array_and_size(
 			pack_monster_data(array,monsters,count);
 			break;
 		case EFFECTS_STRUCTURE_TAG:
-			pack_effect_data(array,effects,count);
+			pack_effect_data(array,EffectList.data(),count);
 			break;
 		case PROJECTILES_STRUCTURE_TAG:
 			pack_projectile_data(array,projectiles,count);
@@ -2520,21 +2557,28 @@ static wad_data *build_export_wad(wad_header *header, int32 *length)
 		vector<platform_data> SavedPlatforms = PlatformList;
 		vector<polygon_data> SavedPolygons = PolygonList;
 		vector<line_data> SavedLines = LineList;
+		vector<side_data> SavedSides = SideList;
 
 		for (size_t loop = 0; loop < PlatformList.size(); ++loop)
 		{
-			platform_data *platform = &PlatformList[loop];
-			// reset the polygon heights
-			if (PLATFORM_COMES_FROM_FLOOR(platform))
-			{
-				platform->floor_height = platform->minimum_floor_height;
-				PolygonList[platform->polygon_index].floor_height = platform->floor_height;
-			}
+			platform_data* platform = &PlatformList[loop];
+			platform_data* original_platform = &PlatformListCopy[loop];
+
 			if (PLATFORM_COMES_FROM_CEILING(platform))
 			{
-				platform->ceiling_height = platform->maximum_ceiling_height;
-				PolygonList[platform->polygon_index].ceiling_height = platform->ceiling_height;
+				auto new_ceiling_height = PLATFORM_IS_INITIALLY_EXTENDED(platform) ? platform->minimum_ceiling_height : platform->maximum_ceiling_height;
+				adjust_platform_sides(platform, platform->ceiling_height, new_ceiling_height);
 			}
+
+			platform->floor_height = original_platform->floor_height;
+			platform->ceiling_height = original_platform->ceiling_height;
+			platform->maximum_ceiling_height = original_platform->maximum_ceiling_height;
+			platform->minimum_ceiling_height = original_platform->minimum_ceiling_height;
+			platform->maximum_floor_height = original_platform->maximum_floor_height;
+			platform->minimum_floor_height = original_platform->minimum_floor_height;
+
+			PolygonList[platform->polygon_index].floor_height = PolygonListCopy[platform->polygon_index].floor_height;
+			PolygonList[platform->polygon_index].ceiling_height = PolygonListCopy[platform->polygon_index].ceiling_height;
 		}
 
 		for (size_t loop = 0; loop < LineList.size(); ++loop)
@@ -2574,6 +2618,7 @@ static wad_data *build_export_wad(wad_header *header, int32 *length)
 		PlatformList = SavedPlatforms;
 		PolygonList = SavedPolygons;
 		LineList = SavedLines;
+		SideList = SavedSides;
 
 		if(wad) *length= calculate_wad_length(header, wad);
 	}

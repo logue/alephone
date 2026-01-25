@@ -6,13 +6,11 @@
 
 #include "FileHandler.h"
 #include "Logging.h"
-
 #include "csstrings.h"
 
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#undef CreateDirectory
 #endif
 
 static void print_usage();
@@ -69,61 +67,45 @@ static std::ostream& operator<<(std::ostream& s, const ShellOptionsOption& o) {
 }
 
 struct ShellOptionsCommand : public ShellOptionsOption {
-	// once we switch to C++17 this can go away and we can use aggregate
-	// initializers
-	ShellOptionsCommand(std::string short_name, std::string long_name, std::string help, std::function<void()> command_) :
-		ShellOptionsOption{short_name, long_name, help},
-		command{command_}
-		{ }
-	
 	std::function<void()> command;
 };
 
 struct ShellOptionsFlag : public ShellOptionsOption {
-	// once we switch to C++17 this can go away and we can use aggregate
-	// initializers
-	ShellOptionsFlag(std::string short_name, std::string long_name, std::string help, bool& flag_) :
-		ShellOptionsOption{short_name, long_name, help},
-		flag{flag_}
-		{ }
-	
 	bool& flag;
 };
 
 struct ShellOptionsString : public ShellOptionsOption {
-	// once we switch to C++17 this can go away and we can use aggregate
-	// initializers
-	ShellOptionsString(std::string short_name, std::string long_name, std::string help, std::string& string_) :
-		ShellOptionsOption{short_name, long_name, help},
-		string{string_}
-		{ }
-
 	std::string& string;
 };
 
+static std::string ignore;
+
 static const std::vector<ShellOptionsCommand> shell_options_commands {
-	{"h", "help", "このヘルプメッセージを表示します", print_usage},
-	{"v", "version", "ゲームのバージョンを表示します", print_version}
+	{"h", "help", "Display this help message", print_usage},
+	{"v", "version", "Display the game version", print_version}
 };
 
 static const std::vector<ShellOptionsFlag> shell_options_flags {
-	{"d", "debug", "コアダンプを出力するようにします", shell_options.debug},
-	{"f", "fullscreen", "ゲームをフルスクリーンで起動します", shell_options.force_fullscreen},
-	{"w", "windowed", "ゲームをウィンドウモードで起動します", shell_options.force_windowed},
-	{"g", "nogl", "OpenGLを使用せずに起動します", shell_options.nogl},
-	{"s", "nosound", "サウンドを無効化します", shell_options.nosound},
-	{"m", "nogamma", "ガンマエフェクトを無効化します。（メニュー画面のフェードなど）", shell_options.nogamma},
-	{"j", "nojoystick", "ジョイスティックの初期化を行いません", shell_options.nojoystick},
+	{"d", "debug", "Allow saving of core files", shell_options.debug},
+	{"f", "fullscreen", "Run the game fullscreen", shell_options.force_fullscreen},
+	{"w", "windowed", "Run the game in a window", shell_options.force_windowed},
+	{"g", "nogl", "Do not use OpenGL", shell_options.nogl},
+	{"s", "nosound", "Do not access the sound card", shell_options.nosound},
+	{"m", "nogamma", "Disable gamma table effects (menu fades)", shell_options.nogamma},
+	{"j", "nojoystick", "Do not initialize joysticks", shell_options.nojoystick},
 	{"i", "insecure_lua", "", shell_options.insecure_lua},
-	{"Q", "skip-intro", "イントロスクリーンをスキップします。", shell_options.skip_intro},
-	{"e", "editor", "エディタ設定を使い、マップに直接ジャンプします", shell_options.editor}
+	{"Q", "skip-intro", "Skip intro screens", shell_options.skip_intro},
+	{"e", "editor", "Use editor prefs; jump directly to map", shell_options.editor},
+	{"", "no-chooser", "Disable the scenario chooser", shell_options.no_chooser}
 };
 
 static const std::vector<ShellOptionsString> shell_options_strings {
-	{"o", "output", "-eで[file]に出力して終了します。", shell_options.output}
+	{"o", "output", "With -e, output to [file] and exit on quit", shell_options.output},
+	{"l", "replay-directory", "Directory with replays to load", shell_options.replay_directory},
+	{"NSDocumentRevisionsDebugMode", "", "", ignore} // annoying Xcode argument
 };
 
-bool ShellOptions::parse(int argc, char** argv)
+std::unordered_map<int, bool> ShellOptions::parse(int argc, char** argv, bool ignore_unknown_args)
 {
 	shell_options.program_name = argv[0];
 	--argc;
@@ -145,13 +127,16 @@ bool ShellOptions::parse(int argc, char** argv)
         ++argv;
     }
 
-    for (auto it = args.begin(); it != args.end(); ++it)
+	std::unordered_map<int, bool> results;
+
+    for (int i = 0; i < args.size(); i++)
     {
+		const auto& arg = args[i];
 		bool found = false;
 
 		for (auto command : shell_options_commands)
 		{
-			if (command.match(*it))
+			if (command.match(arg))
 			{
 				command.command();
 				exit(0);
@@ -160,7 +145,7 @@ bool ShellOptions::parse(int argc, char** argv)
 
 		for (auto flag : shell_options_flags)
 		{
-			if (flag.match(*it))
+			if (flag.match(arg))
 			{
 				found = true;
 				flag.flag = true;
@@ -170,17 +155,18 @@ bool ShellOptions::parse(int argc, char** argv)
 
 		for (auto option : shell_options_strings)
 		{
-			if (option.match(*it))
+			if (option.match(arg))
 			{
-                if (it != args.end() && (*(++it))[0] != '-')
-                {
+				if (i < args.size() - 1 && args[i + 1][0] != '-')
+				{
 					found = true;
-                    option.string = *it;
+					results.insert({ i++ + 1, true });
+                    option.string = args[i];
                 }
                 else
                 {
-					logFatal("%s requires an additional argument", it->c_str());
-                    printf("%s は追加の引数が必要です。\n", it->c_str());
+					logFatal("%s requires an additional argument", arg.c_str());
+                    printf("%s requires an additional argument\n", arg.c_str());
                     print_usage();
                     exit(1);
                 }
@@ -189,29 +175,37 @@ bool ShellOptions::parse(int argc, char** argv)
 
 		if (!found)
 		{
-			if ((*it)[0] != '-')
+			if (arg[0] != '-')
 			{
-				FileSpecifier f(*it);
-				if (f.IsDir())
+				FileSpecifier f(arg);
+				if (f.Exists())
 				{
-					shell_options.directory = *it;
-				}
-				else
-				{
-					shell_options.files.push_back(*it);
+					if (f.IsDir())
+					{
+						shell_options.directory = arg;
+					}
+					else
+					{
+						shell_options.files.push_back(arg);
+					}
+
+					found = true;
 				}
 			}
-			else
+
+			if (!found && !ignore_unknown_args)
 			{
-				logFatal("Unrecognized argument '%s'.", it->c_str());
-				printf("不明な引数'%s'が入力されました。'%s'.\n", it->c_str());
+				logFatal("Unrecognized argument '%s'.", arg.c_str());
+				printf("Unrecognized argument '%s'.\n", arg.c_str());
 				print_usage();
 				exit(1);
 			}
 		}
+
+		results.insert({ i + 1, found });
 	}
 
-	return true;
+	return results;
 }
 
 void print_version()
@@ -226,9 +220,9 @@ void print_usage()
 	std::ostringstream oss;
 
 #ifdef __WIN32__
-	oss << "コマンドラインスイッチ：\n\n";
+	oss << "Command line switches:\n\n";
 #else
-	oss << "\n使用方法：" << shell_options.program_name << " [オプション] [ディレクトリ] [ファイル]\n";
+	oss << "\nUsage: " << shell_options.program_name << " [options] [directory] [file]\n";
 #endif
 
 	for (auto command : shell_options_commands)
@@ -246,17 +240,17 @@ void print_usage()
 		oss << option;
 	}
 
-	oss << "\tディレクトリ" << spaces(help_tab_stop - 12 - 8)
-		<< "データが含まれているディレクトリ\n"
+	oss << "\tdirectory" << spaces(help_tab_stop - strlen("directory") - 8)
+		<< "Directory containing scenario data files\n"
 		
-		<< "\tfile" << spaces(help_tab_stop - 8 - 8)
-		<< "保存されたゲームやフィルムの再生\n"
+		<< "\tfile" << spaces(help_tab_stop - strlen("file") - 8)
+		<< "Saved game to load or film to play\n"
 		<< "\n"
-		<< "この他にも、環境変数「ALEPHONE_DATA」の値を変更することで、\n"
-		<< "読み込ませたいデータディレクトリを指定することができます。\n";
+		<< "You can also use the ALEPHONE_DATA environment variable to specify\n"
+		<< "the data directory.\n";
 
 #ifdef __WIN32__
-	MessageBoxW(NULL, utf8_to_wide(oss.str()).c_str(), L"使用方法", MB_OK | MB_ICONINFORMATION);
+	MessageBoxW(NULL, utf8_to_wide(oss.str()).c_str(), L"Usage", MB_OK | MB_ICONINFORMATION);
 #else
 	std::cout << oss.str();
 #endif

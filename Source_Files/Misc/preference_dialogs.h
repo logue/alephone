@@ -51,6 +51,7 @@ protected:
 	ToggleWidget*		m_blurWidget;
 	ToggleWidget*		m_bumpWidget;
 	ToggleWidget*		m_perspectiveWidget;
+	ToggleWidget*       m_billboardWidget;
 	
 	ToggleWidget*		m_colourTheVoidWidget;
 	ColourPickerWidget*	m_voidColourWidget;
@@ -66,16 +67,12 @@ protected:
 	SelectorWidget* m_textureQualityWidget [OGL_NUMBER_OF_TEXTURE_TYPES];
 	SelectorWidget* m_modelQualityWidget;
 	
-	ToggleWidget*		m_geForceFixWidget;
 	ToggleWidget*		m_useNPOTWidget;
 	ToggleWidget* m_vsyncWidget;
 	SelectSelectorWidget*		m_wallsFilterWidget;
 	SelectSelectorWidget*		m_spritesFilterWidget;
 
 	SelectSelectorWidget* m_nearFiltersWidget[OGL_NUMBER_OF_TEXTURE_TYPES];
-	
-	SelectorWidget* m_textureResolutionWidget [OGL_NUMBER_OF_TEXTURE_TYPES];
-	SelectorWidget* m_textureDepthWidget [OGL_NUMBER_OF_TEXTURE_TYPES];
 };
 
 #endif

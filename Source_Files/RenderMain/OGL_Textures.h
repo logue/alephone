@@ -38,6 +38,19 @@ May 3, 2003 (Br'fin (Jeremy Parsons))
 #include "OGL_Subst_Texture_Def.h"
 #include "scottish_textures.h"
 
+#ifdef HAVE_OPENGL
+
+// Texture mapping
+struct TxtrTypeInfoData
+{
+	GLenum NearFilter;			// OpenGL parameter for near filter (GL_NEAREST, etc.)
+	GLenum FarFilter;			// OpenGL parameter for far filter (GL_NEAREST, etc.)
+	int Resolution;				// 0 is full-sized, 1 is half-sized, 2 is fourth-sized
+	GLenum ColorFormat;			// OpenGL parameter for stored color format (RGBA8, etc.)
+};
+
+extern TxtrTypeInfoData TxtrTypeInfoList[];
+
 // Initialize the texture accounting
 void OGL_StartTextures();
 
@@ -186,7 +199,7 @@ class TextureManager
 	uint32 *GetOGLTexture(uint32 *ColorTable);
 	
 	// This one creates a fake landscape
-	uint32 *GetFakeLandscape();
+	uint32 *GetFakeLandscape() const;
 	
 	// This is for shrinking a texture
 	uint32 *Shrink(uint32 *Buffer);
@@ -211,7 +224,7 @@ public:
 	
 	// The width of a landscape texture will be 2^(-Landscape_AspRatExp) * (the height)
 	short Landscape_AspRatExp;
-	
+
 	// Sets up all the texture stuff:	
 	bool Setup();
 	
@@ -238,6 +251,10 @@ public:
 	float GlowBloomScale() {return (TxtrOptsPtr->GlowBloomScale);}
 	float GlowBloomShift() {return (TxtrOptsPtr->GlowBloomShift);}
 	float LandscapeBloom() {return (TxtrOptsPtr->LandscapeBloom);}
+	int TileRatio() { return (1 << TxtrOptsPtr->TileRatioExp); }
+
+	bool ForceYBillboard() const { return TxtrOptsPtr->Billboard == BillboardType::Y; }
+	bool ForceXYBillboard() const { return TxtrOptsPtr->Billboard == BillboardType::XY; }
 	
 	// Scaling and offset of the current texture;
 	// important for sprites, which will be padded to make them OpenGL-friendly.
@@ -358,5 +375,7 @@ struct OGL_TexturesStats {
 };
 
 extern OGL_TexturesStats gGLTxStats;
+
+#endif
 
 #endif

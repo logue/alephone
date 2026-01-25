@@ -27,6 +27,8 @@
 #include "OGL_Headers.h"
 #include "FileHandler.h"
 
+#ifdef HAVE_OPENGL
+
 class Shader {
 
 friend class XML_ShaderParser;
@@ -47,8 +49,9 @@ public:
 		U_OffsetX,
 		U_OffsetY,
 		U_Pass,
-		U_UseFog,
+		U_FogMix,
 		U_Visibility,
+        U_TransferFadeOut,
 		U_Depth,
 		U_StrictDepthMode,
 		U_Glow,
@@ -63,6 +66,7 @@ public:
 		U_LogicalHeight,
 		U_PixelWidth,
 		U_PixelHeight,
+		U_FogMode,
 		NUMBER_OF_UNIFORM_LOCATIONS
 	};
 
@@ -86,6 +90,9 @@ public:
 		S_Bump,
 		S_BumpBloom,
 		S_Gamma,
+		S_LandscapeSphere,
+		S_LandscapeSphereBloom,
+		S_LandscapeSphereInfravision,
 		NUMBER_OF_SHADER_TYPES
 	};
 private:
@@ -137,5 +144,7 @@ public:
 class InfoTree;
 void parse_mml_opengl_shader(const InfoTree& root);
 void reset_mml_opengl_shader();
+
+#endif
 
 #endif

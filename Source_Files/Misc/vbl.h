@@ -35,9 +35,10 @@ Jul 5, 2000 (Loren Petrich):
 
 /* ------------ prototypes/VBL.C */
 bool setup_for_replay_from_file(FileSpecifier& File, uint32 map_checksum, bool prompt_to_export = false);
-bool setup_replay_from_random_resource(uint32 map_checksum);
+bool setup_replay_from_random_resource();
 
 void start_recording(void);
+void set_recording_saved_wad_data(const std::vector<byte>& saved_wad_data);
 
 bool find_replay_to_use(bool ask_user, FileSpecifier& File);
 
@@ -70,10 +71,5 @@ void write_flags(struct recorded_flag *buffer, int32 count);
 static void debug_stream_of_flags(uint32 action_flag, short player_index);
 static void close_stream_file(void);
 #endif
-
-
-class InfoTree;
-void parse_mml_keyboard(const InfoTree& root);
-void reset_mml_keyboard();
 
 #endif

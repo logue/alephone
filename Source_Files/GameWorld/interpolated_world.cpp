@@ -38,10 +38,11 @@ INTERPOLATED_WORLD.CPP
 extern std::vector<int16_t> polygon_ephemera;
 
 // above this speed, don't interpolate
-static const world_distance speed_limit = WORLD_ONE_HALF;
+static const world_distance default_speed_limit = WORLD_ONE_HALF;
+static const world_distance projectile_speed_limit = WORLD_ONE;
 
 bool world_is_interpolated;
-static uint32_t start_machine_tick;
+static uint64_t start_machine_tick;
 
 extern struct view_data* world_view;
 
@@ -197,9 +198,11 @@ void init_interpolated_world()
 	}
 
 	previous_tick_world_view.origin_polygon_index = NONE;
+	current_tick_world_view.origin_polygon_index = NONE;
 
 	weapon_display_information data;
 	short count = 0;
+	current_tick_weapon_display.clear();
 	while (get_weapon_display_information(&count, &data))
 	{	
 		current_tick_weapon_display.push_back(data);
@@ -261,13 +264,24 @@ void enter_interpolated_world()
 		current_tick_polygon_ephemera[i] = polygon_ephemera[i];
 	}
 
+	// Lua scripts can add sides
+	if (current_tick_sides.size() != MAXIMUM_SIDES_PER_MAP) {
+		for (auto i = current_tick_sides.size();
+			 i < MAXIMUM_SIDES_PER_MAP;
+			 ++i)
+		{
+			current_tick_sides.push_back({map_sides[i].primary_texture.y0});
+		}
+	}
+	
 	previous_tick_sides.assign(current_tick_sides.begin(),
 							   current_tick_sides.end());
+	
 	for (auto i = 0; i < MAXIMUM_SIDES_PER_MAP; ++i)
 	{
 		current_tick_sides[i].y0 = map_sides[i].primary_texture.y0;
 	}
-
+	
 	previous_tick_lines.assign(current_tick_lines.begin(),
 							   current_tick_lines.end());
 	for (auto i = 0; i < MAXIMUM_LINES_PER_MAP; ++i)
@@ -447,12 +461,24 @@ static fixed_angle lerp_fixed_angle(fixed_angle a, fixed_angle b, float t)
 }
 
 
-static bool should_interpolate(world_point3d& prev, world_point3d& next)
+static bool should_interpolate(world_point3d& prev, world_point3d& next,
+	world_distance speed_limit = default_speed_limit)
 {
 	return world_is_interpolated &&
 		guess_distance2d(reinterpret_cast<world_point2d*>(&prev),
 						 reinterpret_cast<world_point2d*>(&next))
 		<= speed_limit;
+}
+
+static world_distance get_object_speed_limit(const TickObjectData* object)
+{
+	switch (GET_OBJECT_OWNER(object))
+	{
+	case _object_is_projectile:
+		return projectile_speed_limit;
+	default:
+		return default_speed_limit;
+	}
 }
 
 extern void add_object_to_polygon_object_list(short, short);
@@ -563,7 +589,8 @@ void update_interpolated_world(float heartbeat_fraction)
 		}
 
 
-		if (!should_interpolate(prev->location, next->location))
+		if (!should_interpolate(prev->location, next->location,
+								get_object_speed_limit(next)))
 		{
 			continue;
 		}
@@ -623,7 +650,8 @@ void update_interpolated_world(float heartbeat_fraction)
 			continue;
 		}
 
-		if (!should_interpolate(prev->location, next->location))
+		if (!should_interpolate(prev->location, next->location) ||
+			std::abs(prev->location.z - next->location.z) > default_speed_limit)
 		{
 			continue;
 		}
@@ -805,13 +833,18 @@ static void interpolate_weapon_display_information(
 	{
 		return;
 	}
+
+	if (index >= previous_tick_weapon_display.size())
+	{
+		return;
+	}
 	
 	static constexpr int _shell_casing_type = 1; // from weapons.cpp
 
 	weapon_display_information* next;
 	weapon_display_information* prev;
 
-	if (data->interpolation_data & 0x3 == _shell_casing_type)
+	if ((data->interpolation_data & 0x3) == _shell_casing_type)
 	{
 		next = &current_tick_weapon_display[index];
 		prev = &previous_tick_weapon_display[index];
@@ -831,11 +864,6 @@ static void interpolate_weapon_display_information(
 	}
 	else
 	{
-		if (index >= previous_tick_weapon_display.size())
-		{
-			return;
-		}
-
 		next = &current_tick_weapon_display[index];
 		prev = &previous_tick_weapon_display[index];
 	}
@@ -846,9 +874,6 @@ static void interpolate_weapon_display_information(
 	{
 		return;
 	}
-	
-	auto dx = next->horizontal_position - prev->horizontal_position;
-	auto dy = next->vertical_position - prev->vertical_position;
 
 	data->vertical_position = lerp(prev->vertical_position,
 								   next->vertical_position,
@@ -862,7 +887,6 @@ static void interpolate_weapon_display_information(
 bool get_interpolated_weapon_display_information(short* count,
 												 weapon_display_information* data)
 {
-	auto heartbeat_fraction = get_heartbeat_fraction();
 	if (*count < current_tick_weapon_display.size())
 	{
 		*data = current_tick_weapon_display[*count];

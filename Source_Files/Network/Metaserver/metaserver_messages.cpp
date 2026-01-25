@@ -27,8 +27,6 @@
 #include "cseries.h"
 
 #include "metaserver_messages.h"
-
-#include "CommunicationsChannel.h"
 #include "Message.h"
 #include "MessageDispatcher.h"
 #include "MessageHandler.h"
@@ -308,8 +306,13 @@ RoomDescription::read(AIStream& inStream)
 	inStream >> m_id
 		>> m_playerCount;
 
-	inStream.read((char*) &(m_address.host), sizeof(m_address.host));
-	inStream.read((char*) &(m_address.port), sizeof(m_address.port));
+	uint16_t port;
+	uint8_t host[4];
+
+	inStream.read(host, sizeof(host));
+	m_address.set_address(host);
+	inStream >> port;
+	m_address.set_port(port);
 
 	inStream >> m_gameCount
 		>> m_type;
@@ -368,6 +371,24 @@ operator <<(ostream& out, const RoomListMessage& message)
 	return out;
 }
 
+void
+RemoteHubRequestMessage::reallyDeflateTo(AOStream& out) const
+{
+	write_string(out, mVersion);
+}
+
+bool
+RemoteHubListMessage::reallyInflateFrom(AIStream& inStream)
+{
+	while (inStream.maxg() > inStream.tellg())
+	{
+		RemoteHubServerDescription server;
+		m_servers.push_back(server);
+		m_servers.back().read(inStream);
+	}
+
+	return true;
+}
 
 
 void
@@ -597,11 +618,9 @@ operator <<(ostream& out, const PlayerListMessage& message)
 void
 CreateGameMessage::reallyDeflateTo(AOStream& thePacket) const
 {
-	uint16 orderGame = 0;
-	
 	thePacket
 		<< m_gamePort
-		<< orderGame
+		<< m_remoteHubId
 		<< m_description;
 }
 

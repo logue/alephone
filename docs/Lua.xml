@@ -131,17 +131,26 @@
 		<p>Only numbers, strings, booleans, and tables (including Aleph One’s built-in userdata tables) can be restored.</p>
       </description>
     </section>
+	<section name="Solo Plugin Write Access" id="write_access">
+	  <description>
+		<p>Plugins that specify solo Lua scripts can also specify write access to features (see the Plugins Guide). Legacy solo Lua plugins are automatically assigned the <code>world</code> write access feature. This means they can modify anything in the game using Lua, but only one <code>world</code> feature script can run at a time, and achievements will be disabled.</p>
+		<p>The write access features <code>music</code>, <code>fog</code>, and <code>overlays</code> can run with other non-<code>world</code> Lua plugins that do not access the same features. For example, only one <code>music</code> plugin can run at a time, but a <code>music</code> plugin and <code>fog</code> plugin could run at the same time.</p>
+		<p>The write access features <code>ephemera</code> and <code>sound</code> can run with any other non-<code>world</code> write access plugins. Remember when writing a <code>ephemera</code> plugin that other plugins (and embedded Lua) can also access ephemera, so manage accordingly.</p>
+		<p>Plugins can specify multiple non-<code>world</code> write access features, and compatibility with other plugins will be determined automatically.</p>
+		<p>All solo Lua scripts can use Players:print and print to the console.</p>
+	  </description>
+	</section>
   </section>
   <triggers id="triggers">
     <description>These are functions scripts can define which Aleph One will call at specific times or events. For example, to regenerate health:
 	<span class="pre">Triggers = {}
-	function Triggers.idle()
-	for p in Players() do 
+function Triggers.idle()
+  for p in Players() do 
     if p.life &lt; 150 and not p.dead then 
-    p.life = p.life + 1
+      p.life = p.life + 1
     end
-	end
-	end
+  end
+end
 	</span>
 	Calling Triggers = {} at the beginning of the script removes the compatibility triggers installed for old Lua scripts, speeding up execution of new scripts.
 	</description>
@@ -341,6 +350,14 @@
 	  <argument name="t" version="20210408"><type>variant</type></argument>
 	  <note>t can be a side, polygon_floor, polygon_ceiling, monster, scenery, polygon; see Polygon:check_collision for info on how to decode. It can also be nil, in the rare case a projectile detonates without hitting something</note>
     </function>
+	<function name="calculate_level_completion_state" version="20240712">
+	  <description>replaces the classic completion state calculation</description>
+	  <return><type>CompletionState</type></return>
+	</function>
+	<function name="monster_kamikazed" version="20240712">
+	  <description>whenever a monster kamikazes</description>
+	  <argument name="monster"><type>monster</type></argument>
+	</function>
   </triggers>
   <section id="using_tables" name="Using Tables">
     <description><p>There are numerous tables (technically, userdata) defined in Aleph One which scripts can use to access objects in the game. A complete list is below.</p>
@@ -451,6 +468,10 @@
       </variable>
     </table>
     <table name="game" singleton="true">
+      <function name="autosave" version="20250302">
+		<description>saves the game without prompting the user, if possible</description>
+		<note>solo only</note>
+      </function>
       <variable name="dead_players_drop_items" version="20150619">
         <description>whether dead players drop items</description>
         <type>boolean</type>
@@ -474,37 +495,34 @@
 		<description>the game kill limit, or 0 if there is none</description>
 		<type>number</type>
       </variable>
-      <variable name="monsters_replenish" version="20111201">
-		<description>whether monsters spawn or not; in a net game, this corresponds to the "Aliens" checkbox</description>
-		<type>boolean</type>
-		<note>this can suppress initial monster placement, if set to false directly when the script is loaded</note>
-      </variable>
-      <variable name="proper_item_accounting" version="20100118">
-		<description>When true, the current item counts on the map are updated properly when Lua deletes map items and changes player inventories. This defaults to false to preserve film playback with older scripts. New scripts that manipulate items should always set this to true.</description>
-		<type>boolean</type>
-      </variable>
-      <variable name="nonlocal_overlays" version="20200830">
-		<description>When false, only the local player’s overlays are used, and only prints to the local player will be displayed. When true, the overlays and prints of whatever player is currently being viewed will apply. This defaults to false for compatibility with scripts that depend on the old behavior.</description>
-		<type>boolean</type>
-      </variable>
-      <variable name="time_remaining" access="read-only">
-		<description>the number of ticks until the game ends, or nil if there is no time limit</description>
-		<type>number</type>
-      </variable>
-      <variable name="scoring_mode">
-		<description>the current scoring mode (if the gametype is "custom")</description>
-		<type>scoring_mode_type</type>
-      </variable>
-      <variable name="over" access="write-only">
-		<description>Use this variable to override the game’s default scoring behavior. If set to false, the game will not end due to a score limit. If set to true, the game ends immediately. If left unset or if set to nil, the game will end if a score limit is reached. (Note that you cannot prevent the game from ending due to a time limit.)</description>
-		<type>boolean</type>
-      </variable>
-      <function name="local_random">
+	  <function name="local_random">
 		<description>returns a random number between 0 and n-1 from Aleph One’s original random number generator</description>
 		<argument name="n"><type>number</type></argument>
 		<return><type>number</type></return>
 		<note>use only for local player effects (see Net Games and Films)</note>
       </function>
+      <variable name="monsters_replenish" version="20111201">
+		<description>whether monsters spawn or not; in a net game, this corresponds to the "Aliens" checkbox</description>
+		<type>boolean</type>
+		<note>this can suppress initial monster placement, if set to false directly when the script is loaded</note>
+      </variable>
+      <variable name="nonlocal_overlays" version="20200830">
+		<description>When false, only the local player’s overlays are used, and only prints to the local player will be displayed. When true, the overlays and prints of whatever player is currently being viewed will apply. This defaults to false for compatibility with scripts that depend on the old behavior.</description>
+		<type>boolean</type>
+      </variable>
+      <variable name="over" access="write-only">
+		<description>Use this variable to override the game’s default scoring behavior. If set to false, the game will not end due to a score limit. If set to true, the game ends immediately. If left unset or if set to nil, the game will end if a score limit is reached. (Note that you cannot prevent the game from ending due to a time limit.)</description>
+		<type>boolean</type>
+      </variable>
+	  <variable name="player" version="20250829">
+		<description>In Tag games, the player who is It. In Kill the Man With the Ball or Rugby games, the player who is carrying the ball</description>
+		<type>Player</type>
+		<note>writing to this will only work in Tag games</note>
+	  </variable>
+      <variable name="proper_item_accounting" version="20100118">
+		<description>When true, the current item counts on the map are updated properly when Lua deletes map items and changes player inventories. This defaults to false to preserve film playback with older scripts. New scripts that manipulate items should always set this to true.</description>
+		<type>boolean</type>
+      </variable>
       <function name="random">
 		<description>returns a random number between 0 and n-1 using a good random number generator</description>
 		<argument name="n"><type>number</type></argument>
@@ -516,6 +534,11 @@
 		<return><type>number</type></return>
 		<note>use only for local player effects (see Net Games and Films)</note>
 	  </function>
+	  <variable name="replay" access="read-only" version="20221126">
+		<description>is the script being run during a film replay</description>
+		<return><type>boolean</type></return>
+		<note>use sparingly; altering the world differently during a replay than during live playback will cause the replay go out of sync</note>
+	  </variable>
       <function name="restore_passed" version="20090909">
 		<description>tries to restore any Player or Game custom fields from before the last level jump; returns true if custom fields were successfully restored</description>
 		<note>if successful, overwrites all existing Player or Game custom fields</note>
@@ -530,6 +553,10 @@
 		<description>saves the game (as if the user had activated a pattern buffer)</description>
 		<note>solo only</note>
       </function>
+	  <variable name="scoring_mode">
+		<description>the current scoring mode (if the gametype is "custom")</description>
+		<type>scoring_mode_type</type>
+      </variable>
       <function name="serialize" version="20200830">
         <description>serializes v into a binary string</description>
         <argument name="v"><type>value</type></argument>
@@ -540,6 +567,11 @@
 		<description>ticks since game started</description>
 		<type>time</type>
       </variable>
+	   <variable name="time_remaining" access="read-only">
+		<description>the number of ticks until the game ends, or nil if there is no time limit</description>
+		<type>number</type>
+      </variable>
+      
       <variable name="type" access="read-only">
 		<description>whether the game is EMFH, KOTH, etc.</description>
 		<type>game_type</type>
@@ -570,6 +602,7 @@
       </variable>
       <variable name="z" access="read-only" version="20111201">
 		<type>WU</type>
+		<note>from floor or ceiling</note>
       </variable>
     </table>
     <table name="item">
@@ -596,9 +629,20 @@
 		<argument name="z"><type>WU</type></argument>
 		<argument name="polygon"><type>polygon</type></argument>
       </function>
+	  <function name="teleport_in" version="20240712">
+		<description>teleports item in</description>
+		<note>can fail silently if there are not enough effects slots</note>
+	  </function>
+	  <function name="teleport_out" version="20240712">
+		<description>teleports item out</description>
+		<note>can fail silently if there are not enough effects slots</note>
+	  </function>
       <variable name="type" access="read-only">
 		<description>type of item</description>
 		<type>item_type</type>
+      </variable>
+      <variable name="visible" version="20240712">
+    <type>boolean</type>
       </variable>
       <variable name="x" access="read-only">
 		<type>WU</type>
@@ -639,6 +683,7 @@
       </variable>
       <variable name="z" access="read-only" version="20111201">
 		<type>WU</type>
+		<note>from floor or ceiling</note>
       </variable>
     </table>
 
@@ -646,6 +691,7 @@
       <function name="calculate_completion_state" version="20081213">
 		<description>returns whether level is finished, unfinished, or failed</description>
 		<return><type>completion_state</type></return>
+		<note>does not call the trigger, so it can be used in the trigger</note>
       </function>
       <variable name="completed" access="read-only" version="20111201">
 		<description>check this in Triggers.cleanup() to determine whether the player(s) teleported out</description>
@@ -688,6 +734,20 @@
 		<variable name="depth">
 		  <description>fog depth in WU</description>
 		  <type>number</type>
+		</variable>
+		<variable name="landscape_mix" version="20231125">
+		  <description>amount of fog to mix into landscape</description>
+		  <type>number</type>
+		  <note>values range from 0.0 to 1.0</note>
+		</variable>
+		<variable name="mode" version="20231125">
+		  <description>linear, exp, or exp2</description>
+		  <type>fog_mode</type>
+		</variable>
+		<variable name="start" version="20231125">
+		  <description>fog start in WU</description>
+		  <type>number</type>
+		  <note>only applies to linear fog</note>
 		</variable>
       </subtable>
       <variable name="low_gravity" access="read-only">
@@ -1082,31 +1142,35 @@
       </variable>
       <variable name="z" access="read-only" version="20111201">
 		<type>WU</type>
+		<note>from floor or ceiling</note>
       </variable>
     </table>
-    <table name="music" singleton="true">
-      <function name="clear">
-		<description>clears the level playlist</description>
-      </function>
-      <function name="fade">
-		<description>fades out the currently playing track and clears the playlist</description>
-		<argument name="duration"><type>seconds</type></argument>
-      </function>
-      <function name="play">
-		<description>appends all of the specified tracks to the end of the playlist</description>
-		<argument name="track1"><type>string</type></argument>
-		<argument name="track2" required="false"><type>string</type></argument>
-		<argument name="..." required="false"><type>string</type></argument>
-      </function>
-      <function name="stop">
-		<description>stops level music and clears the playlist</description>
-      </function>
-      <function name="valid">
-		<description>for every track passed, return true if it exists and is playable and false otherwise</description>
-		<argument name="track1"><type>string</type></argument>
-		<argument name="track2" required="false"><type>string</type></argument>
-		<argument name="..." required="false"><type>string</type></argument>
-      </function>
+    <table name="music">
+	  <function name="play" version="20231125">
+		<description>plays the music</description>
+		<note>if the music was stopped, restarts it</note>
+	  </function>
+	  <function name="stop" version="20231125">
+		<description>stops the music</description>
+	  </function>
+	  <function name="fade" version="20231125">
+		<description>fades the music</description>
+		<argument name="volume"><type>number</type></argument>
+		<argument name="duration" required="false"><type>seconds</type></argument>
+		<argument name="stop_after_fade" required="false"><type>boolean</type></argument>
+		<note>it will fade in until volume is reached. volume is decimal [0 - 1]</note>
+		<note>duration unit is seconds and is 1 if not specified</note>
+		<note>stop_after_fade is disabled by default, if set to true if the volume reaches 0 while fading the music will automatically stop</note>
+	  </function>
+	  <variable name="volume" version="20231125">
+		<description>the volume of the music</description>
+		<type>number</type>
+		<note>volume is decimal [0 - 1]</note>
+	  </variable>
+	  <variable name="active" access="read-only" version="20231125">
+		<description>returns true if the music is still playing</description>
+		<type>boolean</type>
+	  </variable>
     </table>
     <table name="platform">
 	  <variable name="activates_adjacent_platforms_at_each_level" version="20210408">
@@ -1218,6 +1282,22 @@
 		<type>boolean</type>
 		<note>this flag doesn’t actually do anything</note>
       </variable>
+      <variable name="maximum_ceiling_height" access="read-only" version="20220115">
+    <description>greatest height a platform's ceiling can ever rise</description>
+    <type>WU</type>
+      </variable>
+      <variable name="maximum_floor_height" access="read-only" version="20220115">
+    <description>greatest height a platform's floor can ever rise</description>
+    <type>WU</type>
+      </variable>
+      <variable name="minimum_ceiling_height" access="read-only" version="20220115">
+    <description>least height a platform's ceiling must rise</description>
+    <type>WU</type>
+      </variable>
+      <variable name="minimum_floor_height" access="read-only" version="20220115">
+    <description>least height a platform's floor must rise</description>
+    <type>WU</type>
+      </variable>
       <variable name="monster_controllable">
 		<description>whether platform can be controlled by monsters</description>
 		<type>boolean</type>
@@ -1243,6 +1323,10 @@
 		<description>platform speed</description>
 		<type>speed</type>
       </variable>
+	  <variable name="tag" version="20221126">
+		<description>tag of platform</description>
+		<type>tag</type>
+	  </variable>
       <variable name="type" version="20100118">
 		<description>type of this platform</description>
 		<type>platform_type</type>
@@ -1269,6 +1353,10 @@
 		  <type>boolean</type>
 		  <note>latched</note>
 		</variable>
+		<variable name="aux_trigger" version="20231125">
+		  <description>formerly microphone button; now dedicated to Lua scripts</description>
+		  <type>boolean</type>
+		</variable>
 		<variable name="cycle_weapons_forward">
 		  <description>switches to next weapon</description>
 		  <type>boolean</type>
@@ -1282,11 +1370,6 @@
 		<variable name="left_trigger">
 		  <description>fires primary trigger</description>
 		  <type>boolean</type>
-		</variable>
-		<variable name="microphone_button">
-		  <description>activates the net mic</description>
-		  <type>boolean</type>
-		  <note>can not be set to true; can be set to false</note>
 		</variable>
 		<variable name="right_trigger">
 		  <description>fires secondary trigger</description>
@@ -1421,17 +1504,23 @@
       <function name="find_action_key_target" return="variant">
 		<description>if player is in range of a platform or control panel, returns a platform or side; otherwise returns nil</description>
 		<return><type>variant</type></return>
+		
 		<note>you can check the type of the return with is_polygon() and is_side()</note>
       </function>
       <function name="find_target" return="variant">
-		<description>returns t, x, y, z, polygon, where t is the side, polygon_floor, polygon_ceiling, monster, scenery, or polygon (if the target is the surface of a liquid) the player is looking at; and x, y, z, and polygon are the point the player is looking at</description>
+		<description>returns t, x, y, z, polygon, where t is the side, polygon_floor, polygon_ceiling, monster, scenery, or polygon (if the target is the surface of a liquid, and penetrate_media is false) the player is looking at; and x, y, z, and polygon are the point the player is looking at</description>
+		<argument name="penetrate_media" required="false" version="20220115"><type>boolean</type></argument>
 		<return><type>variant</type></return>
 		<return><type>WU</type></return>
 		<return><type>WU</type></return>
 		<return><type>WU</type></return>
 		<return><type>polygon</type></return>
 		<note>you can check the type of t with is_side(), is_polygon_floor(), is_polygon_ceiling(), is_monster(), is_scenery(), and is_polygon()</note>
+		<note>this function will not work under liquid unless penetrate_media is true</note>
       </function>
+	  <variable name="has_map_open" access="read-only" version="20220115">
+		<description>whether player has overhead map open</description>
+	  </variable>
       <variable name="head_below_media" access="read-only">
 		<description>whether player is completely below liquid</description>
 		<type>boolean</type>
@@ -1582,6 +1671,9 @@
 		<description>teleports player to level (of course, all the other players will also go to that level)</description>
 		<argument name="level"><type>number</type></argument>
       </function>
+	  <variable name="teleporting" access="read-only" version="20220115">
+		<description>whether player is teleporting</description>
+	  </variable>
       <subtable name="texture_palette">
 		<description>displays a texture palette instead of the classic HUD</description>
 		<variable name="highlight" access="local-player">
@@ -1651,12 +1743,11 @@
 		<function name="select">
 		  <description>attempts to force player to ready weapon</description>
 		</function>
+		<variable name="type" access="read-only">
+		  <description>type of this weapon</description>
+		  <type>weapon_type</type>
+		</variable>
       </subtable-accessor>
-      <variable name="weapons.current" access="read-only">
-		<description>weapon the player is currently wielding</description>
-		<type>player_weapon</type>
-		<note>can be nil</note>
-      </variable>
       <variable name="x" access="read-only">
 		<type>WU</type>
       </variable>
@@ -1696,6 +1787,7 @@
       </variable>
       <variable name="z" access="read-only" version="20111201">
 		<type>WU</type>
+		<note>from floor or ceiling</note>
       </variable>
     </table>
     <table name="polygon">
@@ -1950,10 +2042,22 @@
 		<description>whether this scenery is solid</description>
 		<type>boolean</type>
       </variable>
+	  <function name="teleport_in" version="20240712">
+		<description>teleports scenery in</description>
+		<note>can fail silently if there are not enough effects slots</note>
+	  </function>
+	  <function name="teleport_out" version="20240712">
+		<description>teleports scenery out</description>
+		<note>can fail silently if there are not enough effects slots</note>
+	  </function>
       <variable name="type" access="read-only">
 		<description>type of scenery</description>
 		<type>scenery_type</type>
       </variable>
+	  <variable name="visible" version="20240712">
+		<description>whether this scenery is visible</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="x" access="read-only">
 		<type>WU</type>
       </variable>
@@ -2012,9 +2116,9 @@
 		  <type>collection</type>
 		</variable>
 		<variable name="empty">
-		  <description>whether transparent side is empty</description>
+		  <description>whether side is empty</description>
 		  <type>boolean</type>
-		  <note>transparent side only</note>
+		  <note version="Git">transparent sides only in earlier versions</note>
 		  <note>setting empty to false is a no-op; set collection and texture_index instead</note>
 		</variable>
 		<variable name="light">
@@ -2093,6 +2197,7 @@
       </variable>
       <variable name="z" access="read-only" version="20111201">
 		<type>WU</type>
+		<note>from floor or ceiling</note>
       </variable>
     </table>
     <table name="tag">
@@ -2289,7 +2394,46 @@
 		<description>iterates through all monster starting locations in the level</description>
       </call>
     </accessor>
-    <accessor name="Music" contains="music"/>
+    <accessor name="Music" contains="music">
+      <length>
+		<description>maximum number of music channels active simultaneously</description>
+      </length>
+      <index/>
+      <call>
+		<description>iterates through all the music channels</description>
+      </call>
+	  <function name="new" version="20231125">
+		<description>returns a new music channel</description>
+		<argument name="track"><type>string</type></argument>
+		<argument name="volume" required="false"><type>number</type></argument>
+		<argument name="loop" required="false"><type>boolean</type></argument>
+		<return><type>music</type></return>
+		<note>volume is decimal [0 - 1] and is 1 if not specified</note>
+		<note>loop is enabled by default</note>
+	  </function>
+	  <function name="clear">
+		<description>clears the level playlist</description>
+      </function>
+      <function name="fade">
+		<description>fades out the currently playing track and clears the playlist</description>
+		<argument name="duration"><type>seconds</type></argument>
+      </function>
+      <function name="play">
+		<description>appends all of the specified tracks to the end of the playlist</description>
+		<argument name="track1"><type>string</type></argument>
+		<argument name="track2" required="false"><type>string</type></argument>
+		<argument name="..." required="false"><type>string</type></argument>
+      </function>
+      <function name="stop">
+		<description>stops level music and clears the playlist</description>
+      </function>
+      <function name="valid">
+		<description>for every track passed, return true if it exists and is playable and false otherwise</description>
+		<argument name="track1"><type>string</type></argument>
+		<argument name="track2" required="false"><type>string</type></argument>
+		<argument name="..." required="false"><type>string</type></argument>
+      </function>
+    </accessor>
     <accessor name="Platforms" contains="platform">
       <length>
 		<description>number of platforms on the level</description>
@@ -2685,6 +2829,13 @@
 		<mnemonic name="tint jjaro"/>
       </mnemonics>
     </enum>
+	<enum name="fog_mode">
+	  <mnemonics>
+		<mnemonic name="linear"/>
+		<mnemonic name="exp"/>
+		<mnemonic name="exp2"/>
+	  </mnemonics>
+	</enum>
     <enum name="game_type">
       <mnemonics>
 		<mnemonic name="kill monsters"/>
@@ -2862,14 +3013,40 @@
       </mnemonics>
     </enum>
     <enum name="monster_type">
+	  <variable name="alien" version="20220115">
+		<description>moves slower on slower levels, etc.</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="attacks_immediately" version="20120128">
 		<description>monster will try an attack immediately</description>
 		<type>boolean</type>
       </variable>
+	  <variable name="berserker" version="20220115">
+		<description>below 1/4 vitality, this monster goes berserk</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="can_die_in_flames" version="20220115">
+		<description>uses humanoid dying shape</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="can_teleport_under_media" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="cannot_attack" version="20220115">
+		<description>monster has no weapons and cannot attack (runs constantly to safety)</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="cannot_be_dropped" version="20120128">
 		<description>monster cannot be skipped during placement</description>
 		<type>boolean</type>
       </variable>
+	  <variable name="cannot_fire_backward" version="20220115">
+		<description>monster can’t turn more than 135 degrees</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="chooses_weapons_randomly" version="20220115">
+		<type>boolean</type>
+	  </variable>
       <variable name="class">
 		<description>class of monster type</description>
 		<type>monster_class</type>
@@ -2887,32 +3064,66 @@
 		<argument name="monster_class"><type>monster_class</type></argument>
 		<type>boolean</type>
       </function-variable>
+	  <variable name="enlarged" version="20220115">
+		<description>monster is 1.25 times normal height</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="fires_symmetrically" version="20220115">
+		<description>fires at +/- dy, simultaneously</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="flies" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="floats" version="20220115">
+		<description>exclusive from flies; forces the monster to take delta-h gradually</description>
+		<type>boolean</type>
+	  </variable>
       <function-variable name="friends" classname="monster_type_friends">
 		<description>whether monster class is a friend</description>
 		<argument name="monster_class"><type>monster_class</type></argument>
 		<type>boolean</type>
       </function-variable>
+	  <variable name="has_delayed_hard_death" version="20220115">
+		<description>always dies soft, then switches to hard</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="has_nuclear_hard_death" version="20220115">
+		<description>player’s screen whites out and slowly recovers</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="impact_effect" access="read-only">
 		<description>type of effect generated when monster gets hit by a bleeding projectile</description>
 		<type>effect_type</type>
-      </variable>
-      <function-variable name="immunities" classname="monster_type_immunities">
-		<description>whether monster type is immune to damage type</description>
-		<argument name="damage_type"><type>damage_type</type></argument>
-		<type>boolean</type>
-      </function-variable>
-      <variable name="initial_count" version="20111201">
-		<description>how many monsters of this type are placed in the level during initial placement</description>
-		<type>number</type>
       </variable>
       <variable name="height" access="read-only">
 		<description>height of monster</description>
 		<type>WU</type>
       </variable>
+	  <function-variable name="immunities" classname="monster_type_immunities">
+		<description>whether monster type is immune to damage type</description>
+		<argument name="damage_type"><type>damage_type</type></argument>
+		<type>boolean</type>
+	  </function-variable>
+	  <variable name="impact_effect" access="read-only">
+		<type>effect</type>
+	  </variable>
+      <variable name="initial_count" version="20111201">
+		<description>how many monsters of this type are placed in the level during initial placement</description>
+		<type>number</type>
+      </variable>
+	  <variable name="invisible" version="20220115">
+		<description>this monster uses _xfer_invisibility</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="item">
 		<description>type of item the monster drops when it dies</description>
 		<type>item_type</type>
       </variable>
+	  <variable name="kamikaze" version="20220115">
+		<description>monster does shrapnel damage and will suicide if close enough to target</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="major" version="20120128">
 		<description>monster is major</description>
 		<type>boolean</type>
@@ -2920,6 +3131,10 @@
       <variable name="maximum_count" version="20111201">
 		<description>maximum number of this type of monster in the level</description>
 		<type>number</type>
+      </variable>
+      <variable name="melee_impact_effect" access="read-only">
+		<description>type of effect generated when monster gets hit by a melee projectile</description>
+		<type>effect_type</type>
       </variable>
       <variable name="minimum_count" version="20111201">
 		<description>minimum number of this type of monster in the level</description>
@@ -2929,10 +3144,22 @@
 		<description>monster is minor</description>
 		<type>boolean</type>
       </variable>
-      <variable name="melee_impact_effect" access="read-only">
-		<description>type of effect generated when monster gets hit by a melee projectile</description>
-		<type>effect_type</type>
-      </variable>
+	  <variable name="not_afraid_of_goo" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="not_afraid_of_lava" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="not_afraid_of_sewage" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="not_afraid_of_water" version="20220115">
+		<type>boolean</type>
+	  </variable>
+	  <variable name="omniscient" version="20220115">
+		<description>ignores line-of-sight during find_closest_appropriate_target()</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="radius" access="read-only">
 		<description>radius of monster</description>
 		<type>WU</type>
@@ -2945,12 +3172,28 @@
 		<description>whether monsters of this type spawn in random locations</description>
 		<type>boolean</type>
       </variable>
+	  <variable name="subtly_invisible" version="20220115">
+		<description>this monster uses _xfer_subtle_invisibility</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="tiny" version="20220115">
+		<description>0.25-size normal height</description>
+		<type>boolean</type>
+	  </variable>
       <variable name="total_available" version="20111201">
 		<description>total number of monsters of this type that can be spawned in this level</description>
 		<type>number</type>
 		<note>-1 means infinite monsters are available</note>
 		<note>setting this to anything but -1 will only be effective if changed immediately when the script runs, before monster placement is done</note>
       </variable>
+	  <variable name="uses_sniper_ledges" version="20220115">
+		<description>sit on ledges and hurl shit at the player (ranged attack monsters only</description>
+		<type>boolean</type>
+	  </variable>
+	  <variable name="vitality" version="20220115" access="read-only">
+		<description>monster’s initial vitality</description>
+		<type>number</type>
+	  </variable>
       <function-variable name="weaknesses" classname="monster_type_weaknesses">
 		<description>whether monster type has a weakness to damage type</description>
 		<argument name="damage type"><type>damage_type</type></argument>
@@ -3437,6 +3680,12 @@
 		<mnemonic name="fast vertical slide"/>
 		<mnemonic name="wander"/>
 		<mnemonic name="fast wander"/>
+		<mnemonic name="reverse horizontal slide" version="20231125"/>
+		<mnemonic name="reverse fast horizontal slide" version="20231125"/>
+		<mnemonic name="reverse vertical slide" version="20231125"/>
+		<mnemonic name="reverse fast vertical slide" version="20231125"/>
+		<mnemonic name="2x" version="20231125"/>
+		<mnemonic name="4x" version="20231125"/>
       </mnemonics>
     </enum>
     <enum name="weapon_type">
@@ -3463,6 +3712,7 @@
     <enum-accessor name="EffectTypes" contains="effect_type" nice-name="Effects"/>
 	<enum-accessor name="EphemeraQualities" contains="ephemera_quality" nice-name="Ephemera Quality"/>
     <enum-accessor name="FadeTypes" contains="fade_type" nice-name="Faders"/>
+	<enum-accessor name="FogModes" contains="fog_mode" nice-name="Fog Modes"/>
     <enum-accessor name="GameTypes" contains="game_type" nice-name="Game Types"/>
     <enum-accessor name="ItemKinds" contains="item_kind" nice-name="Item Kinds"/>
     <enum-accessor name="ItemTypes" contains="item_type" nice-name="Item Types"/>

@@ -22,6 +22,7 @@
 */
 
 #include "ConnectPool.h"
+#include "network.h"
 #include <utility>
 
 
@@ -68,15 +69,12 @@ int NonblockingConnect::Thread()
 {
 	if (!m_ipSpecified)
 	{
-		if (SDLNet_ResolveHost(&m_ip, const_cast<char*>(m_address.c_str()), m_port) < 0)
-		{
-			m_status = ResolutionFailed;
-			return 1;
-		}
-
+		auto address = NetGetNetworkInterface()->resolve_address(m_address.c_str(), m_port);
+		if (!address.has_value()) return 1;
+		m_ip = address.value();
 	}
 
-	std::unique_ptr<CommunicationsChannel> channel(new CommunicationsChannel);
+	auto channel = std::make_unique<CommunicationsChannel>();
 
 	channel->connect(m_ip);
 	if (channel->isConnected())

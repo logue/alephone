@@ -1,20 +1,20 @@
+
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = Source_Files tools data
+SUBDIRS = Source_Files Steam tools data
 
 # Requires automake 1.5
-AUTOMAKE_OPTIONS = 1.5 foreign dist-xz no-dist-gzip
+AUTOMAKE_OPTIONS = 1.5 foreign dist-bzip2 no-dist-gzip
 
-EXTRA_DIST = INSTALL.MacOSX INSTALL.Unix INSTALL.Windows	\
-  docs/MML.html docs/Lua.html docs/Lua_HUD.html		\
-  Resources/Windows/alephone.ico				\
+EXTRA_DIST = docs/MML.html docs/Lua.html docs/Lua_HUD.html		\
+  docs/README.txt Resources/Windows/alephone.ico		        \
   Resources/Windows/alephone.rc						\
   Resources/Windows/marathon.rc Resources/Windows/marathon.ico          \
   Resources/Windows/marathon2.rc Resources/Windows/marathon2.ico        \
   Resources/Windows/marathon-infinity.rc                                \
   Resources/Windows/marathon-infinity.ico                               \
   PBProjects/AlephOne.xcodeproj/project.pbxproj				\
-  PBProjects/English.lproj/InfoPlist.strings PBProjects/FilmIcon.icns	\
+  PBProjects/en.lproj/InfoPlist.strings PBProjects/FilmIcon.icns	\
   PBProjects/ImagesIcon.icns PBProjects/MapIcon.icns			\
   PBProjects/MMLIcon.icns PBProjects/MusakIcon.icns			\
   PBProjects/PhysIcon.icns			                        \
@@ -22,28 +22,38 @@ EXTRA_DIST = INSTALL.MacOSX INSTALL.Unix INSTALL.Windows	\
   PBProjects/SoundsIcon.icns		\
   PBProjects/AlephOne.icns				\
   PBProjects/config.h PBProjects/confpaths.h	\
-  data/AlephSansMono-Bold.ttf \
-  data/Japanese_Font/AlephJPSansMonoLicense.txt data/Japanese_Font/AlephJPSansMono-Bold.ttf		\
-  data/Japanese_Font/mplus-license.txt data/Japanese_Font/SourceHanMono-Lisence.txt		\
-  docs/alephone.6 examples/lua/Cheats.lua THANKS			\
+  data/AlephSansMono-Bold.ttf data/AlephSansMonoLicense.txt		\
+  data/ProFontAO.ttf data/ProFontAOLicense.txt		\
+  docs/alephone.6 examples/lua/Cheats.lua THANKS README.md		\
   data/powered-by-alephone.svg						\
   PBProjects/Info-AlephOne-Xcode4.plist\
 	PBProjects/AppStore/Marathon/Info.plist \
 	PBProjects/AppStore/Marathon/Marathon.icns \
-	PBProjects/AppStore/Marathon/English.lproj/InfoPlist.strings
+	PBProjects/AppStore/Marathon/en.lproj/InfoPlist.strings \
+  flatpak/alephone.desktop flatpak/alephone.png flatpak/marathon2.desktop	  \
+  flatpak/marathon2.png flatpak/marathon.desktop							  \
+  flatpak/marathon-infinity.desktop flatpak/marathon-infinity.png			  \
+  flatpak/marathon.png flatpak/org.bungie.source.AlephOne.yml				  \
+  flatpak/org.bungie.source.Marathon2.yml									  \
+  flatpak/org.bungie.source.MarathonInfinity.yml							  \
+  flatpak/org.bungie.source.Marathon.yml flatpak/run-nodata.sh flatpak/run.sh \
+  flatpak/shared/alephone.yml flatpak/shared/boost.yml flatpak/shared/glu.yml \
+  flatpak/shared/miniupnpc.yml flatpak/shared/zzip.yml						  \
+  flatpak/shared/asio.yml flatpak/shared/ebml.yml flatpak/shared/matroska.yml \
+  flatpak/shared/libyuv.yml
 
 man_MANS = docs/alephone.6
 
 dist-hook: AlephOne.spec
 	cp AlephOne.spec $(distdir)
-	mkdir -p "$(distdir)/PBProjects/AppStore/Marathon 2/English.lproj"
+	mkdir -p "$(distdir)/PBProjects/AppStore/Marathon 2/en.lproj"
 	cp "$(srcdir)/PBProjects/AppStore/Marathon 2/Info.plist" "$(distdir)/PBProjects/AppStore/Marathon 2/"
 	cp "$(srcdir)/PBProjects/AppStore/Marathon 2/Marathon 2.icns" "$(distdir)/PBProjects/AppStore/Marathon 2/"
-	cp "$(srcdir)/PBProjects/AppStore/Marathon 2/English.lproj/InfoPlist.strings" "$(distdir)/PBProjects/AppStore/Marathon 2/English.lproj/"
-	mkdir -p "$(distdir)/PBProjects/AppStore/Marathon Infinity/English.lproj"
+	cp "$(srcdir)/PBProjects/AppStore/Marathon 2/en.lproj/InfoPlist.strings" "$(distdir)/PBProjects/AppStore/Marathon 2/en.lproj/"
+	mkdir -p "$(distdir)/PBProjects/AppStore/Marathon Infinity/en.lproj"
 	cp "$(srcdir)/PBProjects/AppStore/Marathon Infinity/Info.plist" "$(distdir)/PBProjects/AppStore/Marathon Infinity/"
 	cp "$(srcdir)/PBProjects/AppStore/Marathon Infinity/Marathon Infinity.icns" "$(distdir)/PBProjects/AppStore/Marathon Infinity/"
-	cp "$(srcdir)/PBProjects/AppStore/Marathon Infinity/English.lproj/InfoPlist.strings" "$(distdir)/PBProjects/AppStore/Marathon Infinity/English.lproj/"
+	cp "$(srcdir)/PBProjects/AppStore/Marathon Infinity/en.lproj/InfoPlist.strings" "$(distdir)/PBProjects/AppStore/Marathon Infinity/en.lproj/"
 
 
 release: dist windist
@@ -71,8 +81,7 @@ m1-winup: $(M1_WINUP)
 m2-winup: $(M2_WINUP)
 inf-winup: $(MINF_WINUP)
 
-# windist: winzip m1-winzip m2-winzip inf-winzip m1-winup m2-winup inf-winup
-windist: winzip
+windist: winzip m1-winzip m2-winzip inf-winzip m1-winup m2-winup inf-winup
 
 # Windows directories
 
@@ -83,12 +92,9 @@ tar -c --exclude='.svn' --exclude='.git' --exclude='Makefile' --exclude='Makefil
 endef
 
 define windist_common
-cp $(srcdir)/THANKS "$(1)/THANKS.txt"
-cp $(srcdir)/COPYING "$(1)/COPYING.txt"
-cp $(srcdir)/README "$(1)/README.txt"
-todos -u "$(1)/THANKS.txt"
-todos -u "$(1)/COPYING.txt"
-todos -u "$(1)/README.txt"
+unix2dos -n $(srcdir)/THANKS "$(1)/THANKS.txt"
+unix2dos -n $(srcdir)/COPYING "$(1)/COPYING.txt"
+unix2dos -n $(srcdir)/README "$(1)/README.txt"
 mkdir "$(1)/docs"
 cp $(srcdir)/docs/Lua.html "$(1)/docs/Lua.html"
 cp $(srcdir)/docs/Lua_HUD.html "$(1)/docs/Lua_HUD.html"
@@ -96,8 +102,7 @@ cp $(srcdir)/docs/MML.html "$(1)/docs/MML.html"
 mkdir "$(1)/Extras"
 cp $(srcdir)/data/Software_Transparent_Liquids.mml "$(1)/Extras"
 cp $(srcdir)/data/Carnage_Messages.mml "$(1)/Extras"
-cp $(srcdir)/examples/lua/Cheats.lua "$(1)/Extras/Cheats.lua"
-todos -u "$(1)/Extras/Cheats.lua"
+unix2dos -n $(srcdir)/examples/lua/Cheats.lua "$(1)/Extras/Cheats.lua"
 $(call cp_no_svn,$(srcdir)/Resources/Library Licenses,$(1)/docs/Library Licenses)
 endef
 
@@ -108,9 +113,7 @@ $(WINZIP): Source_Files/AlephOne.exe
 	mkdir "$(WINDISTDIR)"
 	$(call windist_common,$(WINDISTDIR))
 	cp Source_Files/AlephOne.exe $(WINDISTDIR)/
-	strip "$(WINDISTDIR)/AlephOne.exe"
-	cp $(srcdir)/INSTALL.Windows "$(WINDISTDIR)/docs/INSTALL.Windows.txt"
-	todos -u "$(WINDISTDIR)/docs/INSTALL.Windows.txt"
+	unix2dos -n $(srcdir)/INSTALL.Windows "$(WINDISTDIR)/docs/INSTALL.Windows.txt"
 	cp $(srcdir)/data/Transparent_Sprites.mml $(WINDISTDIR)/Extras
 	cp $(srcdir)/data/Transparent_Liquids.mml $(WINDISTDIR)/Extras
 	$(call cp_no_svn,$(srcdir)/data/default_theme,$(WINDISTDIR)/Plugins/Default_Theme)
@@ -123,7 +126,6 @@ $(M1_WINUP): Source_Files/Marathon.exe
 	mkdir "$(WINUPDIR_M1)"
 	$(call windist_common,$(WINUPDIR_M1))
 	cp Source_Files/Marathon.exe "$(WINUPDIR_M1)/Marathon.exe"
-	strip "$(WINUPDIR_M1)/Marathon.exe"
 	rm -f $(M1_WINUP)
 	zip -r $(M1_WINUP) "$(WINUPDIR_M1)"
 	rm -rf "$(WINUPDIR_M1)"
@@ -143,7 +145,6 @@ $(M2_WINUP): Source_Files/Marathon2.exe
 	mkdir "$(WINUPDIR_M2)"
 	$(call windist_common,$(WINUPDIR_M2))
 	cp Source_Files/Marathon2.exe "$(WINUPDIR_M2)/Marathon 2.exe"
-	strip "$(WINUPDIR_M2)/Marathon 2.exe"
 	rm -f $(M2_WINUP)
 	zip -r $(M2_WINUP) "$(WINUPDIR_M2)"
 	rm -rf "$(WINUPDIR_M2)"
@@ -154,7 +155,6 @@ $(M2_WINZIP): Source_Files/Marathon2.exe
 	$(call windist_common,$(WINDISTDIR_M2))
 	$(call cp_no_svn,$(srcdir)/data/Scenarios/Marathon 2,$(WINDISTDIR_M2))
 	cp Source_Files/Marathon2.exe "$(WINDISTDIR_M2)/Marathon 2.exe"
-	strip "$(WINDISTDIR_M2)/Marathon 2.exe"
 	rm -f $(M2_WINZIP)
 	zip -r $(M2_WINZIP) "$(WINDISTDIR_M2)"
 	rm -rf "$(WINDISTDIR_M2)"
@@ -165,7 +165,6 @@ $(MINF_WINUP): Source_Files/MarathonInfinity.exe
 	mkdir "$(WINUPDIR_MINF)"
 	$(call windist_common,$(WINUPDIR_MINF))
 	cp Source_Files/MarathonInfinity.exe "$(WINUPDIR_MINF)/Marathon Infinity.exe"
-	strip "$(WINUPDIR_MINF)/Marathon Infinity.exe"
 	rm -f $(MINF_WINUP)
 	zip -r $(MINF_WINUP) "$(WINUPDIR_MINF)"
 	rm -rf "$(WINUPDIR_MINF)"
@@ -176,7 +175,6 @@ $(MINF_WINZIP): Source_Files/Marathon2.exe
 	$(call windist_common,$(WINDISTDIR_MINF))
 	$(call cp_no_svn,$(srcdir)/data/Scenarios/Marathon Infinity,$(WINDISTDIR_MINF))
 	cp Source_Files/MarathonInfinity.exe "$(WINDISTDIR_MINF)/Marathon Infinity.exe"
-	strip "$(WINDISTDIR_MINF)/Marathon Infinity.exe"
 	rm -f $(MINF_WINZIP)
 	zip -r $(MINF_WINZIP) "$(WINDISTDIR_MINF)"
 	rm -rf "$(WINDISTDIR_MINF)"
@@ -215,5 +213,33 @@ $(MINF_DATAZIP):
 	rm -f $(MINF_DATAZIP)
 	zip -r $(MINF_DATAZIP) "$(DATADISTDIR_MINF)"
 	rm -rf "$(DATADISTDIR_MINF)"
+
+# flatpaks
+M1_FLATPAK=Marathon-$(VERSION).flatpak
+m1-flatpak: $(M1_FLATPAK)
+M2_FLATPAK=Marathon2-$(VERSION).flatpak
+m2-flatpak: $(M2_FLATPAK)
+MINF_FLATPAK=MarathonInfinity-$(VERSION).flatpak
+minf-flatpak: $(MINF_FLATPAK)
+A1_FLATPAK=AlephOne-$(VERSION).flatpak
+a1-flatpak: $(A1_FLATPAK)
+
+flatpaks: m1-flatpak m2-flatpak minf-flatpak a1-flatpak
+
+$(M1_FLATPAK):
+	flatpak-builder --repo=flatpak/repo --force-clean flatpak/Marathon.build $(srcdir)/flatpak/org.bungie.source.Marathon.yml
+	flatpak build-bundle flatpak/repo $@ org.bungie.source.Marathon
+
+$(M2_FLATPAK):
+	flatpak-builder --repo=flatpak/repo --force-clean flatpak/Marathon2.build $(srcdir)/flatpak/org.bungie.source.Marathon2.yml
+	flatpak build-bundle flatpak/repo $@ org.bungie.source.Marathon2
+
+$(MINF_FLATPAK):
+	flatpak-builder --repo=flatpak/repo --force-clean flatpak/MarathonInfinity.build $(srcdir)/flatpak/org.bungie.source.MarathonInfinity.yml
+	flatpak build-bundle flatpak/repo $@ org.bungie.source.MarathonInfinity
+
+$(A1_FLATPAK):
+	flatpak-builder --repo=flatpak/repo --force-clean flatpak/AlephOne.build $(srcdir)/flatpak/org.bungie.source.AlephOne.yml
+	flatpak build-bundle flatpak/repo $@ org.bungie.source.AlephOne
 
 FORCE:

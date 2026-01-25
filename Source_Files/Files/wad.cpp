@@ -35,11 +35,11 @@
 				passed in.
 
 Future Options:
-ðÊReentrancy
-ðÊUse malloc to actually make it possible to read the data as changes are made in the future?
+î€žÂ Reentrancy
+î€žÂ Use malloc to actually make it possible to read the data as changes are made in the future?
 
 	Saturday, October 28, 1995 1:13:38 PM- whoops.  Had a huge memory leak in the inflate wad
-		data.  Iâm fired.
+		data.  I'm fired.
 	
 Jan 30, 2000 (Loren Petrich):
 	Did some typecasts
@@ -368,7 +368,8 @@ void fill_default_wad_header(
 	obj_clear(*header);
 	header->version= wadfile_version;
 	header->data_version= data_version;
-	File.GetName(header->file_name);
+	strncpy(header->file_name, File.GetName().c_str(), MAXIMUM_WADFILE_NAME_LENGTH);
+	header->file_name[MAXIMUM_WADFILE_NAME_LENGTH - 1] = '\0';
 	header->wad_count= wad_count;
 	header->application_specific_directory_data_size= application_directory_data_size;					
 

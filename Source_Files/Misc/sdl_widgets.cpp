@@ -63,6 +63,7 @@
 #include    "mouse.h"   // (ZZZ) NUM_SDL_MOUSE_BUTTONS, SDLK_BASE_MOUSE_BUTTON
 #include "joystick.h"
 
+#include <functional>
 #include <sstream>
 
 /*
@@ -184,9 +185,25 @@ void w_static_text::draw(SDL_Surface *s) const
 
 void w_label::click(int x, int y)
 {
-	if (associated_widget)
-		associated_widget->click(0, 0);
+	// simulate a mouse press
+	mouse_down(0, 0);
+	sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 12);
+	mouse_up(0, 0);
+}
 
+void w_label::mouse_down(int, int)
+{
+	if (!associated_widget) return;
+	down = true;
+}
+
+void w_label::mouse_up(int x, int y)
+{
+	if (!associated_widget || !down) return;
+	down = false;
+
+	if (x >= 0 && x <= rect.w && y >= 0 && y <= rect.h)
+		associated_widget->click(0, 0);
 }
 
 void w_label::draw(SDL_Surface *s) const
@@ -386,7 +403,7 @@ void w_hyperlink::prochandler(void *arg)
 	get_owning_dialog()->draw();
 }
 
-w_hyperlink::w_hyperlink(const char *url, const char *txt) : w_button_base((txt ? txt : url), boost::bind(&w_hyperlink::prochandler, this, _1), const_cast<char *>(url), HYPERLINK_WIDGET)
+w_hyperlink::w_hyperlink(const char *url, const char *txt) : w_button_base((txt ? txt : url), std::bind(&w_hyperlink::prochandler, this, std::placeholders::_1), const_cast<char *>(url), HYPERLINK_WIDGET)
 {
 	rect.w = text_width(text.c_str(), font, style);
 	rect.h = font->get_line_height();
@@ -407,13 +424,6 @@ void w_hyperlink::draw(SDL_Surface *s) const
 	uint32 pixel = get_theme_color(HYPERLINK_WIDGET, state, 0);
 	
 	draw_text(s, text.c_str(), rect.x, rect.y + font->get_ascent(), pixel, font, style);
-	
-	// draw_text doesn't support underline, so draw one manually
-	if (style & styleUnderline)
-	{
-		SDL_Rect r = {rect.x, rect.y + rect.h - 1, rect.w, 1};
-		SDL_FillRect(s, &r, pixel);
-	}
 }
 
 
@@ -669,7 +679,7 @@ const uint16 MAX_TEXT_WIDTH = 200;
 // Anyway, this fixes the "crash when clicking in the Environment menu" bug we've seen
 // in the Windows version all this time.
 w_select_button::w_select_button(const char *s, action_proc p, void *a, bool u)
-	: widget(LABEL_WIDGET), selection(s), proc(p), arg(a), utf8(u), p_flags(placeable::kDefault)
+	: widget(LABEL_WIDGET), selection(s), proc(p), arg(a), utf8(u), p_flags(placeable::kDefault), down(false)
 {
 	uint16 max_selection_width = MAX_TEXT_WIDTH;
 
@@ -677,6 +687,28 @@ w_select_button::w_select_button(const char *s, action_proc p, void *a, bool u)
 	saved_min_height = font->get_line_height();
 }
 
+void w_select_button::mouse_down(int, int)
+{
+	if (!enabled) return;
+	down = true;
+}
+
+void w_select_button::mouse_up(int x, int y)
+{
+	if (!enabled || !down) return;
+	down = false;
+
+	if (proc && x >= 0 && x <= rect.w && y >= 0 && y <= rect.h)
+		proc(arg);
+}
+
+void w_select_button::click(int /*x*/, int /*y*/)
+{
+	// simulate a mouse press
+	mouse_down(0, 0);
+	sleep_for_machine_ticks(MACHINE_TICKS_PER_SECOND / 12);
+	mouse_up(0, 0);
+}
 
 
 void w_select_button::draw(SDL_Surface *s) const
@@ -695,12 +727,6 @@ void w_select_button::draw(SDL_Surface *s) const
 	if (active) {
 		//!!
 	}
-}
-
-void w_select_button::click(int /*x*/, int /*y*/)
-{
-    if(enabled)
-	    proc(arg);
 }
 
 void w_select_button::set_selection(const char *s)
@@ -742,7 +768,7 @@ void w_select_button::place(const SDL_Rect &r, placement_flags flags)
 // if no valid labels, returns -1 when asked for selection
 // draw(), get_selection() check num_labels directly instead of trying to keep selection set at -1
 
-static const char* sNoValidOptionsString = "（無効なオプション）"; // XXX should be moved outside compiled code e.g. to MML
+static const char* sNoValidOptionsString = "(no valid options)"; // XXX should be moved outside compiled code e.g. to MML
 
 w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), we_own_labels(false), selection(s), selection_changed_callback(NULL), utf8(false)
 {
@@ -750,7 +776,7 @@ w_select::w_select(size_t s, const char **l) : widget(LABEL_WIDGET), labels(l), 
         if(labels) {
             while (labels[num_labels])
                     num_labels++;
-            if (selection >= num_labels || selection < 0)
+            if (selection >= num_labels)
                     selection = 0;
         }
 
@@ -1042,18 +1068,9 @@ w_player_color::w_player_color(int selection) : w_select(selection, NULL)
 
 void w_player_color::draw(SDL_Surface *s) const
 {
-	int y = rect.y + font->get_ascent();
-
-	// Selection
-	if (selection >= 0) {
-		uint32 pixel = get_dialog_player_color(selection);
-		SDL_Rect r = {rect.x, rect.y + 1, 48, rect.h - 2};
-		SDL_FillRect(s, &r, pixel);
-	} else {
-		int state = enabled ? (active ? ACTIVE_STATE : DEFAULT_STATE) : DISABLED_STATE;
-
-		draw_text(s, "<不明>", rect.x, y, get_theme_color(ITEM_WIDGET, state), font, style);
-	}
+	uint32 pixel = get_dialog_player_color(selection);
+	SDL_Rect r = {rect.x, rect.y + 1, 48, rect.h - 2};
+	SDL_FillRect(s, &r, pixel);
 
 	// Cursor
 	if (active)	{
@@ -1086,7 +1103,7 @@ void w_color_picker::click(int, int)
 	dialog d;
 	
 	vertical_placer *placer = new vertical_placer;
-	placer->dual_add(new w_title("色を選択"), d);
+	placer->dual_add(new w_title("CHOOSE A COLOR"), d);
 	placer->add(new w_spacer(), true);
 
 	w_color_block *color_block = new w_color_block(&m_color);
@@ -1096,22 +1113,22 @@ void w_color_picker::click(int, int)
 	table->col_flags(0, placeable::kAlignRight);
 
 	w_percentage_slider *red_w = new w_percentage_slider(16, m_color.red >> 12);
-	table->dual_add(red_w->label("赤"), d);
+	table->dual_add(red_w->label("Red"), d);
 	table->dual_add(red_w, d);
 
 	w_percentage_slider *green_w = new w_percentage_slider(16, m_color.green >> 12);
-	table->dual_add(green_w->label("緑"), d);
+	table->dual_add(green_w->label("Green"), d);
 	table->dual_add(green_w, d);
 
 	w_percentage_slider *blue_w = new w_percentage_slider(16, m_color.blue >> 12);
-	table->dual_add(blue_w->label("青"), d);
+	table->dual_add(blue_w->label("Blue"), d);
 	table->dual_add(blue_w, d);
 
 	placer->add(table, true);
 	placer->add(new w_spacer(), true);
 	
 	horizontal_placer *button_placer = new horizontal_placer;
-	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
+	button_placer->dual_add(new w_button("CANCEL", dialog_cancel, &d), d);
 	button_placer->dual_add(new w_button("OK", dialog_ok, &d), d);
 	
 	placer->add(button_placer, true);
@@ -1481,8 +1498,8 @@ void w_password_entry::draw(SDL_Surface *s) const
  *  Key name widget
  */
 
-static const std::vector<std::string> WAITING_TEXT = { "キー入力待ち", "ボタン入力待ち", "ボタン入力待ち" };
-static const std::vector<std::string> UNBOUND_TEXT = { "なし", "なし", "なし" };
+static const std::vector<std::string> WAITING_TEXT = { "waiting for key", "waiting for button", "waiting for button" };
+static const std::vector<std::string> UNBOUND_TEXT = { "none", "none", "none" };
 
 w_key::w_key(SDL_Scancode key, w_key::Type event_type) : widget(LABEL_WIDGET), binding(false), event_type(event_type)
 {
@@ -1504,31 +1521,31 @@ void w_key::place(const SDL_Rect& r, placement_flags flags)
 		
 // ZZZ: we provide phony key names for the phony keys used for mouse buttons.
 static const char* sMouseButtonKeyName[NUM_SDL_MOUSE_BUTTONS] = {
-        "左クリック",
-        "中央クリック",
-        "右クリック",
-        "進むボタン",
-        "戻るボタン",
-        "ホイールアップ",
-        "ホイールダウン"
+        "Mouse Left",
+        "Mouse Middle",
+        "Mouse Right",
+        "Mouse X1",
+        "Mouse X2",
+        "Mouse Scroll Up",
+        "Mouse Scroll Down"
 };
 
 static const char* get_joystick_button_key_name(int offset)
 {
 	static_assert(SDL_CONTROLLER_BUTTON_MAX <= 21 &&
 				  SDL_CONTROLLER_AXIS_MAX <= 12,
-				  "SDLはボタン/軸の数を再び変更しました！");
+				  "SDL changed the number of buttons/axes again!");
 
 	static const char* buttons[] = {
-		"A（×）", "B（○）", "X（□）", "Y（△）", "Back（Share）", "Guide（PS）", "Start",
-		"左スティック", "右スティック", "Lボタン", "Rボタン", "↑", "↓", "←", "→",
+		"A", "B", "X", "Y", "Back", "Guide", "Start",
+		"LS", "RS", "LB", "RB", "Up", "Down", "Left", "Right",
 		// new in SDL 2.0.14
-		"その他", "パドル1", "パドル 2", "パドル3", "パドル4", "タッチパットボタン",
+		"Misc", "Paddle 1", "Paddle 2", "Paddle 3", "Paddle 4", "TP Button",
 	};
 
 	static const char* axes[] = {
-		"左スティック→", "左スティック↓", "右スティック→", "右スティック↓", "Lトリガー", "Rトリガー",
-		"左スティック←", "左スティック↑", "右スティック←", "右スティック↑", "Lトリガー反転", "Rトリガー反転"
+		"LS Right", "LS Down", "RS Right", "RS Down", "LT", "RT",
+		"LS Left", "LS Up", "RS Left", "RS Up", "LT Neg", "RT Neg"
 	};
 
 	if (offset < SDL_CONTROLLER_BUTTON_MAX)
@@ -1549,7 +1566,11 @@ GetSDLKeyName(SDL_Scancode inKey) {
 	else if (w_key::event_type_for_key(inKey) == w_key::JoystickButton)
 	    return get_joystick_button_key_name(inKey - AO_SCANCODE_BASE_JOYSTICK_BUTTON);
     else
-        return SDL_GetScancodeName(inKey);
+	{
+		static std::string s;
+		s = utf8_to_mac_roman(SDL_GetKeyName(SDL_GetKeyFromScancode(inKey)));
+		return s.c_str();
+	}
 }
 
 void w_key::draw(SDL_Surface *s) const
@@ -1921,7 +1942,7 @@ std::string w_percentage_slider::formatted_value()
  *  List selection
  */
 
-w_list_base::w_list_base(uint16 width, size_t lines, size_t /*sel*/) : widget(ITEM_WIDGET), num_items(0), shown_items(lines), thumb_dragging(false), top_item(0)
+w_list_base::w_list_base(uint16 width, size_t lines, size_t /*sel*/) : widget(ITEM_WIDGET), selection(0), num_items(0), shown_items(lines), thumb_dragging(false), top_item(0)
 {
 	rect.w = width;
 	rect.h = item_height() * static_cast<uint16>(shown_items) + get_theme_space(LIST_WIDGET, T_SPACE) + get_theme_space(LIST_WIDGET, B_SPACE);
@@ -2245,12 +2266,12 @@ void w_list_base::set_top_item(size_t i)
  */
 
 w_levels::w_levels(const vector<entry_point> &items, dialog *d)
-	  : w_list<entry_point>(items, 400, 8, 0), parent(d), show_level_numbers(true) {}
+	: w_list<entry_point>(items, 400, 8, 0), parent(d), show_level_numbers(true), offset{1} {}
 
 // ZZZ: new constructor gives more control over widget's appearance.
 w_levels::w_levels(const vector<entry_point>& items, dialog* d, uint16 inWidth,
         size_t inNumLines, size_t inSelectedItem, bool in_show_level_numbers)
-	  : w_list<entry_point>(items, inWidth, inNumLines, inSelectedItem), parent(d), show_level_numbers(in_show_level_numbers) {}
+	: w_list<entry_point>(items, inWidth, inNumLines, inSelectedItem), parent(d), show_level_numbers(in_show_level_numbers), offset{1} {}
 
 void
 w_levels::item_selected(void)
@@ -2265,9 +2286,9 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
 	char str[256];
 
     if(show_level_numbers)
-    	sprintf(str, "%d - %s", i->level_number + 1, _UTF8(i->level_name));
+    	sprintf(str, "%d - %s", i->level_number + offset, i->level_name);
     else
-        sprintf(str, "%s", _UTF8(i->level_name));
+        sprintf(str, "%s", i->level_name);
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
 	draw_text(s, str, x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
@@ -2360,10 +2381,10 @@ void w_select_popup::gotSelected ()
 }
 
 
-static const char* const sFileChooserInvalidFileString = "（無効な選択）";
+const char* const sFileChooserInvalidFileString = "(no valid selection)";
 
 w_file_chooser::w_file_chooser(const char* inDialogPrompt, Typecode inTypecode)
-	: w_select_button("", NULL, NULL, true), typecode(inTypecode)
+	: w_select_button("", std::bind(&w_file_chooser::proc, this), nullptr, true), typecode(inTypecode)
 {
 	strncpy(dialog_prompt, inDialogPrompt, sizeof(dialog_prompt));
 	set_selection(sFileChooserInvalidFileString);
@@ -2381,7 +2402,7 @@ w_file_chooser::set_file(const FileSpecifier& inFile)
 
 
 void
-w_file_chooser::click(int, int)
+w_file_chooser::proc()
 {
 	if(enabled)
 	{
@@ -2401,15 +2422,58 @@ w_file_chooser::update_filename()
 {
 	if(file.Exists())
 	{
-		file.GetName(filename);
-		std::string filename_copy = filename;
-		strcpy(filename, FileSpecifier::HideExtension(filename_copy).c_str());
+		strncpy(filename, FileSpecifier::HideExtension(file.GetName()).c_str(), sizeof(filename));
+		filename[sizeof(filename) - 1] = '\0';
 		set_selection(filename);
 	}
 	else
 		set_selection(sFileChooserInvalidFileString);
 }
 
+w_directory_chooser::w_directory_chooser()
+	: w_select_button("", std::bind(&w_directory_chooser::proc, this), nullptr, true)
+{
+	set_selection(sFileChooserInvalidFileString);
+}
+
+
+
+void
+w_directory_chooser::set_directory(const FileSpecifier& inDirectory)
+{
+	directory = inDirectory;
+	update_directoryname();
+}
+
+
+
+void
+w_directory_chooser::proc()
+{
+	if (enabled)
+	{
+		if (directory.ReadDirectoryDialog())
+		{
+			update_directoryname();
+			if (m_callback)
+				m_callback();
+		}
+	}
+}
+
+
+void
+w_directory_chooser::update_directoryname()
+{
+	if (directory.Exists())
+	{
+		strncpy(directory_name, directory.GetName().c_str(), sizeof(directory_name));
+		directory_name[sizeof(directory_name) - 1] = '\0';
+		set_selection(directory_name);
+	}
+	else
+		set_selection(sFileChooserInvalidFileString);
+}
 
 const string w_items_in_room_get_name_of_item (GameListMessage::GameListEntry item)
 {
@@ -2479,21 +2543,21 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		{
 			if (item.minutes_remaining() == 1)
 			{
-				time_or_ping << "1分未満";
+				time_or_ping << "~1 Minute";
 			}
 			else
 			{
-				time_or_ping << item.minutes_remaining() << "分";
+				time_or_ping << item.minutes_remaining() << " Minutes";
 			}
 		}
 		else
 		{
-			time_or_ping << "無制限";
+			time_or_ping << "Untimed";
 		}
 	}
-	else
+	else if (item.m_description.m_latency != UINT16_MAX)
 	{
-		// draw ping
+		time_or_ping << item.m_description.m_latency << " ms";
 	}
 
 	right_text_width = text_width(time_or_ping.str().c_str(), font, game_style);
@@ -2515,7 +2579,7 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_and_map << "|i" << item.m_description.m_scenarioName;
 		if (item.m_description.m_scenarioVersion != "")
 		{
-			game_and_map << ", バージョン " << item.m_description.m_scenarioVersion;
+			game_and_map << ", Version " << item.m_description.m_scenarioVersion;
 		}
 	} 
 	else
@@ -2537,11 +2601,11 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 	{
 		if (item.m_description.m_numPlayers == 1)
 		{
-			game_settings << "1プレイヤー";
+			game_settings << "1 Player";
 		}
 		else
 		{
-			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << "プレイヤー";
+			game_settings << static_cast<uint16>(item.m_description.m_numPlayers) << " Players";
 		}
 	}
 	else
@@ -2549,19 +2613,19 @@ void w_games_in_room::draw_item(const GameListMessage::GameListEntry& item, SDL_
 		game_settings << static_cast<uint16>(item.m_description.m_numPlayers)
 			      << "/"
 			      << item.m_description.m_maxPlayers
-			      << "プレイヤー";
+			      << " Players";
 	}
 
 	if (item.m_description.m_timeLimit && !(item.m_description.m_timeLimit == INT32_MAX || item.m_description.m_timeLimit == -1))
 	{
 		game_settings << ", " 
 			      << item.m_description.m_timeLimit / 60 / TICKS_PER_SECOND 
-			      << "分";
+			      << " Minutes";
 	}
 
 	if (item.m_description.m_teamsAllowed)
 	{
-		game_settings << ", チーム";
+		game_settings << ", Teams";
 	}
 
 	draw_text(s, game_settings.str().c_str(), x, y, fg, font, game_style);

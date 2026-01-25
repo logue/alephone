@@ -24,9 +24,9 @@
 #include "preferences.h"
 #include "screen.h"
 
-#define MAXIMUM_VERTICES_PER_WORLD_POLYGON (MAXIMUM_VERTICES_PER_POLYGON+4)
+#ifdef HAVE_OPENGL
 
-inline bool FogActive();
+#define MAXIMUM_VERTICES_PER_WORLD_POLYGON (MAXIMUM_VERTICES_PER_POLYGON+4)
 
 class Blur {
 
@@ -160,35 +160,56 @@ void RenderRasterize_Shader::render_tree() {
 		}
 	}
 	
-	bool usefog = false;
-	int fogtype;
-	OGL_FogData *fogdata;
-	if (TEST_FLAG(Get_OGL_ConfigureData().Flags,OGL_Flag_Fog))
-	{
-		fogtype = (current_player->variables.flags&_HEAD_BELOW_MEDIA_BIT) ?
-		OGL_Fog_BelowLiquid : OGL_Fog_AboveLiquid;
-		fogdata = OGL_GetFogData(fogtype);
-		if (fogdata && fogdata->IsPresent && fogdata->AffectsLandscapes) {
-			usefog = true;
-		}
+	float fogMix = 0.0;
+	auto fogdata = OGL_GetCurrFogData();
+	if (fogdata && fogdata->IsPresent && fogdata->AffectsLandscapes) {
+		fogMix = fogdata->LandscapeMix;
 	}
+
+	float fogmode = -1.0;
+	if (fogdata) {
+		fogmode = fogdata->Mode;
+	}
+
 	const float virtual_yaw = view->virtual_yaw * FixedAngleToRadians;
 	const float virtual_pitch = view->virtual_pitch * FixedAngleToRadians;
-	s = Shader::get(Shader::S_Landscape);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
-	s = Shader::get(Shader::S_LandscapeBloom);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
-	s = Shader::get(Shader::S_LandscapeInfravision);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 :virtual_pitch);
+
+	Shader* landscape_shaders[] = {
+		Shader::get(Shader::S_Landscape),
+		Shader::get(Shader::S_LandscapeBloom),
+		Shader::get(Shader::S_LandscapeInfravision),
+		Shader::get(Shader::S_LandscapeSphere),
+		Shader::get(Shader::S_LandscapeSphereBloom),
+		Shader::get(Shader::S_LandscapeSphereInfravision)
+	};
+
+	for (auto s : landscape_shaders) {
+		s->enable();
+		s->setFloat(Shader::U_FogMix, fogMix);
+		s->setFloat(Shader::U_Yaw, virtual_yaw);
+		s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
+	}
+
+	Shader* fog_mode_shaders[] = {
+		Shader::get(Shader::S_Bump),
+		Shader::get(Shader::S_BumpBloom),
+		Shader::get(Shader::S_Invincible),
+		Shader::get(Shader::S_InvincibleBloom),
+		Shader::get(Shader::S_Invisible),
+		Shader::get(Shader::S_InvisibleBloom),
+		Shader::get(Shader::S_Wall),
+		Shader::get(Shader::S_WallBloom),
+		Shader::get(Shader::S_WallInfravision),
+		Shader::get(Shader::S_Sprite),
+		Shader::get(Shader::S_SpriteBloom),
+		Shader::get(Shader::S_SpriteInfravision)
+	};
+	
+	for (auto s : fog_mode_shaders) {
+		s->enable();
+		s->setFloat(Shader::U_FogMode, fogmode);
+	}
+	
 	Shader::disable();
 
 	RenderRasterizerClass::render_tree(kDiffuse);
@@ -270,7 +291,7 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupSpriteTexture(const
 	GLdouble shade = PIN(static_cast<GLfloat>(rect.ambient_shade)/static_cast<GLfloat>(FIXED_ONE),0,1);
 	color[0] = color[1] = color[2] = shade;
 
-	auto TMgr = std::unique_ptr<TextureManager>(new TextureManager());
+	auto TMgr = std::make_unique<TextureManager>();
 
 	TMgr->ShapeDesc = rect.ShapeDesc;
 	TMgr->LowLevelShape = rect.LowLevelShape;
@@ -301,6 +322,7 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupSpriteTexture(const
 			s = Shader::get(Shader::S_InvincibleBloom);
 		}
 		s->enable();
+        s->setFloat(Shader::U_TransferFadeOut,((float)((uint16)rect.transfer_data))/(float)((int)FIXED_ONE));
 	} else if (current_player->infravision_duration) {
 		color[0] = color[1] = color[2] = 1;
 		FindInfravisionVersionRGBA(GET_COLLECTION(GET_DESCRIPTOR_COLLECTION(rect.ShapeDesc)), color);
@@ -377,7 +399,7 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupWallTexture(const s
 
 	Shader *s = NULL;
 
-	auto TMgr = std::unique_ptr<TextureManager>(new TextureManager());
+	auto TMgr = std::make_unique<TextureManager>();
 	LandscapeOptions *opts = NULL;
 	TMgr->ShapeDesc = Texture;
 	if (TMgr->ShapeDesc == UNONE) { return TMgr; }
@@ -400,6 +422,7 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupWallTexture(const s
 			flare = -1;
 			s = Shader::get(renderStep == kGlow ? Shader::S_InvincibleBloom : Shader::S_Invincible);
 			s->enable();
+            s->setFloat(Shader::U_TransferFadeOut,0);
 			break;
 		case _xfer_landscape:
 		case _xfer_big_landscape:
@@ -407,17 +430,38 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupWallTexture(const s
 			TMgr->TransferMode = _big_landscaped_transfer;
 			opts = View_GetLandscapeOptions(Texture);
 			TMgr->LandscapeVertRepeat = opts->VertRepeat;
-			TMgr->Landscape_AspRatExp = opts->OGL_AspRatExp;
+			TMgr->Landscape_AspRatExp = opts->SphereMap ? 1 : opts->OGL_AspRatExp;
 			if (current_player->infravision_duration) {
 				GLfloat color[3] {1, 1, 1};
 				FindInfravisionVersionRGBA(GET_COLLECTION(GET_DESCRIPTOR_COLLECTION(Texture)), color);
 				glColor4f(color[0], color[1], color[2], 1);
-				s = Shader::get(Shader::S_LandscapeInfravision);
+				if (opts->SphereMap)
+				{
+					s = Shader::get(Shader::S_LandscapeSphereInfravision);
+				}
+				else
+				{
+					s = Shader::get(Shader::S_LandscapeInfravision);
+				}
 			} else {
-				if (renderStep == kDiffuse) {
-					s = Shader::get(Shader::S_Landscape);
-				} else {
-					s = Shader::get(Shader::S_LandscapeBloom);
+				if (opts->SphereMap)
+				{
+					if (renderStep == kDiffuse)
+					{
+						s = Shader::get(Shader::S_LandscapeSphere);
+					}
+					else
+					{
+						s = Shader::get(Shader::S_LandscapeSphereBloom);
+					}
+				}
+				else
+				{
+					if (renderStep == kDiffuse) {
+						s = Shader::get(Shader::S_Landscape);
+					} else {
+						s = Shader::get(Shader::S_LandscapeBloom);
+					}
 				}
 			}
 			s->enable();
@@ -463,16 +507,23 @@ std::unique_ptr<TextureManager> RenderRasterize_Shader::setupWallTexture(const s
 	TMgr->SetupTextureMatrix();
 	
 	if (TMgr->TextureType == OGL_Txtr_Landscape && opts) {
-		double TexScale = ABS(TMgr->U_Scale);
-		double HorizScale = double(1 << opts->HorizExp);
-		s->setFloat(Shader::U_ScaleX, HorizScale * (npotTextures ? 1.0 : TexScale) * Radian2Circle);
-		s->setFloat(Shader::U_OffsetX, HorizScale * (0.25 + opts->Azimuth * FullCircleReciprocal));
-		
-		short AdjustedVertExp = opts->VertExp + opts->OGL_AspRatExp;
-		double VertScale = (AdjustedVertExp >= 0) ? double(1 << AdjustedVertExp)
-		                                          : 1/double(1 << (-AdjustedVertExp));
-		s->setFloat(Shader::U_ScaleY, VertScale * TexScale * Radian2Circle);
-		s->setFloat(Shader::U_OffsetY, (0.5 + TMgr->U_Offset) * TexScale);
+		if (opts->SphereMap)
+		{
+			s->setFloat(Shader::U_OffsetX, opts->Azimuth * TWO_PI * FullCircleReciprocal);
+		}
+		else
+		{
+			double TexScale = std::abs(TMgr->U_Scale);
+			double HorizScale = double(1 << opts->HorizExp);
+			s->setFloat(Shader::U_ScaleX, HorizScale * (npotTextures ? 1.0 : TexScale) * Radian2Circle);
+			s->setFloat(Shader::U_OffsetX, HorizScale * (0.25 + opts->Azimuth * FullCircleReciprocal));
+			
+			short AdjustedVertExp = opts->VertExp + opts->OGL_AspRatExp;
+			double VertScale = (AdjustedVertExp >= 0) ? double(1 << AdjustedVertExp)
+		                       : 1/double(1 << (-AdjustedVertExp));
+			s->setFloat(Shader::U_ScaleY, VertScale * TexScale * Radian2Circle);
+			s->setFloat(Shader::U_OffsetY, (0.5 + TMgr->U_Offset) * TexScale);
+		}
 	}
 
 	if (renderStep == kGlow) {
@@ -504,6 +555,10 @@ void instantiate_transfer_mode(struct view_data *view, short transfer_mode, worl
 		case _xfer_fast_vertical_slide:
 		case _xfer_wander:
 		case _xfer_fast_wander:
+		case _xfer_reverse_horizontal_slide:
+		case _xfer_reverse_fast_horizontal_slide:
+		case _xfer_reverse_vertical_slide:
+		case _xfer_reverse_fast_vertical_slide:
 			x0 = y0= 0;
 			switch (transfer_mode) {
 				case _xfer_fast_horizontal_slide: transfer_phase<<= 1;
@@ -511,6 +566,11 @@ void instantiate_transfer_mode(struct view_data *view, short transfer_mode, worl
 
 				case _xfer_fast_vertical_slide: transfer_phase<<= 1;
 				case _xfer_vertical_slide: y0= (transfer_phase<<2)&(WORLD_ONE-1); break;
+				case _xfer_reverse_fast_horizontal_slide: transfer_phase<<= 1;
+				case _xfer_reverse_horizontal_slide: x0 = WORLD_ONE - (transfer_phase<<2)&(WORLD_ONE-1); break;
+			
+		        case _xfer_reverse_fast_vertical_slide: transfer_phase<<= 1;
+				case _xfer_reverse_vertical_slide: y0 = WORLD_ONE - (transfer_phase<<2)&(WORLD_ONE-1); break;
 
 				case _xfer_fast_wander: transfer_phase<<= 1;
 				case _xfer_wander:
@@ -656,6 +716,21 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 
 		GLfloat* vp = vertex_array;
 		GLfloat* tp = texcoord_array;
+		float scale;
+
+		switch (surface->transfer_mode)
+		{
+			case _xfer_2x:
+				scale = 2 * WORLD_ONE * TMgr->TileRatio();
+				break;
+		    case _xfer_4x:
+				scale = 4 * WORLD_ONE * TMgr->TileRatio();
+				break;
+			default:
+				scale = WORLD_ONE * TMgr->TileRatio();
+				break;
+		}
+
 		if (ceil)
 		{
 			for(short i = 0; i < vertex_count; ++i) {
@@ -663,8 +738,8 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 				*vp++ = vertex.x;
 				*vp++ = vertex.y;
 				*vp++ = surface->height;
-				*tp++ = (vertex.x + surface->origin.x + x) / float(WORLD_ONE);
-				*tp++ = (vertex.y + surface->origin.y + y) / float(WORLD_ONE);
+				*tp++ = (vertex.x + surface->origin.x + x) / scale;
+				*tp++ = (vertex.y + surface->origin.y + y) / scale;
 			}
 		}
 		else
@@ -674,8 +749,8 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 				*vp++ = vertex.x;
 				*vp++ = vertex.y;
 				*vp++ = surface->height;
-				*tp++ = (vertex.x + surface->origin.x + x) / float(WORLD_ONE);
-				*tp++ = (vertex.y + surface->origin.y + y) / float(WORLD_ONE);
+				*tp++ = (vertex.x + surface->origin.x + x) / scale;
+				*tp++ = (vertex.y + surface->origin.y + y) / scale;
 			}
 		}
 		glVertexPointer(3, GL_FLOAT, 0, vertex_array);
@@ -754,12 +829,25 @@ void RenderRasterize_Shader::render_node_side(clipping_window_data *window, vert
 			vertices[0].flags = vertices[3].flags = 0;
 			vertices[1].flags = vertices[2].flags = 0;
 
-			double div = WORLD_ONE;
+			uint16 div;
+			switch (surface->transfer_mode)
+			{
+				case _xfer_2x:
+					div = 2 * WORLD_ONE * TMgr->TileRatio();
+					break;
+				case _xfer_4x:
+					div = 4 * WORLD_ONE * TMgr->TileRatio();
+					break;
+				default:
+					div = WORLD_ONE * TMgr->TileRatio();;
+					break;
+			}
+			
 			double dx = (surface->p1.i - surface->p0.i) / double(surface->length);
 			double dy = (surface->p1.j - surface->p0.j) / double(surface->length);
 
-			world_distance x0 = WORLD_FRACTIONAL_PART(surface->texture_definition->x0);
-			world_distance y0 = WORLD_FRACTIONAL_PART(surface->texture_definition->y0);
+			world_distance x0 = surface->texture_definition->x0 % div;
+			world_distance y0 = surface->texture_definition->y0 % div;
 
 			double tOffset = surface->h1 + view->origin.z + y0;
 
@@ -788,8 +876,8 @@ void RenderRasterize_Shader::render_node_side(clipping_window_data *window, vert
 				*vp++ = vertices[i].x;
 				*vp++ = vertices[i].y;
 				*vp++ = vertices[i].z;
-				*tp++ = (tOffset - vertices[i].z) / div;
-				*tp++ = (x0+p2) / div;
+				*tp++ = (tOffset - vertices[i].z) / static_cast<float>(div);
+				*tp++ = (x0+p2) / static_cast<float>(div);
 			}
 			glVertexPointer(3, GL_FLOAT, 0, vertex_array);
 			glTexCoordPointer(2, GL_FLOAT, 0, texcoord_array);
@@ -851,6 +939,8 @@ bool RenderModel(rectangle_definition& RenderRectangle, short Collection, short 
 		} else {
 			s = Shader::get(Shader::S_InvincibleBloom);
 		}
+        s->enable();
+        s->setFloat(Shader::U_TransferFadeOut,((float)((uint16)RenderRectangle.transfer_data))/(float)((int)FIXED_ONE));
 	} else if (current_player->infravision_duration) {
 		color[0] = color[1] = color[2] = 1;
 		FindInfravisionVersionRGBA(GET_COLLECTION(GET_DESCRIPTOR_COLLECTION(RenderRectangle.ShapeDesc)), color);
@@ -904,6 +994,25 @@ bool RenderModel(rectangle_definition& RenderRectangle, short Collection, short 
 	s->setFloat(Shader::U_Depth, 0);
 	s->setFloat(Shader::U_Glow, 0);
 	glColor4f(color[0], color[1], color[2], 1);
+
+	// Find an animated model's vertex positions and normals:
+	short ModelSequence = RenderRectangle.ModelSequence;
+	if (ModelSequence >= 0)
+	{
+		int NumFrames = ModelPtr->Model.NumSeqFrames(ModelSequence);
+		if (NumFrames > 0)
+		{
+			short ModelFrame = PIN(RenderRectangle.ModelFrame, 0, NumFrames - 1);
+			short NextModelFrame = PIN(RenderRectangle.NextModelFrame, 0, NumFrames - 1);
+			float MixFrac = RenderRectangle.MixFrac;
+			ModelPtr->Model.FindPositions_Sequence(true,
+				ModelSequence, ModelFrame, MixFrac, NextModelFrame);
+		}
+		else
+			ModelPtr->Model.FindPositions_Neutral(true);	// Fallback: neutral
+	}
+	else
+		ModelPtr->Model.FindPositions_Neutral(true);	// Fallback: neutral (will do nothing for static models)
 
 	glVertexPointer(3,GL_FLOAT,0,ModelPtr->Model.PosBase());
 	glClientActiveTextureARB(GL_TEXTURE0_ARB);
@@ -1032,6 +1141,7 @@ void RenderRasterize_Shader::_render_node_object_helper(render_object_data *obje
 	double yaw = view->virtual_yaw * FixedAngleToDegrees;
 	glRotated(yaw, 0.0, 0.0, 1.0);
 
+			
 	float offset = 0;
 	if (OGL_ForceSpriteDepth()) {
 		// look for parasitic objects based on y position,
@@ -1049,6 +1159,15 @@ void RenderRasterize_Shader::_render_node_object_helper(render_object_data *obje
 
 	auto TMgr = setupSpriteTexture(rect, OGL_Txtr_Inhabitant, offset, renderStep);
 	if (TMgr->ShapeDesc == UNONE) { glPopMatrix(); return; }
+
+	if (!view->mimic_sw_perspective)
+	{
+		if (TMgr->ForceXYBillboard() ||
+			(view->billboard_xy && !TMgr->ForceYBillboard()))
+		{
+			glRotated(view->virtual_pitch * FixedAngleToDegrees, 0.0, -1.0, 0.0);
+		}
+	}
 
 	float texCoords[2][2];
 
@@ -1148,7 +1267,7 @@ void RenderRasterize_Shader::render_viewer_sprite_layer(RenderStep renderStep)
         rect.Opacity = 1;
 
         /* get_weapon_display_information() returns true if there is a weapon to be drawn.  it
-           should initially be passed a count of zero.  it returns the weaponÕs texture and
+           should initially be passed a count of zero.  it returns the weapon’s texture and
            enough information to draw it correctly. */
 	count= 0;
 	while (get_weapon_display_information(&count, &display_data))
@@ -1188,7 +1307,7 @@ void RenderRasterize_Shader::render_viewer_sprite_layer(RenderStep renderStep)
 		rect.flip_horizontal= display_data.flip_horizontal;
 		rect.flip_vertical= display_data.flip_vertical;
 		
-		/* lighting: depth of zero in the cameraÕs polygon index */
+		/* lighting: depth of zero in the camera’s polygon index */
 		rect.depth= 0;
 		rect.ambient_shade= get_light_intensity(get_polygon_data(view->origin_polygon_index)->floor_lightsource_index);
 		rect.ambient_shade= MAX(shape_information->minimum_light_intensity, rect.ambient_shade);
@@ -1198,7 +1317,7 @@ void RenderRasterize_Shader::render_viewer_sprite_layer(RenderStep renderStep)
 		// for the convenience of doing teleport-in/teleport-out
 		rect.xc = (rect.x0 + rect.x1) >> 1;
 
-                /* make the weapon reflect the ownerÕs transfer mode */
+                /* make the weapon reflect the owner’s transfer mode */
 		instantiate_rectangle_transfer_mode(view, &rect, display_data.transfer_mode, display_data.transfer_phase);
 
                 render_viewer_sprite(rect, renderStep);
@@ -1321,3 +1440,5 @@ void RenderRasterize_Shader::render_viewer_sprite(rectangle_definition& RenderRe
 	TMgr->RestoreTextureMatrix();
 
 }
+
+#endif

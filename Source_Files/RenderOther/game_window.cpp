@@ -60,9 +60,9 @@ Mar 08, 2002 (Woody Zenfell):
 
 #include "cseries.h"
 
-#ifdef HAVE_OPENGL
+#include <array>
+
 #include "OGL_Headers.h"
-#endif
 
 #include "HUDRenderer_SW.h"
 #include "game_window.h"
@@ -77,8 +77,7 @@ Mar 08, 2002 (Woody Zenfell):
 #include "screen_definitions.h"
 #include "images.h"
 #include "InfoTree.h"
-
-#include    "network_sound.h"
+#include "interface_menus.h"
 
 extern void draw_panels(void);
 extern void validate_world_window(void);
@@ -148,7 +147,7 @@ struct weapon_interface_data weapon_interface_definitions[NUMBER_OF_WEAPON_INTER
 		_i_assault_rifle,
 		BUILD_DESCRIPTOR(_collection_interface, _assault_panel),
 		430, 452,
-		439, NONE, //¥¥
+		439, NONE, //â€¢â€¢
 		366, 460, 
 		false,
 		{
@@ -246,7 +245,7 @@ struct weapon_interface_data weapon_interface_definitions[NUMBER_OF_WEAPON_INTER
 		_i_smg,
 		BUILD_DESCRIPTOR(_collection_interface, _smg),
 		430, 452,
-		439, NONE, //¥¥
+		439, NONE, //â€¢â€¢
 		366, 460, 
 		false,
 		{
@@ -382,13 +381,6 @@ void mark_player_network_stats_as_dirty(short player_index)
 		set_current_inventory_screen(player_index, _network_statistics);
 		SET_INVENTORY_DIRTY_STATE(player, true);
 	}
-}
-
-void set_interface_microphone_recording_state(bool state)
-{
-#if !defined(DISABLE_NETWORKING)
-	set_network_microphone_state(state);
-#endif // !defined(DISABLE_NETWORKING)
 }
 
 void scroll_inventory(short dy)
@@ -528,7 +520,11 @@ void draw_panels(void)
 }
 
 extern short vidmasterStringSetID; // shell.cpp
+extern short vidmasterLevelOffset;
 struct weapon_interface_data *original_weapon_interface_definitions = NULL;
+
+extern std::array<int, iAbout> menu_item_order;
+std::vector<int> original_menu_item_order;
 
 void reset_mml_interface()
 {
@@ -537,6 +533,15 @@ void reset_mml_interface()
 			weapon_interface_definitions[i] = original_weapon_interface_definitions[i];
 		free(original_weapon_interface_definitions);
 		original_weapon_interface_definitions = NULL;
+	}
+	
+	if (original_menu_item_order.size())
+	{
+		std::copy(original_menu_item_order.begin(),
+				  original_menu_item_order.end(),
+				  menu_item_order.begin());
+
+		original_menu_item_order.clear();
 	}
 }
 
@@ -549,10 +554,15 @@ void parse_mml_interface(const InfoTree& root)
 		for (unsigned i = 0; i < NUMBER_OF_WEAPON_INTERFACE_DEFINITIONS; i++)
 			original_weapon_interface_definitions[i] = weapon_interface_definitions[i];
 	}
+
+	if (!original_menu_item_order.size())
+	{
+		original_menu_item_order.assign(menu_item_order.begin(), menu_item_order.end());
+	}
 	
 	root.read_attr("motion_sensor", MotionSensorActive);
 	
-	BOOST_FOREACH(InfoTree rect, root.children_named("rect"))
+	for (const InfoTree &rect : root.children_named("rect"))
 	{
 		int16 index;
 		if (!rect.read_indexed("index", index, NUMBER_OF_INTERFACE_RECTANGLES))
@@ -571,15 +581,28 @@ void parse_mml_interface(const InfoTree& root)
 			r->right = right;
 		}
 	}
+
+	for (const InfoTree& menu_item : root.children_named("menu_item"))
+	{
+		int16_t index;
+		if (!menu_item.read_indexed("index", index, menu_item_order.size()))
+			continue;
+
+		int16_t item;
+		if (menu_item.read_indexed("item", item, iAbout + 1))
+		{
+			menu_item_order[index] = item;
+		}
+	}
 	
-	BOOST_FOREACH(InfoTree color, root.children_named("color"))
+	for (const InfoTree &color : root.children_named("color"))
 	{
 		int16 index;
 		if (!color.read_indexed("index", index, NUMBER_OF_INTERFACE_COLORS))
 			continue;
 		color.read_color(get_interface_color(index));
 	}
-	BOOST_FOREACH(InfoTree font, root.children_named("font"))
+	for (const InfoTree &font : root.children_named("font"))
 	{
 		int16 index;
 		if (!font.read_indexed("index", index, NUMBER_OF_INTERFACE_FONTS))
@@ -587,13 +610,14 @@ void parse_mml_interface(const InfoTree& root)
 		font.read_font(get_interface_font(index));
 	}
 	
-	BOOST_FOREACH(InfoTree vid, root.children_named("vidmaster"))
+	for (const InfoTree &vid : root.children_named("vidmaster"))
 	{
 		vidmasterStringSetID = -1;
 		vid.read_attr_bounded<int16>("stringset_index", vidmasterStringSetID, -1, SHRT_MAX);
+		vid.read_attr_bounded<int16>("level_offset", vidmasterLevelOffset, 0, 1);
 	}
 	
-	BOOST_FOREACH(InfoTree weapon, root.children_named("weapon"))
+	for (const InfoTree &weapon : root.children_named("weapon"))
 	{
 		int16 index;
 		if (!weapon.read_indexed("index", index, MAXIMUM_WEAPON_INTERFACE_DEFINITIONS))
@@ -613,7 +637,7 @@ void parse_mml_interface(const InfoTree& root)
 		weapon.read_attr("multiple_delta_x", def.multiple_delta_x);
 		weapon.read_attr("multiple_delta_y", def.multiple_delta_y);
 		
-		BOOST_FOREACH(InfoTree ammo, weapon.children_named("ammo"))
+		for (const InfoTree &ammo : weapon.children_named("ammo"))
 		{
 			int16 index;
 			if (!ammo.read_indexed("index", index, NUMBER_OF_WEAPON_INTERFACE_ITEMS))

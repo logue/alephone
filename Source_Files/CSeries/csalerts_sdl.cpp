@@ -63,9 +63,9 @@ void system_alert_user(const char* message, short severity)
 	} else {
 		type = MB_ICONERROR|MB_OK;
 	}
-	MessageBoxW(NULL, utf8_to_wide(message).c_str(), severity == infoError ? L"警告" : L"エラー", type);
+	MessageBoxW(NULL, utf8_to_wide(message).c_str(), severity == infoError ? L"Warning" : L"Error", type);
 #else
-	fprintf(stderr, "%s: %s\n", severity == infoError ? "情報" : "致命的エラー", message);
+	fprintf(stderr, "%s: %s\n", severity == infoError ? "INFO" : "FATAL", message);
 #endif	
 }
 
@@ -92,7 +92,7 @@ bool system_alert_choose_scenario(char *chosen_dir)
 #if defined(__WIN32__)
 	BROWSEINFOW bi = { 0 };
 	wchar_t path[MAX_PATH];
-	bi.lpszTitle = L"プレイしたいシナリオを選択してください：";
+	bi.lpszTitle = L"Select a scenario to play:";
 	bi.pszDisplayName = path;
 	bi.lpfn = browse_callback_proc;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | 0x00000200; // no "New Folder" button
@@ -144,12 +144,50 @@ extern bool MainScreenVisible(void);
 
 void alert_user(const char *message, short severity) 
 {
-  if (!MainScreenVisible()) {
-	SDL_ShowSimpleMessageBox(severity == infoError ? SDL_MESSAGEBOX_WARNING : SDL_MESSAGEBOX_ERROR, severity == infoError ? "警告" : "エラー", message, NULL);
+#ifndef A1_NETWORK_STANDALONE_HUB
+
+	if (!MainScreenVisible()) {
+		std::string title;
+		uint32 box_type;
+		switch (severity) {
+			case fatalError:
+				title = "Error";
+				box_type = SDL_MESSAGEBOX_ERROR;
+				break;
+			case infoNoError:
+				title = "Information";
+				box_type = SDL_MESSAGEBOX_INFORMATION;
+				break;
+			case infoError:
+			default:
+				title = "Warning";
+				box_type = SDL_MESSAGEBOX_WARNING;
+				break;
+		}
+	SDL_ShowSimpleMessageBox(box_type, title.c_str(), message, NULL);
   } else {
+
+	std::string title;
+	std::string box_button;
+	switch (severity) {
+		case fatalError:
+			title = "ERROR";
+			box_button = "QUIT";
+			break;
+		case infoNoError:
+			title = "INFORMATION";
+			box_button = "OK";
+			break;
+		case infoError:
+		default:
+			title = "WARNING";
+			box_button = "OK";
+			break;
+	}
+
     dialog d;
     vertical_placer *placer = new vertical_placer;
-    placer->dual_add(new w_title(severity == infoError ? "警告" : "エラー"), d);
+    placer->dual_add(new w_title(title.c_str()), d);
     placer->add(new w_spacer, true);
     
     // Wrap lines
@@ -177,17 +215,20 @@ void alert_user(const char *message, short severity)
     }
     free(p);
     placer->add(new w_spacer, true);
-    w_button *button = new w_button(severity == infoError ? "OK" : "終了", dialog_ok, &d);
+    w_button *button = new w_button(box_button.c_str(), dialog_ok, &d);
     placer->dual_add (button, d);
     d.set_widget_placer(placer);
 
     d.activate_widget(button);
 
     d.run();
-    if (severity == infoError && top_dialog == NULL)
+    if (severity != fatalError && top_dialog == NULL)
       update_game_window();
   }
-  if (severity != infoError) exit(1);
+
+#endif
+
+  if (severity == fatalError) exit(1);
 }
 
 void alert_user(short severity, short resid, short item, int error)

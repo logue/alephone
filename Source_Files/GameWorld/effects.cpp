@@ -70,7 +70,7 @@ static effect_definition *get_effect_definition(const short type);
 effect_data *get_effect_data(
 	const short effect_index)
 {
-	struct effect_data *effect = GetMemberWithBounds(effects,effect_index,MAXIMUM_EFFECTS_PER_MAP);
+	struct effect_data *effect = GetMemberWithBounds(EffectList.data(),effect_index,MAXIMUM_EFFECTS_PER_MAP);
 	
 	vassert(effect, csprintf(temporary, "effect index #%d is out of range", effect_index));
 	vassert(SLOT_IS_USED(effect), csprintf(temporary, "effect index #%d (%p) is unused", effect_index, (void*)effect));
@@ -111,7 +111,7 @@ short new_effect(
 		}
 		else
 		{
-			for (effect_index= 0,effect= effects; effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
+			for (effect_index= 0,effect = EffectList.data(); effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
 			{
 				if (SLOT_IS_FREE(effect))
 				{
@@ -124,11 +124,12 @@ short new_effect(
 						effect->type= type;
 						effect->flags= 0;
 						effect->object_index= object_index;
-						effect->data= 0;
+						effect->data= NONE;
 						effect->delay= definition->delay ? global_random()%definition->delay : 0;
 						MARK_SLOT_AS_USED(effect);
 						
 						SET_OBJECT_OWNER(object, _object_is_effect);
+						object->permutation = effect_index;
 						object->sound_pitch= definition->sound_pitch;
 						if (effect->delay) SET_OBJECT_INVISIBILITY(object, true);
 						if (definition->flags&_media_effect) SET_OBJECT_IS_MEDIA_EFFECT(object);
@@ -148,14 +149,14 @@ short new_effect(
 	return effect_index;
 }
 
-/* assumes ¶t==1 tick */
+/* assumes âˆ‚t==1 tick */
 void update_effects(
 	void)
 {
 	struct effect_data *effect;
 	short effect_index;
 	
-	for (effect_index= 0, effect= effects; effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
+	for (effect_index= 0, effect = EffectList.data(); effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
 	{
 		if (SLOT_IS_USED(effect))
 		{
@@ -175,16 +176,16 @@ void update_effects(
 			}
 			else
 			{
-				/* update our objectÕs animation */
+				/* update our objectâ€™s animation */
 				animate_object(effect->object_index);
 				
-				/* if the effectÕs animation has terminated and weÕre supposed to deactive it, do so */
+				/* if the effectâ€™s animation has terminated and weâ€™re supposed to deactive it, do so */
 				if (((GET_OBJECT_ANIMATION_FLAGS(object)&_obj_last_frame_animated)&&(definition->flags&_end_when_animation_loops)) ||
 					((GET_OBJECT_ANIMATION_FLAGS(object)&_obj_transfer_mode_finished)&&(definition->flags&_end_when_transfer_animation_loops)))
 				{
 					remove_effect(effect_index);
 					
-					/* if weÕre supposed to make another item visible, do so */
+					/* if weâ€™re supposed to make another item visible, do so */
 					if (definition->flags&_make_twin_visible)
 					{
 						struct object_data *object= get_object_data(effect->data);
@@ -214,7 +215,7 @@ void remove_all_nonpersistent_effects(
 	struct effect_data *effect;
 	short effect_index;
 	
-	for (effect_index= 0, effect= effects; effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
+	for (effect_index= 0, effect = EffectList.data(); effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
 	{
 		if (SLOT_IS_USED(effect))
 		{
@@ -259,6 +260,7 @@ void teleport_object_out(
 			struct effect_data *effect= get_effect_data(effect_index);
 			struct object_data *effect_object= get_object_data(effect->object_index);
 			
+			effect->data = object_index;
 			// make the effect look like the object
 			effect_object->shape= object->shape;
 			effect_object->sequence= object->sequence;
@@ -275,14 +277,14 @@ void teleport_object_out(
 	}
 }
 
-// if the given object isnÕt already teleporting in, do so
+// if the given object isnâ€™t already teleporting in, do so
 void teleport_object_in(
 	short object_index)
 {
 	struct effect_data *effect;
 	short effect_index;
 
-	for (effect_index= 0, effect= effects; effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
+	for (effect_index= 0, effect = EffectList.data(); effect_index<MAXIMUM_EFFECTS_PER_MAP; ++effect_index, ++effect)
 	{
 		if (SLOT_IS_USED(effect))
 		{

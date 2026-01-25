@@ -55,48 +55,29 @@ protected:
 
 
 static WritableTickBasedActionQueue* sStarQueues[MAXIMUM_NUMBER_OF_NETWORK_PLAYERS];
-static bool		sHubIsLocal;
 static NetTopology*	sTopology = NULL;
 static short*		sNetStatePtr = NULL;
+
+#ifdef A1_NETWORK_STANDALONE_HUB
+static constexpr bool sHubIsLocal = true;
+#else
+static bool sHubIsLocal;
+#endif
+
 
 
 bool
 StarGameProtocol::Enter(short* inNetStatePtr)
 {
+#ifndef A1_NETWORK_STANDALONE_HUB
+	sHubIsLocal = false;
+#endif
 	sNetStatePtr = inNetStatePtr;
 	return true;
 }
 
-
-
 void
-StarGameProtocol::Exit1()
-{
-//	return true;
-}
-
-
-
-void
-StarGameProtocol::Exit2()
-{
-//	return true;
-}
-
-
-
-void
-StarGameProtocol::DistributeInformation(short type, void *buffer, short buffer_size, bool send_to_self, bool only_send_to_team)
-{
-	const NetDistributionInfo* theInfo = NetGetDistributionInfoForType(type);
-	if(theInfo != NULL && theInfo->lossy)
-		spoke_distribute_lossy_streaming_bytes_to_everyone(type, static_cast<byte*>(buffer), buffer_size, !send_to_self, only_send_to_team);
-}
-
-
-
-void
-StarGameProtocol::PacketHandler(DDPPacketBufferPtr packet)
+StarGameProtocol::PacketHandler(UDPpacket& packet)
 {
         if(sHubIsLocal)
                 hub_received_network_packet(packet);
@@ -107,9 +88,13 @@ StarGameProtocol::PacketHandler(DDPPacketBufferPtr packet)
 
 
 bool
-StarGameProtocol::Sync(NetTopology* inTopology, int32 inSmallestGameTick, size_t inLocalPlayerIndex, size_t inServerPlayerIndex)
+StarGameProtocol::Sync(NetTopology* inTopology, int32 inSmallestGameTick, int inLocalPlayerIndex, bool isServer)
 {
 	assert(inTopology != NULL);
+
+#ifdef A1_NETWORK_STANDALONE_HUB
+	assert(isServer && inLocalPlayerIndex == NONE);
+#endif
 	
 	sTopology = inTopology;
 	
@@ -125,22 +110,27 @@ StarGameProtocol::Sync(NetTopology* inTopology, int32 inSmallestGameTick, size_t
                 theConnectedPlayerStatus[i] = ((sTopology->players[i].identifier != NONE) && !sTopology->players[i].net_dead);
         }
 
-        if(inLocalPlayerIndex == inServerPlayerIndex)
+        if(isServer)
         {
+#ifndef A1_NETWORK_STANDALONE_HUB
 		sHubIsLocal = true;
+#endif
 		
-                NetAddrBlock* theAddresses[MAXIMUM_NUMBER_OF_NETWORK_PLAYERS];
+                IPaddress* theAddresses[MAXIMUM_NUMBER_OF_NETWORK_PLAYERS];
 
                 for(int i = 0; i < sTopology->player_count; i++)
                         theAddresses[i] = (theConnectedPlayerStatus[i] ? &(sTopology->players[i].ddpAddress) : NULL);
 
                 hub_initialize(inSmallestGameTick, sTopology->player_count, theAddresses, inLocalPlayerIndex);
         }
+#ifndef A1_NETWORK_STANDALONE_HUB
 	else
 		sHubIsLocal = false;
 
-        spoke_initialize(sTopology->players[inServerPlayerIndex].ddpAddress, inSmallestGameTick, sTopology->player_count,
+
+        spoke_initialize(sTopology->server.ddpAddress, inSmallestGameTick, sTopology->player_count,
                          sStarQueues, theConnectedPlayerStatus, inLocalPlayerIndex, sHubIsLocal);
+#endif
 
         *sNetStatePtr = netActive;
 
@@ -154,7 +144,9 @@ StarGameProtocol::UnSync(bool inGraceful, int32 inSmallestPostgameTick)
 {
         if(*sNetStatePtr == netStartingUp || *sNetStatePtr == netActive)
         {
+#ifndef A1_NETWORK_STANDALONE_HUB
                 spoke_cleanup(inGraceful);
+#endif
                 if(sHubIsLocal)
                         hub_cleanup(inGraceful, inSmallestPostgameTick);
 
@@ -228,24 +220,12 @@ make_player_really_net_dead(size_t inPlayerIndex)
         sTopology->players[inPlayerIndex].net_dead = true;
 }
 
-
-
-void
-call_distribution_response_function_if_available(byte* inBuffer, uint16 inBufferSize, int16 inDistributionType, uint8 inSendingPlayerIndex)
-{
-	const NetDistributionInfo* theInfo = NetGetDistributionInfoForType(inDistributionType);
-	if(theInfo != NULL)
-		theInfo->distribution_proc(inBuffer, inBufferSize, inSendingPlayerIndex);
-}
-
-
-
 void
 StarGameProtocol::ParsePreferencesTree(InfoTree prefs, std::string version)
 {
-	BOOST_FOREACH(InfoTree child, prefs.children_named("hub"))
+	for (const InfoTree &child : prefs.children_named("hub"))
 		HubParsePreferencesTree(child, version);
-	BOOST_FOREACH(InfoTree child, prefs.children_named("spoke"))
+	for (const InfoTree &child : prefs.children_named("spoke"))
 		SpokeParsePreferencesTree(child, version);
 }
 

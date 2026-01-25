@@ -38,10 +38,14 @@ enum {
 	_receiving_physics,
 	// non-network ones
 	_loading,
+	_uploading_steam_workshop_default,
+	_uploading_steam_workshop_prepare,
+	_uploading_steam_workshop_upload,
 	// more network ones
 	_opening_router_ports,
 	_closing_router_ports,
-	_checking_for_updates
+	_checking_for_updates,
+	_connecting_to_remote_hub
 };
 
 void open_progress_dialog(size_t message_id, bool show_progress_bar = false);
@@ -52,6 +56,7 @@ void set_progress_dialog_message(size_t message_id);
 void draw_progress_bar(size_t sent, size_t total);
 
 void reset_progress_bar(void);
+void progress_dialog_event(void);
 
 #endif
 

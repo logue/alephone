@@ -38,10 +38,12 @@
 #include "Update.h"
 #include "progress.h"
 
+#include <functional>
+
 extern ChatHistory gMetaserverChatHistory;
 extern MetaserverClient* gMetaserverClient;
 
-const IPaddress
+std::optional<IPaddress>
 run_network_metaserver_ui()
 {
 	return MetaserverClientUi::Create()->GetJoinAddressByRunning();
@@ -49,7 +51,7 @@ run_network_metaserver_ui()
 
 
 void
-setupAndConnectClient(MetaserverClient& client)
+setupAndConnectClient(MetaserverClient& client, bool use_remote_hub)
 {
 	{
 		client.setPlayerName(player_preferences->name);
@@ -59,13 +61,14 @@ setupAndConnectClient(MetaserverClient& client)
 	
 	static bool user_informed = false;
 
+#ifndef HAVE_STEAM
 	if (network_preferences->check_for_updates && !user_informed)
 	{
 		static bool first_check = true;
 		
 		if (first_check)
 		{
-			uint32 ticks = machine_tick_count();
+			uint64_t ticks = machine_tick_count();
 
 			// if we get an update in a short amount of time, don't display progress
 			while (Update::instance()->GetStatus() == Update::CheckingForUpdate && machine_tick_count() - ticks < 500);
@@ -102,17 +105,16 @@ setupAndConnectClient(MetaserverClient& client)
 		
 		if (status != Update::CheckingForUpdate) user_informed = true;
 	}
+#endif
 
 	client.setPlayerTeamName("");
-	client.connect(A1_METASERVER_HOST, 6321, network_preferences->metaserver_login, network_preferences->metaserver_password);
+	client.connect(A1_METASERVER_HOST, 6321, network_preferences->metaserver_login, network_preferences->metaserver_password, use_remote_hub);
 }
 
 
 
-GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_info& info)
+GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_info& info, uint16 remote_hub_id)
 {
-	setupAndConnectClient(*gMetaserverClient);
-
 	GameDescription description;
 	description.m_type = info.net_game_type;
 	// If the time limit is longer than a week, we figure it's untimed (  ;)
@@ -132,10 +134,7 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	if (network_preferences->use_netscript)
 	{
 		FileSpecifier netScript(network_preferences->netscript_file);
-		char netScriptName[256];
-		netScript.GetName(netScriptName);
-		netScriptName[32] = '\0';
-		description.m_netScript = netScriptName;
+		description.m_netScript = netScript.GetName();
 	}
 	else if (HasLua)
 	{
@@ -153,20 +152,18 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 	}
 	else
 	{
-		char name[256];
 		FileSpecifier fs = environment_preferences->map_file;
-		fs.GetName(name);
-		description.m_mapFileName = name;
+		description.m_mapFileName = fs.GetName();
 		
 		fs = environment_preferences->physics_file;
 		if (fs.Exists() && fs.GetType() == _typecode_physics)
 		{
-			fs.GetName(name);
-			description.m_physicsName = name;
+			description.m_physicsName = fs.GetName();
 		}
 	}
 	
-	gMetaserverClient->announceGame(GAME_PORT, description);
+	//port is ignored if we are using a remote server
+	gMetaserverClient->announceGame(GAME_PORT, description, remote_hub_id);
 }
 
 void GameAvailableMetaserverAnnouncer::Start(int32 time_limit)
@@ -288,30 +285,29 @@ void MetaserverClientUi::delete_widgets ()
 	delete m_gameInfoWidget;
 }
 
-const IPaddress MetaserverClientUi::GetJoinAddressByRunning()
+std::optional<IPaddress> MetaserverClientUi::GetJoinAddressByRunning()
 {
 	// This was designed with one-shot-ness in mind
 	assert(!m_used);
 	m_used = true;
 	
-	obj_clear(m_joinAddress);
-
-	setupAndConnectClient(*gMetaserverClient);
+	setupAndConnectClient(*gMetaserverClient, false);
 	gMetaserverClient->associateNotificationAdapter(this);
 
-	m_gamesInRoomWidget->SetItemSelectedCallback(bind(&MetaserverClientUi::GameSelected, this, _1));
-	m_playersInRoomWidget->SetItemSelectedCallback(bind(&MetaserverClientUi::PlayerSelected, this, _1));
-	m_muteWidget->set_callback(boost::bind(&MetaserverClientUi::MuteClicked, this));
-	m_chatEntryWidget->set_callback(bind(&MetaserverClientUi::ChatTextEntered, this, _1));
-	m_cancelWidget->set_callback(boost::bind(&MetaserverClientUi::handleCancel, this));
-	m_joinWidget->set_callback(boost::bind(&MetaserverClientUi::JoinClicked, this));
-	m_gameInfoWidget->set_callback(boost::bind(&MetaserverClientUi::InfoClicked, this));
+	m_gamesInRoomWidget->SetItemSelectedCallback(std::bind(&MetaserverClientUi::GameSelected, this, std::placeholders::_1));
+	m_playersInRoomWidget->SetItemSelectedCallback(std::bind(&MetaserverClientUi::PlayerSelected, this, std::placeholders::_1));
+	m_muteWidget->set_callback(std::bind(&MetaserverClientUi::MuteClicked, this));
+	m_chatEntryWidget->set_callback(std::bind(&MetaserverClientUi::ChatTextEntered, this, std::placeholders::_1));
+	m_cancelWidget->set_callback(std::bind(&MetaserverClientUi::handleCancel, this));
+	m_joinWidget->set_callback(std::bind(&MetaserverClientUi::JoinClicked, this));
+	m_gameInfoWidget->set_callback(std::bind(&MetaserverClientUi::InfoClicked, this));
 	
 	gMetaserverChatHistory.clear ();
 	m_chatWidget->attachHistory (&gMetaserverChatHistory);
 
 	if (Run() < 0) {
 		handleCancel();
+		return std::nullopt;
 	}
 	
 	return m_joinAddress;
@@ -427,8 +423,8 @@ void MetaserverClientUi::JoinClicked()
 
 void MetaserverClientUi::JoinGame(const GameListMessage::GameListEntry& game)
 {
-	memcpy(&m_joinAddress.host, &game.m_ipAddress, sizeof(m_joinAddress.host));
-	m_joinAddress.port = game.m_port;
+	m_joinAddress.set_address(game.m_ipAddress);
+	m_joinAddress.set_port(game.m_port);
 	Stop();
 }
 
@@ -455,6 +451,7 @@ void MetaserverClientUi::gamesInRoomChanged(const std::vector<GameListMessage::G
 		if (gameChanges[i].verb() == MetaserverClient::GamesInRoom::kAdd && !gameChanges[i].running())
 		{
 			PlayInterfaceButtonSound(_snd_got_ball);
+			gMetaserverClient->gamesInRoomUpdate(false);
 			break;
 		}
 	}
@@ -463,6 +460,7 @@ void MetaserverClientUi::gamesInRoomChanged(const std::vector<GameListMessage::G
 void MetaserverClientUi::sendChat()
 {
 	string message = m_chatEntryWidget->get_text();
+	if (message.empty()) return;
 	if (gMetaserverClient->player_target() != MetaserverPlayerInfo::IdNone)
 	{
 		gMetaserverClient->sendPrivateMessage(gMetaserverClient->player_target(), message);
@@ -487,10 +485,9 @@ void MetaserverClientUi::ChatTextEntered (char character)
 
 void MetaserverClientUi::handleCancel ()
 {
-	// gMetaserverClient->disconnect ();
 	delete gMetaserverClient;
-	gMetaserverClient = new MetaserverClient ();
-	Stop ();
+	gMetaserverClient = new MetaserverClient();
+	Cancel();
 }
 
 #endif // !defined(DISABLE_NETWORKING)

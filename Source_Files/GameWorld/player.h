@@ -279,7 +279,7 @@ struct physics_variables
 	_fixed actual_height;
 
 	/* used by mask_in_absolute_positioning_information (because it is not really absolute) to
-		keep track of where weÕre going */
+		keep track of where weâ€™re going */
 	_fixed adjusted_pitch, adjusted_yaw;
 	
 	fixed_vector3d external_velocity; /* from impacts; slowly absorbed */
@@ -293,32 +293,28 @@ struct physics_variables
 	_fixed ceiling_height; /* same as above, but ceiling height */
 	_fixed media_height; /* media height */
 
-	int16 action; /* what the playerÕs legs are doing, basically */
+	int16 action; /* what the playerâ€™s legs are doing, basically */
 	uint16 old_flags, flags; /* stuff like _RECENTERING */
 };
 
 enum { /* Player flags */
 	_player_doesnt_auto_switch_weapons_flag= 0x0080,
 	_player_is_interlevel_teleporting_flag= 0x0100,
-	_player_has_cheated_flag= 0x0200,
 	_player_is_teleporting_flag= 0x0400,	
 	_player_has_map_open_flag= 0x0800,	
 	_player_is_totally_dead_flag= 0x1000,
-	_player_is_zombie_flag= 0x2000, // IS THIS USED??
+	_player_is_zombie_flag= 0x2000,
 	_player_is_dead_flag= 0x4000,
-	_player_is_pfhortran_controlled_flag= 0x8000
+	_player_had_overhead_map_active_flag= 0x8000
 };
 
-#define PLAYER_PERSISTANT_FLAGS (_player_has_cheated_flag | _player_doesnt_auto_switch_weapons_flag)
+#define PLAYER_PERSISTANT_FLAGS (_player_doesnt_auto_switch_weapons_flag | _player_is_zombie_flag)
 
 #define PLAYER_IS_DEAD(p) ((p)->flags&_player_is_dead_flag)
 #define SET_PLAYER_DEAD_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_is_dead_flag):((p)->flags&=(uint16)~_player_is_dead_flag)))
 
 #define PLAYER_IS_ZOMBIE(p) ((p)->flags&_player_is_zombie_flag)
 #define SET_PLAYER_ZOMBIE_STATUS(p,v) ((v)?((p)->flags|=(uint16)_player_is_zombie_flag):((p)->flags&=(uint16)~_player_is_zombie_flag))
-
-#define PLAYER_IS_PFHORTRAN_CONTROLLED(p) ( ( p )->flags & _player_is_pfhortran_controlled_flag )
-#define SET_PLAYER_IS_PFHORTRAN_CONTROLLED_STATUS(p,v) ((v)?((p)->flags|=(uint16)_player_is_pfhortran_controlled_flag):((p)->flags&=(uint16)~_player_is_pfhortran_controlled_flag))
 
 /* i.e., our animation has stopped */
 #define PLAYER_IS_TOTALLY_DEAD(p) ((p)->flags&_player_is_totally_dead_flag)
@@ -327,14 +323,14 @@ enum { /* Player flags */
 #define PLAYER_HAS_MAP_OPEN(p) ( (p)->flags & _player_has_map_open_flag )
 #define SET_PLAYER_MAP_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_has_map_open_flag):((p)->flags&=(uint16)~_player_has_map_open_flag)))
 
+#define PLAYER_HAD_OVERHEAD_MAP_ACTIVE(p) ((p)->flags&_player_had_overhead_map_active_flag)
+#define SET_PLAYER_HAD_OVERHEAD_MAP_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_had_overhead_map_active_flag):((p)->flags&=(uint16)~_player_had_overhead_map_active_flag)))
+
 #define PLAYER_IS_TELEPORTING(p) ((p)->flags&_player_is_teleporting_flag)
 #define SET_PLAYER_TELEPORTING_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_is_teleporting_flag):((p)->flags&=(uint16)~_player_is_teleporting_flag)))
 
 #define PLAYER_IS_INTERLEVEL_TELEPORTING(p) ((p)->flags&_player_is_interlevel_teleporting_flag)
 #define SET_PLAYER_INTERLEVEL_TELEPORTING_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_is_interlevel_teleporting_flag):((p)->flags&=(uint16)~_player_is_interlevel_teleporting_flag)))
-
-#define PLAYER_HAS_CHEATED(p) ((p)->flags&_player_has_cheated_flag)
-#define SET_PLAYER_HAS_CHEATED(p) ((p)->flags|=(uint16)_player_has_cheated_flag)
 
 #define PLAYER_DOESNT_AUTO_SWITCH_WEAPONS(p) ((p)->flags&_player_doesnt_auto_switch_weapons_flag)
 #define SET_PLAYER_DOESNT_AUTO_SWITCH_WEAPONS_STATUS(p,v) ((void)((v)?((p)->flags|=(uint16)_player_doesnt_auto_switch_weapons_flag):((p)->flags&=(uint16)~_player_doesnt_auto_switch_weapons_flag)))
@@ -362,7 +358,7 @@ struct player_data
 	int16 team;
 	char name[MAXIMUM_PLAYER_NAME_LENGTH+1];
 	
-	/* shadowed from physics_variables structure below and the playerÕs object (read-only) */
+	/* shadowed from physics_variables structure below and the playerâ€™s object (read-only) */
 	world_point3d location;
 	world_point3d camera_location; // beginning of fake world_location3d structure
 	int16 camera_polygon_index;
@@ -370,10 +366,10 @@ struct player_data
 	int16 supporting_polygon_index; /* what polygon is actually supporting our weight */
 	int16 last_supporting_polygon_index;
 
-	/* suit energy shadows vitality in the playerÕs monster slot */
+	/* suit energy shadows vitality in the playerâ€™s monster slot */
 	int16 suit_energy, suit_oxygen;
 	
-	int16 monster_index; /* this playerÕs entry in the monster list */
+	int16 monster_index; /* this playerâ€™s entry in the monster list */
 	int16 object_index; /* monster->object_index */
 	
 	/* Reset by initialize_player_weapons */
@@ -418,6 +414,10 @@ struct player_data
 	world_distance step_height; // not serialized, used to correct chase cam bob
 	uint8_t hotkey_sequence;    // not serialized, used to decode hotkey
 	int16_t hotkey; 			// not serialized, used to store hotkey
+
+	bool run_key;				// not serialized, used by HUD
+
+	int32_t ticks_at_death;		// not serialized
 
 	// ZZZ: since we don't put this structure directly into files or network communications,
 	// there ought? to be no reason for the padding
@@ -500,7 +500,7 @@ void team_damage_from_player_data(void);
 // ZZZ: this now takes a set of ActionQueues as a parameter so the caller can redirect
 // the update routine's input.  Also, now callers can request a 'predictive update',
 // which changes less state, in an effort to make partial state saving/restoration successful.
-void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive); /* assumes ¶t==1 tick */
+void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive); /* assumes âˆ‚t==1 tick */
 void decode_hotkeys(ModifiableActionQueues& action_queues);
 
 // handle pausing Marathon 1 terminals
@@ -551,8 +551,6 @@ _fixed get_player_forward_velocity_scale(short player_index);
 // Delta from the low-precision physical aim to the virtual "true" aim implied by high-precision aiming input;
 // |<yaw or pitch delta>| <= FIXED_ONE/2
 fixed_yaw_pitch virtual_aim_delta();
-
-fixed_yaw_pitch prev_virtual_aim_delta(); // for interpolation
 
 // Resync the virtual aim to the current physical aim
 void resync_virtual_aim();

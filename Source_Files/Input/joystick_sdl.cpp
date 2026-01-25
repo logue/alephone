@@ -23,28 +23,20 @@ May 18, 2009 (Eric Peterson):
 
 */
 
-#include <SDL.h>
-#include <boost/ptr_container/ptr_map.hpp>
+#include <SDL2/SDL.h>
 
 #include "player.h" // for mask_in_absolute_positioning_information
 #include "preferences.h"
 #include "joystick.h"
 #include "Logging.h"
-#include "FileHandler.h"
 
 // internal handles
 int joystick_active = true;
-static boost::ptr_map<int, SDL_GameController*> active_instances;
+static std::map<int, SDL_GameController*> active_instances;
 int axis_values[SDL_CONTROLLER_AXIS_MAX] = {};
 bool button_values[NUM_SDL_JOYSTICK_BUTTONS] = {};
 
 void initialize_joystick(void) {
-	// Look for "gamecontrollerdb.txt" in default search path
-	FileSpecifier fs;
-	if (fs.SetNameWithPath("gamecontrollerdb.txt")) {
-		SDL_GameControllerAddMappingsFromFile(fs.GetPath());
-	}
-	
 	SDL_GameControllerEventState(SDL_ENABLE);
 	for (int i = 0; i < SDL_NumJoysticks(); ++i)
 		joystick_added(i);
@@ -74,12 +66,14 @@ void joystick_added(int device_index) {
 	active_instances[instance_id] = controller;
 }
 
-void joystick_removed(int instance_id) {
+bool joystick_removed(int instance_id) {
 	SDL_GameController *controller = active_instances[instance_id];
 	if (controller) {
 		SDL_GameControllerClose(controller);
 		active_instances.erase(instance_id);
+		return true;
 	}
+	return false;
 }
 
 void joystick_axis_moved(int instance_id, int axis, int value) {
@@ -119,11 +113,6 @@ static const std::vector<AxisInfo> axis_mappings = {
 	{ 3, _flags_yaw, false },
 	{ 8, _flags_pitch, true },
 	{ 9, _flags_pitch, false }
-};
-
-static const float axis_limits[NUMBER_OF_ABSOLUTE_POSITION_VALUES] = {
-	0.5f - 1.f / (1<<ABSOLUTE_YAW_BITS),
-	0.5f - 1.f / (1<<ABSOLUTE_PITCH_BITS)
 };
 
 static int axis_mapped_to_action(int action, bool* negative) {
@@ -176,7 +165,7 @@ void joystick_buttons_become_keypresses(Uint8* ioKeyMap) {
     return;
 }
 
-int process_joystick_axes(int flags, int tick) {
+int process_joystick_axes(int flags) {
     if (!joystick_active)
         return flags;
 	if (active_instances.empty())
@@ -191,18 +180,33 @@ int process_joystick_axes(int flags, int tick) {
 		int axis = axis_mapped_to_action(info.key_binding_index, &negative);
 		if (axis < 0)
 			continue;
+
+		short controller_deadzone = 0;
+		_fixed controller_sensitivity = 0;
+		switch (info.abs_pos_index)
+		{
+			case _flags_yaw:
+				controller_sensitivity = input_preferences->controller_sensitivity_horizontal;
+				controller_deadzone = input_preferences->controller_deadzone_horizontal;
+				break;
+			case _flags_pitch:
+				controller_sensitivity = input_preferences->controller_sensitivity_vertical;
+				controller_deadzone = input_preferences->controller_deadzone_vertical;
+				break;
+		}
 		
 		int val = axis_values[axis] * (negative ? -1 : 1);
-		if (val > input_preferences->controller_deadzone) {
-			float norm = val/32767.f * (static_cast<float>(input_preferences->controller_sensitivity) / FIXED_ONE);
-			const float angle_per_norm = 768/63.f;
+		if (val > controller_deadzone) {
+			float norm = val/32767.f * (static_cast<float>(controller_sensitivity) / FIXED_ONE);
+			constexpr float angle_per_norm = 768/63.f;
 			angular_deltas[info.abs_pos_index] += norm * (info.negative ? -1.0 : 1.0) * angle_per_norm;
 		}
 	}
 	
 	// return this tick's action flags augmented with movement data
 	const fixed_angle dyaw = static_cast<fixed_angle>(angular_deltas[_flags_yaw] * FIXED_ONE);
-	const fixed_angle dpitch = static_cast<fixed_angle>(angular_deltas[_flags_pitch] * FIXED_ONE);
+	const fixed_angle dpitch = static_cast<fixed_angle>(angular_deltas[_flags_pitch] * FIXED_ONE) * (input_preferences->controller_aim_inverted ? -1 : 1);
+
 	if (dyaw != 0 || dpitch != 0)
 		flags = process_aim_input(flags, {dyaw, dpitch});
 	return flags;

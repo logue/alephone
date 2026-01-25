@@ -244,7 +244,6 @@ enum { /* states. */
 bool game_window_is_full_screen(void);
 void set_change_level_destination(short level_number);
 bool networking_available(void);
-void free_and_unlock_memory(void);
 
 /* ---------- prototypes/INTERFACE.C */
 
@@ -258,7 +257,6 @@ bool suppress_background_events(void);
 void set_game_state(short new_state);
 short get_game_state(void);
 short get_game_controller(void);
-bool current_netgame_allows_microphone();
 void set_change_level_destination(short level_number);
 bool check_level_change(void);
 void pause_game(void);
@@ -268,7 +266,7 @@ void process_main_menu_highlight_advance(bool reverse);
 void process_main_menu_highlight_select(bool cheatkeys_down);
 void draw_menu_button_for_command(short index);
 void update_interface_display(void);
-bool idle_game_state(uint32 ticks);
+bool idle_game_state(uint64_t time);
 void display_main_menu(void);
 void do_menu_item_command(short menu_id, short menu_item, bool cheat);
 bool interface_fade_finished(void);
@@ -276,12 +274,13 @@ void stop_interface_fade(void);
 bool enabled_item(short item);
 void paint_window_black(void);
 
+void set_game_focus_lost();
+void set_game_focus_gained();
+
 /* ---------- prototypes/INTERFACE_MACINTOSH.C */
 void do_preferences(void);
 short get_level_number_from_user(void);
 void toggle_menus(bool game_started);
-void install_network_microphone(void);
-void remove_network_microphone(void);
 
 // Should return NONE if user cancels, 0 for single player, or 1 for multiplayer.
 // Game has been loaded from file before this is called so elements like
@@ -381,6 +380,7 @@ void check_recording_replaying(void);
 bool has_recording_file(void);
 void increment_replay_speed(void);
 void decrement_replay_speed(void);
+void set_replay_speed(short);
 void reset_recording_and_playback_queues(void);
 uint32 parse_keymap(void);
 
@@ -404,12 +404,8 @@ enum {	// Results for network_join
         kNetworkJoinedResumeGame
 };
 
-bool network_gather(bool inResumingGame);
+bool network_gather(bool inResumingGame, bool& outUseRemoteHub);
 int network_join(void);
-
-/* ---------- prototypes/NETWORK_MICROPHONE.C */
-
-void handle_microphone(bool triggered);
 
 /* ---------- prototypes/PHYSICS.C */
 
@@ -434,11 +430,6 @@ bool get_default_theme_spec(FileSpecifier& File);
 // ZZZ addition: since Mac versions now search for any candidate files instead of picking
 // by name, new interface to search for all simultaneously instead of duplicating effort.
 void get_default_file_specs(FileSpecifier* outMapSpec, FileSpecifier* outShapesSpec, FileSpecifier* outSoundsSpec, FileSpecifier* outPhysicsSpec);
-
-// external resources: terminals for Marathon 1
-void set_external_resources_file(FileSpecifier&);
-void close_external_resources();
-extern OpenedResourceFile ExternalResources;
 
 // LP change: resets field of view to whatever the player had had when reviving
 void ResetFieldOfView();

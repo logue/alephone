@@ -129,7 +129,7 @@ item_definition *get_item_definition_external(
 
 int16 item_definition::get_maximum_count_per_player(bool is_m1, int difficulty_level) const
 {
-	if (has_extended_maximum_count[difficulty_level])
+	if (extended_maximum_count[difficulty_level] != NONE)
 	{
 		return extended_maximum_count[difficulty_level];
 	}
@@ -195,7 +195,7 @@ short new_item(
 			else if ((get_item_kind(type) == _ball) && !static_world->ball_in_play)
 			{
 				static_world->ball_in_play = true;
-				SoundManager::instance()->PlayLocalSound(_snd_got_ball);
+				SoundManager::instance()->PlaySound(_snd_got_ball, nullptr, NONE);
 			}
 			
 			/* let PLACEMENT.C keep track of how many there are */
@@ -227,7 +227,7 @@ void trigger_nearby_items(
 			switch (GET_OBJECT_OWNER(object))
 			{
 				case _object_is_item:
-					if (OBJECT_IS_INVISIBLE(object) && object->permutation!=NONE)
+					if (OBJECT_IS_INVISIBLE(object) && object->permutation!=NONE && get_item_shape(object->permutation) != NONE)
 					{
 						teleport_object_in(object_index);
 					}
@@ -577,7 +577,7 @@ bool try_and_add_player_item(
 
 	switch (definition->item_kind)
 	{
-		case _powerup: /* powerups donÕt get added to your inventory */
+		case _powerup: /* powerups donâ€™t get added to your inventory */
 			if (legal_player_powerup(player_index, type))
 			{
 				process_player_powerup(player_index, type);
@@ -706,7 +706,7 @@ bool try_and_add_player_item(
 	/* Play the pickup sound */
 	if (success && player_index==current_player_index)
 	{
-		SoundManager::instance()->PlayLocalSound(grabbed_sound_index);
+		SoundManager::instance()->PlaySound(grabbed_sound_index, nullptr, NONE);
 	
 		/* Flash screen */
 		start_fade(_fade_bonus);
@@ -858,7 +858,7 @@ void parse_mml_items(const InfoTree& root)
 			original_item_definitions[i] = item_definitions[i];
 	}
 	
-	BOOST_FOREACH(InfoTree itree, root.children_named("item"))
+	for (const InfoTree &itree : root.children_named("item"))
 	{
 		int16 index;
 		if (!itree.read_indexed("index", index, NUMBER_OF_DEFINED_ITEMS))
@@ -877,13 +877,10 @@ void parse_mml_items(const InfoTree& root)
 			if (!max.read_indexed("index", difficulty, NUMBER_OF_GAME_DIFFICULTY_LEVELS))
 				continue;
 
-			if (max.read_indexed("maximum", def.extended_maximum_count[difficulty], SHRT_MAX+1))
-			{
-				def.has_extended_maximum_count[difficulty] = true;
-			}
+			max.read_indexed("maximum", def.extended_maximum_count[difficulty], SHRT_MAX + 1);
 		}
 
-		BOOST_FOREACH(InfoTree shape, itree.children_named("shape"))
+		for (const InfoTree &shape : itree.children_named("shape"))
 			shape.read_shape(def.base_shape);
 	}
 }

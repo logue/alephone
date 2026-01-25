@@ -29,10 +29,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #ifdef HAVE_SDL_IMAGE
-#include <SDL_image.h>
-#endif
-#ifdef HAVE_PNG
-#include "IMG_savepng.h"
+#include <SDL2/SDL_image.h>
 #endif
 
 #include "FileHandler.h"
@@ -527,9 +524,7 @@ static bool build_map_preview(std::ostringstream& ostream)
     _restore_port();
 	
     SDL_RWops *rwops = SDL_RWFromOStream(ostream);
-//#if defined(HAVE_PNG) && defined(HAVE_SDL_IMAGE)
-//    int ret = aoIMG_SavePNG_RW(rwops, surface, IMG_COMPRESS_DEFAULT, NULL, 0);
-#ifdef HAVE_SDL_IMAGE
+#if defined (HAVE_SDL_IMAGE) && defined (HAVE_PNG)
 	int ret = IMG_SavePNG_RW(surface, rwops, 0);
 #else
     int ret = SDL_SaveBMP_RW(surface, rwops, false);
@@ -734,7 +729,7 @@ bool QuickSaveLoader::ParseQuickSave(FileSpecifier& file_name)
 				std::istringstream strm(metadata);
 				try {
 					pt = InfoTree::load_ini(strm);
-				} catch (InfoTree::ini_error e) {
+				} catch (const InfoTree::ini_error& e) {
 					return false;
 				}
 				

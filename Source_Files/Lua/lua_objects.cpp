@@ -33,11 +33,9 @@ LUA_OBJECTS.CPP
 #include "item_definitions.h"
 #include "scenery_definitions.h"
 
+#include <functional>
+
 #include "SoundManager.h"
-
-#include <boost/bind.hpp>
-
-#ifdef HAVE_LUA
 
 const float AngleConvert = 360/float(FULL_CIRCLE);
 
@@ -66,6 +64,20 @@ int lua_play_object_sound(lua_State *L)
 }
 
 template<class T>
+int lua_teleport_object_in(lua_State* L)
+{
+	teleport_object_in(T::Index(L, 1));
+	return 0;
+}
+
+template<class T>
+int lua_teleport_object_out(lua_State* L)
+{
+	teleport_object_out(T::Index(L, 1));
+	return 0;
+}
+
+template<class T>
 static int get_object_facing(lua_State *L)
 {
 	object_data *object = get_object_data(T::Index(L, 1));
@@ -86,6 +98,14 @@ static int get_object_type(lua_State *L)
 {
 	object_data *object = get_object_data(T::Index(L, 1));
 	TT::Push(L, object->permutation);
+	return 1;
+}
+
+template<class T>
+static int get_object_visible(lua_State* L)
+{
+	auto object = get_object_data(T::Index(L, 1));
+	lua_pushboolean(L, OBJECT_IS_VISIBLE(object));
 	return 1;
 }
 
@@ -121,6 +141,14 @@ static int set_object_facing(lua_State *L)
 
 	object_data *object = get_object_data(T::Index(L, 1));
 	object->facing = static_cast<int>(lua_tonumber(L, 2) / AngleConvert);
+	return 0;
+}
+
+template<class T>
+static int set_object_visible(lua_State* L)
+{
+	auto object = get_object_data(T::Index(L, 1));
+	SET_OBJECT_INVISIBILITY(object, !lua_toboolean(L, 2));
 	return 0;
 }
 
@@ -260,15 +288,23 @@ int Lua_Effect_Position(lua_State* L)
 }
 
 const luaL_Reg Lua_Effect_Get[] = {
-	{"delete", L_TableFunction<Lua_Effect_Delete>},
 	{"facing", Lua_Effect_Get_Facing},
-	{"play_sound", L_TableFunction<Lua_Effect_Play_Sound>},
 	{"polygon", Lua_Effect_Get_Polygon},
-	{"position", L_TableFunction<Lua_Effect_Position>},
 	{"type", Lua_Effect_Get_Type},
 	{"x", Lua_Effect_Get_X},
 	{"y", Lua_Effect_Get_Y},
 	{"z", Lua_Effect_Get_Z},
+	{0, 0}
+};
+
+const luaL_Reg Lua_Effect_Get_Mutable[] = {
+	{"delete", L_TableFunction<Lua_Effect_Delete>},
+	{"position", L_TableFunction<Lua_Effect_Position>},
+	{0, 0}
+};
+
+const luaL_Reg Lua_Effect_Get_Sound[] = {
+	{"play_sound", L_TableFunction<Lua_Effect_Play_Sound>},
 	{0, 0}
 };
 
@@ -293,7 +329,7 @@ bool Lua_Effect_Valid(int32 index)
 	if (index < 0 || index >= MAXIMUM_EFFECTS_PER_MAP)
 		return false;
 
-	effect_data *effect = GetMemberWithBounds(effects, index, MAXIMUM_EFFECTS_PER_MAP);
+	effect_data *effect = GetMemberWithBounds(EffectList.data(), index, MAXIMUM_EFFECTS_PER_MAP);
 	return SLOT_IS_USED(effect);
 }
 
@@ -356,7 +392,7 @@ int Lua_Item_Delete(lua_State* L)
 	{
 		for (auto i = 0; i < MAXIMUM_EFFECTS_PER_MAP; ++i)
 		{
-			auto effect = &effects[i];
+			auto effect = &EffectList.data()[i];
 			if (SLOT_IS_USED(effect) &&
 				effect->type == _effect_teleport_object_in &&
 				effect->data == object_index)
@@ -376,20 +412,33 @@ int Lua_Item_Delete(lua_State* L)
 }
 
 const luaL_Reg Lua_Item_Get[] = {
-	{"delete", L_TableFunction<Lua_Item_Delete>},
 	{"facing", get_object_facing<Lua_Item>},
 	{"play_sound", L_TableFunction<lua_play_object_sound<Lua_Item> >},
 	{"polygon", get_object_polygon<Lua_Item>},
-	{"position", L_TableFunction<lua_object_position<Lua_Item> >},
 	{"type", get_object_type<Lua_Item, Lua_ItemType>},
+	{"visible", get_object_visible<Lua_Item>},
 	{"x", get_object_x<Lua_Item>},
 	{"y", get_object_y<Lua_Item>},
 	{"z", get_object_z<Lua_Item>},
 	{0, 0}
 };
 
+const luaL_Reg Lua_Item_Get_Mutable[] = {
+	{"delete", L_TableFunction<Lua_Item_Delete>},
+	{"position", L_TableFunction<lua_object_position<Lua_Item> >},
+	{"teleport_in", L_TableFunction<lua_teleport_object_in<Lua_Item>>},
+	{"teleport_out", L_TableFunction<lua_teleport_object_out<Lua_Item>>},
+	{0, 0}
+};
+
+const luaL_Reg Lua_Item_Get_Sound[] = {
+	{"play_sound", L_TableFunction<lua_play_object_sound<Lua_Item> >},
+	{0, 0}
+};
+
 const luaL_Reg Lua_Item_Set[] = {
 	{"facing", set_object_facing<Lua_Item>},
+	{"visible", set_object_visible<Lua_Item>},
 	{0, 0}
 };
 
@@ -550,7 +599,6 @@ static int Lua_ItemType_Set_Maximum_Inventory(lua_State* L)
 		auto definition = get_item_definition_external(Lua_ItemType::Index(L, 1));
 		const auto difficulty_level = dynamic_world->game_information.difficulty_level;
 		definition->extended_maximum_count[difficulty_level] = static_cast<int16_t>(lua_tonumber(L, 2));
-		definition->has_extended_maximum_count[difficulty_level] = true;
 	}
 	else
 	{
@@ -688,18 +736,29 @@ static int Lua_Scenery_Get_Solid(lua_State *L)
 }
 
 const luaL_Reg Lua_Scenery_Get[] = {
-	{"damage", L_TableFunction<Lua_Scenery_Damage>},
 	{"damaged", Lua_Scenery_Get_Damaged},
-	{"delete", L_TableFunction<lua_delete_object<Lua_Scenery> >},
 	{"facing", get_object_facing<Lua_Scenery>},
-	{"play_sound", L_TableFunction<lua_play_object_sound<Lua_Scenery> >},
 	{"polygon", get_object_polygon<Lua_Scenery>},
-	{"position", L_TableFunction<lua_object_position<Lua_Scenery> >},
 	{"solid", Lua_Scenery_Get_Solid},
 	{"type", get_object_type<Lua_Scenery, Lua_SceneryType>},
+	{"visible", get_object_visible<Lua_Scenery>},
 	{"x", get_object_x<Lua_Scenery>},
 	{"y", get_object_y<Lua_Scenery>},
 	{"z", get_object_z<Lua_Scenery>},
+	{0, 0}
+};
+
+const luaL_Reg Lua_Scenery_Get_Mutable[] = {
+	{"damage", L_TableFunction<Lua_Scenery_Damage>},
+	{"delete", L_TableFunction<lua_delete_object<Lua_Scenery> >},
+	{"position", L_TableFunction<lua_object_position<Lua_Scenery> >},
+	{"teleport_in", L_TableFunction<lua_teleport_object_in<Lua_Scenery>>},
+	{"teleport_out", L_TableFunction<lua_teleport_object_out<Lua_Scenery>>},
+	{0, 0}
+};
+
+const luaL_Reg Lua_Scenery_Get_Sound[] = {
+	{"play_sound", L_TableFunction<lua_play_object_sound<Lua_Scenery> >},
 	{0, 0}
 };
 
@@ -716,6 +775,7 @@ static int Lua_Scenery_Set_Solid(lua_State *L)
 const luaL_Reg Lua_Scenery_Set[] = {
 	{"facing", set_object_facing<Lua_Scenery>},
 	{"solid", Lua_Scenery_Set_Solid},
+	{"visible", set_object_visible<Lua_Scenery>},
 	{0, 0}
 };
 
@@ -817,25 +877,70 @@ const luaL_Reg Lua_Sounds_Methods[] = {
 
 static void compatibility(lua_State *L);
 
-int Lua_Objects_register(lua_State *L)
+int Lua_Objects_register(lua_State *L, const LuaMutabilityInterface& m)
 {
-	Lua_Effect::Register(L, Lua_Effect_Get, Lua_Effect_Set);
+	Lua_Effect::Register(L, Lua_Effect_Get);
+	if (m.world_mutable())
+	{
+		Lua_Effect::RegisterAdditional(L, Lua_Effect_Get_Mutable, Lua_Effect_Set);
+	}
+	if (m.world_mutable() || m.sound_mutable())
+	{
+		Lua_Effect::RegisterAdditional(L, Lua_Effect_Get_Sound);
+	}
 	Lua_Effect::Valid = Lua_Effect_Valid;
 
-	Lua_Effects::Register(L, Lua_Effects_Methods);
-	Lua_Effects::Length = boost::bind(get_dynamic_limit, (int) _dynamic_limit_effects);
+	if (m.world_mutable())
+	{
+		Lua_Effects::Register(L, Lua_Effects_Methods);
+	}
+	else
+	{
+		Lua_Effects::Register(L);
+	}
+	Lua_Effects::Length = std::bind(get_dynamic_limit, (int) _dynamic_limit_effects);
 
-	Lua_Item::Register(L, Lua_Item_Get, Lua_Item_Set);
+	Lua_Item::Register(L, Lua_Item_Get);		
+	if (m.world_mutable())
+	{
+		Lua_Item::Register(L, Lua_Item_Get_Mutable, Lua_Item_Set);
+	}
+	if (m.world_mutable() || m.sound_mutable())
+	{
+		Lua_Item::Register(L, Lua_Item_Get_Sound);
+	}
 	Lua_Item::Valid = Lua_Item_Valid;
 
-	Lua_Items::Register(L, Lua_Items_Methods);
-	Lua_Items::Length = boost::bind(get_dynamic_limit, (int) _dynamic_limit_objects);
+	if (m.world_mutable())
+	{
+		Lua_Items::Register(L, Lua_Items_Methods);
+	}
+	else
+	{
+		Lua_Items::Register(L);
+	}
+	Lua_Items::Length = std::bind(get_dynamic_limit, (int) _dynamic_limit_objects);
 
-	Lua_Scenery::Register(L, Lua_Scenery_Get, Lua_Scenery_Set);
+	Lua_Scenery::Register(L, Lua_Scenery_Get);
+	if (m.world_mutable())
+	{
+		Lua_Scenery::RegisterAdditional(L, Lua_Scenery_Get_Mutable, Lua_Scenery_Set);
+	}
+	if (m.world_mutable() || m.sound_mutable())
+	{
+		Lua_Scenery::RegisterAdditional(L, Lua_Scenery_Get_Sound);
+	}
 	Lua_Scenery::Valid = Lua_Scenery_Valid;
 
-	Lua_Sceneries::Register(L, Lua_Sceneries_Methods);
-	Lua_Sceneries::Length = boost::bind(get_dynamic_limit, (int) _dynamic_limit_objects);
+	if (m.world_mutable())
+	{
+		Lua_Sceneries::Register(L, Lua_Sceneries_Methods);
+	}
+	else
+	{
+		Lua_Sceneries::Register(L);
+	}
+	Lua_Sceneries::Length = std::bind(get_dynamic_limit, (int) _dynamic_limit_objects);
 
 	Lua_EffectType::Register(L, 0, 0, 0, Lua_EffectType_Mnemonics);
 	Lua_EffectType::Valid = Lua_EffectType::ValidRange(NUMBER_OF_EFFECT_TYPES);
@@ -849,7 +954,14 @@ int Lua_Objects_register(lua_State *L)
 	Lua_ItemKinds::Register(L);
 	Lua_ItemKinds::Length = Lua_ItemKinds::ConstantLength(NUMBER_OF_ITEM_TYPES);
 
-	Lua_ItemType::Register(L, Lua_ItemType_Get, Lua_ItemType_Set, 0, Lua_ItemType_Mnemonics);
+	if (m.world_mutable())
+	{
+		Lua_ItemType::Register(L, Lua_ItemType_Get, Lua_ItemType_Set, 0, Lua_ItemType_Mnemonics);
+	}
+	else
+	{
+		Lua_ItemType::Register(L, Lua_ItemType_Get, 0, 0, Lua_ItemType_Mnemonics);
+	}
 	Lua_ItemType::Valid = Lua_ItemType_Valid;
 
 	Lua_ItemTypes::Register(L);
@@ -883,5 +995,3 @@ static void compatibility(lua_State *L)
 	luaL_loadbuffer(L, compatibility_script, strlen(compatibility_script), "items_compatibility");
 	lua_pcall(L, 0, 0, 0);
 }
-
-#endif

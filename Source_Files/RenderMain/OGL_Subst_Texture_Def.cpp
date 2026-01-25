@@ -206,6 +206,8 @@ void parse_mml_opengl_texture(const InfoTree& root)
 		root.read_attr("glow_bloom_shift", def.GlowBloomShift);
 		root.read_attr("landscape_bloom", def.LandscapeBloom);
 		root.read_attr("minimum_glow_intensity", def.MinGlowIntensity);
+		root.read_attr("tile_ratio_exp", def.TileRatioExp);
+		root.read_attr_bounded("billboard", def.Billboard, BillboardType::User, BillboardType::XY);
 	}
 }
 

@@ -42,7 +42,7 @@
 #ifndef SDL_WIDGETS_H
 #define SDL_WIDGETS_H
 
-#include	<SDL.h>
+#include	<SDL2/SDL.h>
 
 #include	"cseries.h"
 #include	"sdl_dialogs.h"
@@ -55,8 +55,7 @@
 
 #include	<vector>
 #include	<set>
-#include	<boost/function.hpp>
-#include 	<boost/bind.hpp>
+#include <functional>
 
 #include "metaserver_messages.h" // for GameListMessage, for w_games_in_room and MetaserverPlayerInfo, for w_players_in_room
 #include "network.h" // for prospective_joiner_info
@@ -66,8 +65,8 @@
 struct SDL_Surface;
 //class sdl_font_info;
 
-typedef boost::function<void (void)> ControlHitCallback;
-typedef boost::function<void (char)> GotCharacterCallback;
+typedef std::function<void (void)> ControlHitCallback;
+typedef std::function<void (char)> GotCharacterCallback;
 
 /*
  *  Widget base class
@@ -198,14 +197,17 @@ class w_label : public w_static_text {
 	friend class dialog;
 	friend class w_slider;
 public:
-	w_label(const char *text) : w_static_text(text, LABEL_WIDGET), associated_widget(0) {}
+	w_label(const char *text) : w_static_text(text, LABEL_WIDGET), associated_widget(0), down(false) {}
 
 	void associate_widget(widget *w) { associated_widget = w; }
 	void draw(SDL_Surface *s) const;
 	void click(int, int);
+	void mouse_down(int, int);
+	void mouse_up(int, int);
 	bool is_selectable(void) const { if (associated_widget) return associated_widget->is_selectable(); else return false; }
 private:
 	widget *associated_widget;
+	bool down;
 };
 
 class w_title : public w_static_text {
@@ -238,7 +240,7 @@ protected:
  */
 
 // typedef void (*action_proc)(void *);
-typedef boost::function<void (void*)> action_proc;
+typedef std::function<void (void*)> action_proc;
 
 class w_button_base : public widget {
 public:
@@ -321,7 +323,8 @@ public:
 
 	void draw(SDL_Surface *s) const;
 	void click(int x, int y);
-
+	void mouse_down(int x, int y);
+	void mouse_up(int x, int y);
 	void set_selection(const char *selection);
 	void set_callback(action_proc p, void* a) { proc = p; arg = a; }
 
@@ -334,7 +337,7 @@ private:
 	const char *selection;
 	action_proc proc;
 	void *arg;
-
+	bool down;
 	int16 selection_x;			// X offset of selection display
 	bool utf8; // render utf8 text instead of roman
 };
@@ -347,7 +350,7 @@ private:
 // ZZZ: type for callback function
 class w_select;
 // typedef void (*selection_changed_callback_t)(w_select* theWidget);
-typedef boost::function<void (w_select*)> selection_changed_callback_t;
+typedef std::function<void (w_select*)> selection_changed_callback_t;
 
 class w_select : public widget {
 public:
@@ -465,7 +468,7 @@ public:
 class w_text_entry : public widget {
 	friend class w_number_entry;
 public:
-	typedef boost::function<void (w_text_entry*)> Callback;
+	typedef std::function<void (w_text_entry*)> Callback;
 
 	w_text_entry(size_t max_chars, const char *initial_text = NULL);
 	~w_text_entry();
@@ -612,7 +615,7 @@ protected:
  */
 
 class w_slider;
-typedef boost::function<void (w_slider*)> slider_changed_callback_t;
+typedef std::function<void (w_slider*)> slider_changed_callback_t;
 
 class w_slider : public widget {
 	friend class w_slider_text;
@@ -808,9 +811,12 @@ public:
 
 	void draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16 x, int16 y, uint16 width, bool selected) const;
 
+	void set_offset(int offset) { this->offset = offset; }
+
 private:
 	dialog *parent;
 	bool    show_level_numbers;
+	int offset;
 };
 
 
@@ -866,9 +872,7 @@ class w_file_chooser : public w_select_button
 {
 public:
 	w_file_chooser(const char* inDialogPrompt, Typecode inTypecode);
-
-	void click(int x, int y);
-
+	void proc();
 	void set_file(const FileSpecifier& inFile);
 	const FileSpecifier& get_file() { return file; }
 
@@ -883,6 +887,26 @@ private:
 	char		filename[256];
 	char		dialog_prompt[256];
 	Typecode	typecode;
+	ControlHitCallback m_callback;
+};
+
+class w_directory_chooser : public w_select_button
+{
+public:
+	w_directory_chooser();
+	void proc();
+	void set_directory(const FileSpecifier& inFile);
+	const FileSpecifier& get_directory() { return directory; }
+
+	// we also have void set_callback(action_proc, void*)
+	// as inherited from w_select_button
+	void set_callback(ControlHitCallback callback) { m_callback = callback; }
+
+private:
+	void update_directoryname();
+
+	FileSpecifier	directory;
+	char		directory_name[256];
 	ControlHitCallback m_callback;
 };
 
@@ -901,7 +925,7 @@ template <typename tElement>
 class w_items_in_room : public w_list_base
 {
 public:
-	typedef typename boost::function<void (const tElement& item)> ItemClickedCallback;
+	typedef typename std::function<void (const tElement& item)> ItemClickedCallback;
 	typedef typename std::vector<tElement> ElementVector;
 
 	w_items_in_room(ItemClickedCallback itemClicked, int width, int numRows) :
@@ -1115,7 +1139,7 @@ public:
 		: SDLWidgetWidget (toggle)
 		, m_toggle (toggle)
 		, m_callback (NULL)
-		{ m_toggle->set_selection_changed_callback (boost::bind(&ToggleWidget::massage_callback, this, _1)); }
+		{ m_toggle->set_selection_changed_callback (std::bind(&ToggleWidget::massage_callback, this, std::placeholders::_1)); }
 
 	void set_callback (ControlHitCallback callback) { m_callback = callback; }
 	
@@ -1164,7 +1188,7 @@ public:
 	PopupSelectorWidget (w_select_popup* select_popup_w)
 		: SelectorWidget (select_popup_w)
 		, m_select_popup (select_popup_w)
-		{ select_popup_w->set_popup_callback (boost::bind(&PopupSelectorWidget::massage_callback, this, _1), NULL); }
+		{ select_popup_w->set_popup_callback (std::bind(&PopupSelectorWidget::massage_callback, this, std::placeholders::_1), NULL); }
 
 	virtual void set_labels (const std::vector<std::string>& labels) { m_select_popup->set_labels (labels); }
 	
@@ -1183,7 +1207,7 @@ public:
 	SelectSelectorWidget (w_select* select_w)
 		: SelectorWidget (select_w)
 		, m_select (select_w)
-		{ m_select->set_selection_changed_callback (boost::bind(&SelectSelectorWidget::massage_callback, this, _1)); }
+		{ m_select->set_selection_changed_callback (std::bind(&SelectSelectorWidget::massage_callback, this, std::placeholders::_1)); }
 
 	// w_select only knows how to set labels from stringsets
 	virtual void set_labels (int stringset) { m_select->set_labels_stringset (stringset); }
@@ -1271,7 +1295,7 @@ public:
 	EditTextWidget (w_text_entry* text_entry)
 		: SDLWidgetWidget (text_entry)
 		, m_text_entry (text_entry)
-		{ m_text_entry->set_enter_pressed_callback (boost::bind(&EditTextWidget::got_submit, this, _1)); }
+		{ m_text_entry->set_enter_pressed_callback (std::bind(&EditTextWidget::got_submit, this, std::placeholders::_1)); }
 
 	void set_callback (GotCharacterCallback callback) { m_callback = callback; }
 
@@ -1336,17 +1360,17 @@ public:
 	GameListWidget (w_games_in_room* games_in_room)
 		: m_games_in_room (games_in_room)
 		{
-			m_games_in_room->set_item_clicked_callback(boost::bind(&GameListWidget::bounce_callback, this, _1));
+			m_games_in_room->set_item_clicked_callback(std::bind(&GameListWidget::bounce_callback, this, std::placeholders::_1));
 		}
 
 	void SetItems(const vector<GameListMessage::GameListEntry>& items) { m_games_in_room->set_collection (items); }
 
-	void SetItemSelectedCallback(const boost::function<void (GameListMessage::GameListEntry)> itemSelected)
+	void SetItemSelectedCallback(const std::function<void (GameListMessage::GameListEntry)> itemSelected)
 		{ m_callback = itemSelected; }
 
 private:
 	w_games_in_room* m_games_in_room;
-	boost::function<void (GameListMessage::GameListEntry)> m_callback;
+	std::function<void (GameListMessage::GameListEntry)> m_callback;
 	
 	void bounce_callback (GameListMessage::GameListEntry thingy)
 		{ m_callback (thingy); }
@@ -1357,18 +1381,18 @@ class PlayerListWidget
 public:
 	PlayerListWidget (w_players_in_room* players_in_room)
 		: m_players_in_room (players_in_room) {
-		m_players_in_room->set_item_clicked_callback(boost::bind(&PlayerListWidget::bounce_callback, this, _1));
+		m_players_in_room->set_item_clicked_callback(std::bind(&PlayerListWidget::bounce_callback, this, std::placeholders::_1));
 	}
 
 	void SetItems(const vector<MetaserverPlayerInfo>& items) { m_players_in_room->set_collection (items); }
-	void SetItemSelectedCallback(const boost::function<void (MetaserverPlayerInfo)> itemSelected)
+	void SetItemSelectedCallback(const std::function<void (MetaserverPlayerInfo)> itemSelected)
 	{ m_callback = itemSelected; }
 
 	
 
 private:
 	w_players_in_room* m_players_in_room;
-	boost::function<void (MetaserverPlayerInfo)> m_callback;
+	std::function<void (MetaserverPlayerInfo)> m_callback;
 	
 	void bounce_callback (MetaserverPlayerInfo thingy)
 	{ m_callback(thingy); }
@@ -1380,17 +1404,17 @@ public:
 	JoiningPlayerListWidget (w_joining_players_in_room* joining_players_in_room)
 		: m_joining_players_in_room (joining_players_in_room)
 		{
-			m_joining_players_in_room->set_item_clicked_callback(boost::bind(&JoiningPlayerListWidget::bounce_callback, this, _1));
+			m_joining_players_in_room->set_item_clicked_callback(std::bind(&JoiningPlayerListWidget::bounce_callback, this, std::placeholders::_1));
 		}
 
 	void SetItems(const vector<prospective_joiner_info>& items) { m_joining_players_in_room->set_collection (items); }
 
-	void SetItemSelectedCallback(const boost::function<void (prospective_joiner_info)> itemSelected)
+	void SetItemSelectedCallback(const std::function<void (prospective_joiner_info)> itemSelected)
 		{ m_callback = itemSelected; }
 
 private:
 	w_joining_players_in_room* m_joining_players_in_room;
-	boost::function<void (prospective_joiner_info)> m_callback;
+	std::function<void (prospective_joiner_info)> m_callback;
 	
 	void bounce_callback (prospective_joiner_info thingy)
 		{ m_callback (thingy); }

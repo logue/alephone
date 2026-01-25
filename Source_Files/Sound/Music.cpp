@@ -2,7 +2,7 @@
 
 	Copyright (C) 1991-2001 and beyond by Bungie Studios, Inc.
 	and the "Aleph One" developers.
- 
+
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 3 of the License, or
@@ -20,275 +20,310 @@
 */
 
 #include "Music.h"
-#include "Mixer.h"
-#include "XML_LevelScript.h"
+#include "SoundManager.h"
+#include "interface.h"
+#include "OpenALManager.h"
 
-static int16_t db_to_channel_volume(float db)
-{
-	if (db <= SoundManager::MINIMUM_VOLUME_DB / 2)
-	{
-		return 0;
-	}
-	else
-	{
-		return static_cast<int16_t>(Mixer::from_db(db) * MAXIMUM_SOUND_VOLUME);
-	}
-}
-
-Music::Music() : 
-	music_initialized(false), 
-	music_intro(false), 
-	music_play(false), 
-	music_prelevel(false),
-	music_level(false), 
-	music_fading(false), 
-	music_fade_start(0), 
-	music_fade_duration(0),
-	decoder(0),
+Music::Music() :
 	marathon_1_song_index(NONE),
 	song_number(0),
-	random_order(false)
+	random_order(false),
+	music_slots(reserved_music_slots)
+{}
+
+bool Music::Slot::Open(FileSpecifier* file)
 {
-	music_buffer.resize(MUSIC_BUFFER_SIZE);
-}
+	Close();
 
-void Music::Open(FileSpecifier *file)
-{
-	if (music_initialized)
-	{
-		if (file && *file == music_file)
-		{
-			Rewind();
-			return;
-		}
+	if (!file)
+		return false;
 
-		Close();
-	}
+	auto track_id = LoadTrack(file);
+	if (!track_id.has_value()) return false;
 
-	if (file)
-	{
-		music_initialized = Load(*file);
-		music_file = *file;
-	}
-		
-}
+	auto preset_id = AddPreset();
+	if (!preset_id.has_value()) return false;
 
-bool Music::SetupIntroMusic(FileSpecifier &file)
-{
-	music_intro_file = file;
-	Open(&file);
-	if (music_initialized)
-		music_intro = true;
-	return music_initialized;
+	return AddSegmentToPreset(preset_id.value(), track_id.value()).has_value();
 }
 
 void Music::RestartIntroMusic()
 {
-	if (music_intro)
+	auto& introSlot = music_slots[MusicSlot::Intro];
+	if (!introSlot.Playing() && introSlot.SetParameters({}))
 	{
-		Open(&music_intro_file);
-		Play();
-		music_play = true;
-	}
-}
-
-void Music::FadeOut(short duration)
-{
-	if (music_play)
-	{
-		if (!music_level) music_play = false;
-		music_fading = true;
-		music_fade_start = machine_tick_count();
-		music_fade_duration = duration;
-	}
-}
-
-bool Music::Playing()
-{
-	if (!SoundManager::instance()->IsInitialized() || !SoundManager::instance()->IsActive()) return false;
-	return Mixer::instance()->MusicPlaying();
-}
-
-void Music::Restart()
-{
-	if (music_play)
-	{
-		if (music_level)
-		{
-			LoadLevelMusic();
-			Play();
-		}
-		else if (music_intro)
-		{
-			Open(&music_intro_file);
-			Play();
-		}
-	}
-}
-
-void Music::Idle()
-{
-	if (!SoundManager::instance()->IsInitialized() || !SoundManager::instance()->IsActive()) return;
-	if (music_prelevel)
-	{
-		music_prelevel = false;
-		Play();
-	}
-
-	if (!Playing())
-		Restart();
-
-	if (music_fading)
-	{
-		uint32 elapsed = machine_tick_count() - music_fade_start;
-		int max_vol = db_to_channel_volume(GetVolumeLevel());
-		int vol = max_vol - (elapsed * max_vol) / music_fade_duration;
-		if (vol <= 0)
-			Pause();
-		else
-		{
-			if (vol > max_vol)
-				vol = max_vol;
-			// set music channel volume
-
-			Mixer::instance()->SetMusicChannelVolume(vol);
-		}
+		introSlot.Play();
 	}
 }
 
 void Music::Pause()
 {
-	if (!SoundManager::instance()->IsInitialized() || !SoundManager::instance()->IsActive()) return;
-	Mixer::instance()->StopMusicChannel();
-	music_fading = false;
-}
-
-void Music::Close()
-{
-	if (music_initialized)
+	for (auto& slot : music_slots)
 	{
-		music_initialized = false;
-		Pause();
-		delete decoder;
-		decoder = 0;
+		slot.Pause();
 	}
+
+	music_slots.resize(reserved_music_slots);
 }
 
-bool Music::Load(FileSpecifier &song_file)
+void Music::Fade(float limitVolume, short duration, MusicPlayer::FadeType fadeType, bool stopOnNoVolume)
 {
-
-	delete decoder;
-	decoder = StreamDecoder::Get(song_file);
-
-	if (decoder)
+	for (auto& slot : music_slots)
 	{
-		sixteen_bit = decoder->IsSixteenBit();
-		stereo = decoder->IsStereo();
-		signed_8bit = decoder->IsSigned();
-		bytes_per_frame = decoder->BytesPerFrame();
-		rate = (_fixed) ((decoder->Rate() / Mixer::instance()->obtained.freq) * (1 << FIXED_FRACTIONAL_BITS));
-		little_endian = decoder->IsLittleEndian();
-
-		return true;
-		
+		slot.Fade(limitVolume, duration, fadeType, stopOnNoVolume);
 	}
-	else
+}
+
+void Music::Slot::Fade(float limitVolume, short duration, MusicPlayer::FadeType fadeType, bool stopOnNoVolume)
+{
+	if (!Playing()) return;
+
+	music_fade_type = fadeType;
+	music_fade_start_volume = parameters.volume;
+	music_fade_limit_volume = limitVolume;
+	music_fade_start = SoundManager::GetCurrentAudioTick();
+	music_fade_duration = duration;
+	music_fade_stop_no_volume = stopOnNoVolume;
+}
+
+std::optional<uint32_t> Music::Add(const MusicParameters& parameters, FileSpecifier* file)
+{
+	Slot slot;
+	bool success = (!file || slot.Open(file)) && slot.SetParameters(parameters);
+	if (!success) return std::nullopt;
+	music_slots.push_back(std::move(slot));
+	return static_cast<uint32_t>(music_slots.size() - 1);
+}
+
+bool Music::Playing()
+{
+	for (auto& slot : music_slots)
 	{
-		return false;
-	}
-}
-
-void Music::Rewind()
-{
-	
-	if (decoder)
-		decoder->Rewind();
-}
-
-void Music::Play()
-{
-	if (!music_initialized || !SoundManager::instance()->IsInitialized() || !SoundManager::instance()->IsActive()) return;
-	if (FillBuffer()) {
-		// let the mixer handle it
-		Mixer::instance()->StartMusicChannel(sixteen_bit, stereo, signed_8bit, bytes_per_frame, rate, little_endian);
-		CheckVolume();
-	}
-}
-
-bool Music::FillBuffer()
-{
-	if (GetVolumeLevel() <= SoundManager::MINIMUM_VOLUME_DB) return false;
-
-	if (!decoder) return false;
-	int32 bytes_read = decoder->Decode(&music_buffer.front(), MUSIC_BUFFER_SIZE);
-	if (bytes_read)
-	{
-		Mixer::instance()->UpdateMusicChannel(&music_buffer.front(), bytes_read);
-		return true;
+		if (slot.Playing())
+			return true;
 	}
 
-	// Failed
 	return false;
 }
 
-void Music::LoadLevelMusic()
+void Music::Idle()
+{
+	if (!SoundManager::instance()->IsInitialized() || !SoundManager::instance()->IsActive() || OpenALManager::Get()->IsPaused()) return;
+
+	if (get_game_state() == _game_in_progress && !music_slots[MusicSlot::Level].Playing() && LoadLevelMusic()) 
+	{
+		music_slots[MusicSlot::Level].Play();
+	}
+
+	for (int i = 0; i < music_slots.size(); i++)
+	{
+		auto& slot = music_slots.at(i);
+
+		if (slot.IsFading())
+		{
+			auto volumeResult = slot.ComputeFadingVolume();
+			bool fadeIn = volumeResult.first;
+			float vol = fadeIn ? std::min(volumeResult.second, slot.GetLimitFadeVolume()) : std::max(volumeResult.second, slot.GetLimitFadeVolume());
+			slot.SetVolume(vol);
+			if (vol == slot.GetLimitFadeVolume()) slot.StopFade();
+			if (vol <= 0 && slot.StopPlayerAfterFadeOut()) slot.Pause();
+		}
+	}
+}
+
+std::pair<bool, float> Music::Slot::ComputeFadingVolume() const
+{
+	const bool fadeIn = music_fade_limit_volume > music_fade_start_volume;
+	const auto elapsed = SoundManager::GetCurrentAudioTick() - music_fade_start;
+	const float factor = std::clamp(elapsed / (float)music_fade_duration, 0.f, 1.f);
+
+	if (factor == 1.f) //Ensure fade completion despite float precision
+	{
+		return { fadeIn, music_fade_limit_volume };
+	}
+
+	float volume = music_fade_start_volume;
+	switch (music_fade_type) {
+	case MusicPlayer::FadeType::Linear:
+	{
+		volume += (music_fade_limit_volume - music_fade_start_volume) * factor;
+		break;
+	}
+	case MusicPlayer::FadeType::Sinusoidal:
+	{
+		const auto t = factor * M_PI_2;
+		const auto shape = fadeIn ? std::sin(t) : 1.0 - std::cos(t);
+		volume += (music_fade_limit_volume - music_fade_start_volume) * shape;
+		break;
+	}
+	case MusicPlayer::FadeType::None:
+	{
+		volume = music_fade_limit_volume;
+		break;
+	}
+	default:
+		assert(false);
+		break;
+	}
+
+	return { fadeIn, volume };
+}
+
+void Music::Slot::Pause()
+{
+	if (Playing())
+	{
+		musicPlayer->AskStop();
+	}
+
+	StopFade();
+}
+
+void Music::Slot::Close()
+{
+	Pause();
+	musicPlayer.reset();
+	dynamic_music_presets.clear();
+	dynamic_music_tracks.clear();
+}
+
+bool Music::Slot::SetParameters(const MusicParameters& parameters)
+{
+	this->parameters = parameters;
+	this->parameters.volume = std::max(std::min(parameters.volume, 1.f), 0.f);
+	if (musicPlayer) musicPlayer->UpdateParameters(this->parameters);
+	return true;
+}
+
+void Music::Slot::Play(uint32_t preset_index, uint32_t segment_index)
+{
+	if (!OpenALManager::Get() || Playing() || !IsSegmentIndexValid(preset_index, segment_index)) return;
+	musicPlayer = OpenALManager::Get()->PlayMusic(dynamic_music_presets, preset_index, segment_index, parameters);
+}
+
+std::optional<uint32_t> Music::Slot::LoadTrack(FileSpecifier* file)
+{
+	std::shared_ptr<StreamDecoder> segment_decoder = file ? StreamDecoder::Get(*file) : nullptr;
+	if (!segment_decoder) return std::nullopt;
+	dynamic_music_tracks.emplace_back(segment_decoder);
+	return static_cast<uint32_t>(dynamic_music_tracks.size() - 1);
+}
+
+std::optional<uint32_t> Music::Slot::AddPreset()
+{
+	dynamic_music_presets.emplace_back();
+	return static_cast<uint32_t>(dynamic_music_presets.size() - 1);
+}
+
+std::optional<uint32_t> Music::Slot::AddSegmentToPreset(uint32_t preset_index, uint32_t track_index)
+{
+	if (preset_index >= dynamic_music_presets.size() || track_index >= dynamic_music_tracks.size())
+		return std::nullopt;
+
+	dynamic_music_presets[preset_index].AddSegment(dynamic_music_tracks[track_index]);
+	return static_cast<uint32_t>(dynamic_music_presets[preset_index].GetSegments().size() - 1);
+}
+
+bool Music::Slot::SetSegmentMapping(uint32_t preset_index, uint32_t segment_index, uint32_t transition_preset_index, const MusicPlayer::Segment::Mapping& transition_segment_mapping)
+{
+	if (!IsSegmentIndexValid(preset_index, segment_index) || !IsSegmentIndexValid(transition_preset_index, transition_segment_mapping.segment_id))
+		return false;
+
+	auto segment = dynamic_music_presets[preset_index].GetSegment(segment_index);
+	if (!segment) return false;
+
+	segment->SetSegmentMapping(transition_preset_index, transition_segment_mapping);
+	return true;
+}
+
+bool Music::Slot::IsSegmentIndexValid(uint32_t preset_index, uint32_t segment_index) const
+{
+	return preset_index < dynamic_music_presets.size() && segment_index < dynamic_music_presets[preset_index].GetSegments().size();
+}
+
+bool Music::Slot::SetPresetTransition(uint32_t preset_index)
+{
+	if (!musicPlayer || !musicPlayer->IsActive()) return false;
+	return musicPlayer->RequestPresetTransition(preset_index);
+}
+
+bool Music::LoadLevelMusic()
 {
 	FileSpecifier* level_song_file = GetLevelMusic();
-	Open(level_song_file);
+	auto& slot = music_slots[MusicSlot::Level];
+	return slot.Open(level_song_file) && slot.SetParameters({ 1.f, playlist.size() == 1 });
+}
+
+void Music::SetPlaylistParameters(bool randomOrder)
+{
+	random_order = randomOrder;
 }
 
 void Music::SeedLevelMusic()
 {
 	song_number = 0;
-	
-	randomizer.z ^= machine_tick_count();
+	randomizer.z ^= SoundManager::GetCurrentAudioTick();
 	randomizer.SetTable();
 }
 
 void Music::SetClassicLevelMusic(short song_index)
 {
-    ClearLevelMusic();
-    if (song_index < 0)
-        return;
-    
-    FileSpecifier file;
-    sprintf(temporary, "Music/%02d.ogg", song_index);
-    file.SetNameWithPath(temporary);
-    if (!file.Exists())
-    {
-        sprintf(temporary, "Music/%02d.mp3", song_index);
-        file.SetNameWithPath(temporary);
-    }
-    if (!file.Exists())
-        return;
-    
-    PushBackLevelMusic(file);
-    marathon_1_song_index = song_index;
+	if (playlist.size() || song_index < 0)
+		return;
+
+	FileSpecifier file;
+	sprintf(temporary, "Music/%02d.ogg", song_index);
+	file.SetNameWithPath(temporary);
+	if (!file.Exists())
+	{
+		sprintf(temporary, "Music/%02d.mp3", song_index);
+		file.SetNameWithPath(temporary);
+	}
+	if (!file.Exists())
+		return;
+
+	PushBackLevelMusic(file);
+	marathon_1_song_index = song_index;
 }
 
-void Music::PreloadLevelMusic()
+void Music::ClearLevelPlaylist()
 {
-	LoadLevelMusic();
+	playlist.clear();
+	marathon_1_song_index = NONE;
+}
 
-	if (music_initialized)
+void Music::StopInGameMusic()
+{
+	for (int i = MusicSlot::Level; i < music_slots.size(); i++)
 	{
-		music_prelevel = true;
-		music_level = true;
-		music_play = true;
+		music_slots[i].Close();
 	}
 }
 
 void Music::StopLevelMusic()
 {
-	music_level = false;
-	music_play = false;
-	Close();
+	music_slots[MusicSlot::Level].Close();
+}
+
+void Music::PushBackLevelMusic(const FileSpecifier& file)
+{
+	if (std::find(playlist.begin(), playlist.end(), file) != playlist.end())
+	{
+		return;
+	}
+
+	playlist.push_back(file);
+
+	if (playlist.size() > 1)
+	{
+		music_slots[MusicSlot::Level].SetLoop(false);
+	}
 }
 
 FileSpecifier* Music::GetLevelMusic()
 {
 	// No songs to play
-	if (playlist.empty()) return 0;
+	if (playlist.empty()) return nullptr;
 
 	size_t NumSongs = playlist.size();
 	if (NumSongs == 1) return &playlist[0];
@@ -298,14 +333,7 @@ FileSpecifier* Music::GetLevelMusic()
 
 	// Get the song number to within range if playing sequentially;
 	// if the song number gets too big, then it's reset back to the first one
-	if (song_number < 0) song_number = 0;
-	else if (song_number >= NumSongs) song_number = 0;
+	if (song_number >= NumSongs) song_number = 0;
 
 	return &playlist[song_number++];
-}
-
-void Music::CheckVolume()
-{
-	if (!music_fading)
-		Mixer::instance()->SetMusicChannelVolume(db_to_channel_volume(GetVolumeLevel()));
 }

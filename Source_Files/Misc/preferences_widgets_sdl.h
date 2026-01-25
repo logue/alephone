@@ -53,7 +53,8 @@ public:
 
 	env_item(const FileSpecifier &fs, int i, bool sel) : spec(fs), indent(i), selectable(sel)
 	{
-		spec.GetName(name);
+		strncpy(name, spec.GetName().c_str(), sizeof(name));
+		name[sizeof(name) - 1] = '\0';
 	}
 
 	FileSpecifier spec;	// Specifier of associated file
@@ -109,30 +110,47 @@ private:
 // Environment selection button
 // ZZZ: added callback stuff - callback is made if user clicks on an entry in the selection dialog.
 class w_env_select;
-typedef void (*selection_made_callback_t)(w_env_select* inWidget);
+using selection_made_callback_t = std::function<void(w_env_select*)>;
+
+extern const char* const sFileChooserInvalidFileString;
 
 class w_env_select : public w_select_button {
 public:
 w_env_select(const char *path, const char *m, Typecode t, dialog *d)
 	: w_select_button(item_name, select_item_callback, NULL, true),
-		parent(d), menu_title(m), type(t), mCallback(NULL)
+    	parent(d), menu_title(m), type(t), mCallback(NULL), prefer_net{false}
 	{
 		set_arg(this);
 		set_path(path);
 	}
 	~w_env_select() {}
 
-    void    set_selection_made_callback(selection_made_callback_t inCallback) {
+    void set_selection_made_callback(selection_made_callback_t inCallback) {
         mCallback = inCallback;
     }
 
 	void set_path(const char *p)
 	{
 		item = p;
-		item.GetName(item_name);
-		std::string filename = item_name;
-		strncpy(item_name, FileSpecifier::HideExtension(filename).c_str(), 256);
-		set_selection(item_name);
+		
+		if (*p)
+		{
+			if (item.Exists())
+			{
+				strncpy(item_name, FileSpecifier::HideExtension(item.GetName()).c_str(), sizeof(item_name));
+				item_name[sizeof(item_name) - 1] = '\0';
+			}
+			else
+			{
+				snprintf(item_name, sizeof(item_name), "[?%s]", FileSpecifier::HideExtension(item.GetName()).c_str());
+			}
+			
+			set_selection(item_name);
+		}
+		else
+		{
+			set_selection(sFileChooserInvalidFileString);
+		}
 	}
 
 	const char *get_path(void) const
@@ -143,6 +161,11 @@ w_env_select(const char *path, const char *m, Typecode t, dialog *d)
 	FileSpecifier &get_file_specifier(void)
 	{
 		return item;
+	}
+
+	void set_prefer_net(bool prefer_net)
+	{
+		this->prefer_net = prefer_net;
 	}
 
 private:
@@ -157,6 +180,30 @@ private:
 	char item_name[256];	// File name (excluding directory part)
 
     selection_made_callback_t mCallback;
+
+	bool prefer_net;
+};
+
+class EnvSelectWidget : public SDLWidgetWidget, public Bindable<FileSpecifier>
+{
+public:
+	EnvSelectWidget(w_env_select* env_select) :
+		SDLWidgetWidget(env_select),
+		m_env_select(env_select)
+	{
+	}
+
+	void set_callback(ControlHitCallback callback) { m_env_select->set_selection_made_callback([=](w_env_select*) { callback(); }); }
+	void set_file(const FileSpecifier& file) { m_env_select->set_path(file.GetPath()); }
+	FileSpecifier get_file() { return m_env_select->get_file_specifier(); }
+
+	virtual FileSpecifier bind_export() { return get_file(); }
+	virtual void bind_import(FileSpecifier f) { set_file(f); }
+
+	void set_prefer_net(bool prefer_net) { m_env_select->set_prefer_net(prefer_net); }
+
+private:
+	w_env_select* m_env_select;
 };
 
 class w_crosshair_display : public widget {

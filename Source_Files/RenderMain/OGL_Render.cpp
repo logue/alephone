@@ -369,11 +369,21 @@ static _fixed SelfLuminosity;
 // Pointer to current fog data:
 OGL_FogData *CurrFog = NULL;
 
-inline bool FogActive()
+bool FogActive()
 {
 	if (!CurrFog) return false;
 	bool FogAllowed = TEST_FLAG(Get_OGL_ConfigureData().Flags,OGL_Flag_Fog);
 	return CurrFog->IsPresent && FogAllowed;
+}
+
+OGL_FogData* OGL_GetCurrFogData()
+{
+	if (FogActive())
+	{
+		return CurrFog;
+	}
+
+	return nullptr;
 }
 
 // Current fog color; may be different from the fog color above because of infravision being on
@@ -747,7 +757,7 @@ void PreloadWallTexture(const TextureWithTransferMode& inTexture)
 		// Get the landscape-texturing options
 		LandscapeOptions *LandOpts = View_GetLandscapeOptions(TMgr.ShapeDesc);	
 		TMgr.LandscapeVertRepeat = LandOpts->VertRepeat;
-		TMgr.Landscape_AspRatExp = LandOpts->OGL_AspRatExp;
+		TMgr.Landscape_AspRatExp = LandOpts->SphereMap ? 1 : LandOpts->OGL_AspRatExp;
 	}
 	
 	// After all this setting up, now use it!
@@ -845,11 +855,31 @@ bool OGL_StartMain()
 				FindInfravisionVersionRGBA(LoadedWallTexture,CurrFogColor);
 		}
 		glFogfv(GL_FOG_COLOR,CurrFogColor);
-		glFogf(GL_FOG_DENSITY,1.0F/MAX(1,WORLD_ONE*CurrFog->Depth));
+
+		if (CurrFog->Mode == OGL_Fog_Linear)
+		{
+			glFogf(GL_FOG_DENSITY, 0.0F);
+			glFogf(GL_FOG_START, WORLD_ONE*CurrFog->Start);
+			glFogf(GL_FOG_END, WORLD_ONE*(CurrFog->Start + CurrFog->Depth));
+		}
+		else if (CurrFog->Mode == OGL_Fog_Exp2)
+		{
+			glFogf(GL_FOG_DENSITY,1.0F/MAX(1,WORLD_ONE*CurrFog->Depth));
+			glFogf(GL_FOG_START, 0.0F);
+			glFogf(GL_FOG_END, 0.0F);
+		}
+		else
+		{
+			glFogf(GL_FOG_DENSITY,1.0F/MAX(1,WORLD_ONE*CurrFog->Depth));
+			glFogf(GL_FOG_START, 0.0F);
+			glFogf(GL_FOG_END, 0.0F);
+		}
 	}
 	else
 	{
 		glFogf(GL_FOG_DENSITY,0.0F);
+		glFogf(GL_FOG_START, 0.0F);
+		glFogf(GL_FOG_END, 0.0F);
 		glDisable(GL_FOG);
 	}
 	
@@ -1856,7 +1886,7 @@ static bool RenderAsLandscape(polygon_definition& RenderPolygon)
 	// Vertical requires adjustment for aspect ratio;
 	// the texcoords must be stretched in the vertical direction
 	// if the texture is shrunken in the vertical direction
-	short AdjustedVertExp = LandOpts->VertExp + LandOpts->OGL_AspRatExp;
+	short AdjustedVertExp = LandOpts->VertExp + LandOpts->SphereMap ? 1 : LandOpts->OGL_AspRatExp;
 	double VertScale = (AdjustedVertExp >= 0) ?
 		double(1 << AdjustedVertExp) :
 			1/double(1 << (-AdjustedVertExp));
@@ -1876,7 +1906,7 @@ static bool RenderAsLandscape(polygon_definition& RenderPolygon)
 	TMgr.TransferData = RenderPolygon.transfer_data;
 	TMgr.IsShadeless = (RenderPolygon.flags&_SHADELESS_BIT) != 0;
 	TMgr.LandscapeVertRepeat = LandOpts->VertRepeat;
-	TMgr.Landscape_AspRatExp = LandOpts->OGL_AspRatExp;
+	TMgr.Landscape_AspRatExp = LandOpts->SphereMap ? 1 : LandOpts->OGL_AspRatExp;
 	TMgr.TextureType = OGL_Txtr_Landscape;
 	
 	// Use that texture
@@ -2981,6 +3011,16 @@ bool OGL_RenderCrosshairs()
 	// Done with that modelview matrix
 	glPopMatrix();
 			
+	return true;
+}
+
+bool OGL_TextWidth(const char* Text, int count, int& width)
+{
+	if (!OGL_IsActive()) return false;
+
+	std::string s(Text, count);
+
+	width = GetOnScreenFont().TextWidth(s.c_str());
 	return true;
 }
 

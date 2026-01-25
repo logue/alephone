@@ -45,6 +45,7 @@ Mar 1, 2002 (Woody Zenfell):
 #include    "metaserver_dialogs.h"
 
 #include    "shared_widgets.h"
+#include    "preferences_widgets_sdl.h"
 
 #include    <string>
 
@@ -239,16 +240,17 @@ class GatherDialog : public GatherCallbacks, public ChatCallbacks, public Global
 {
 public:
 // Abstract factory; concrete type determined at link-time
-	static std::unique_ptr<GatherDialog> Create();
+	static std::unique_ptr<GatherDialog> Create(bool remote_hub_mode);
 	
 	bool GatherNetworkGameByRunning ();
 	
 	virtual ~GatherDialog ();
 	
 	// Callbacks for network code; final methods
+	virtual void JoiningPlayerArrived(const prospective_joiner_info* player);
 	virtual void JoinSucceeded(const prospective_joiner_info* player);
-	virtual void JoiningPlayerDropped(const prospective_joiner_info* player);
-	virtual void JoinedPlayerDropped(const prospective_joiner_info* player);
+	virtual bool JoiningPlayerDropped(const prospective_joiner_info* player);
+	virtual bool JoinedPlayerDropped(const prospective_joiner_info* player);
 	virtual void JoinedPlayerChanged(const prospective_joiner_info* player);
 
 	virtual void ReceivedMessageFromPlayer(
@@ -256,7 +258,7 @@ public:
 		const char *message);
 
 protected:
-	GatherDialog();
+	GatherDialog(bool use_remote_hub) : remote_hub_mode(use_remote_hub) {}
 	
 	virtual bool Run() = 0;
 	virtual void Stop(bool result) = 0;
@@ -287,6 +289,8 @@ protected:
 	EditTextWidget*			m_chatEntryWidget;
 	SelectorWidget*			m_chatChoiceWidget;
 	ColorfulChatWidget*             m_chatWidget;
+
+	bool remote_hub_mode;
 
 	enum { kPregameChat = 0, kMetaserverChat };
 };
@@ -353,7 +357,7 @@ protected:
 };
 
 
-bool network_game_setup(player_info *player_information, game_info *game_information, bool inResumingGame, bool& outAdvertiseGameOnMetaserver);
+bool network_game_setup(player_info *player_information, game_info *game_information, bool inResumingGame, bool& outAdvertiseGameOnMetaserver, bool& outUpnpPortForward, bool& outUseRemoteHub);
 
 class SetupNetgameDialog
 {
@@ -365,7 +369,9 @@ public:
 		player_info *player_information,
 		game_info *game_information,
 		bool ResumingGame,
-		bool& outAdvertiseGameOnMetaserver);
+		bool& outAdvertiseGameOnMetaserver,
+		bool& outUpnpPortForward,
+		bool& outUseRemoteHub);
 
 	virtual ~SetupNetgameDialog ();
 
@@ -399,7 +405,7 @@ protected:
 	SelectorWidget*		m_colourWidget;
 	SelectorWidget*		m_teamWidget;
 	
-	FileChooserWidget*	m_mapWidget;
+	EnvSelectWidget*	m_mapWidget;
 	SelectorWidget*		m_levelWidget;
 	SelectorWidget*		m_gameTypeWidget;
 	SelectorWidget*		m_difficultyWidget;
@@ -417,9 +423,7 @@ protected:
 	ToggleWidget*		m_useMetaserverWidget;
 	
 	ToggleWidget*		m_useScriptWidget;
-	FileChooserWidget*	m_scriptWidget;
-	
-	ToggleWidget*		m_allowMicWidget;
+	EnvSelectWidget*	m_scriptWidget;
 	
 	ToggleWidget*		m_liveCarnageWidget;
 	ToggleWidget*		m_motionSensorWidget;
@@ -432,13 +436,9 @@ protected:
 	ToggleWidget*           m_savingLevelWidget;
 	
 	ToggleWidget*       m_useUpnpWidget;
+	ToggleWidget*       m_useRemoteHub;
 	SelectorWidget*         m_latencyToleranceWidget;
 };
-
-
-
-extern void reassign_player_colors(short player_index, short num_players);
-
 
 
 // (Postgame Carnage Report routines)
