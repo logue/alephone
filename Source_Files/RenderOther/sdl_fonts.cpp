@@ -47,13 +47,16 @@ using std::map;
 
 #include <boost/tuple/tuple_comparison.hpp>
 #include "preferences.h" // smooth_font
+
+#ifdef ENABLE_JAPANESE
 #include "jp-fonts/AlephJPSansMono-Bold.h"
 #include "jp-fonts/DotGothic16Regular.h"
-
 #include "jp-fonts/SourceHanMono-Regular.h"
 #include "jp-fonts/SourceHanMono-RegularIt.h"
 #include "jp-fonts/SourceHanMono-Bold.h"
 #include "jp-fonts/SourceHanMono-BoldIt.h"
+#endif
+
 // Global variables
 typedef pair<int, int> id_and_size_t;
 typedef map<id_and_size_t, sdl_font_info *> font_list_t;
@@ -78,6 +81,7 @@ typedef struct builtin_font
 	unsigned int size;
 } builtin_font_t;
 
+#ifdef ENABLE_JAPANESE
 static builtin_font_t builtin_fontspecs[] = {
 	{ "mono", AlephJPSansMonoBold, AlephJPSansMonoBold_size },
 	{ "Monaco", DotGothic16Regular, DotGothic16Regular_size },
@@ -86,6 +90,10 @@ static builtin_font_t builtin_fontspecs[] = {
 	{ "Courier Prime Italic", SourceHanMonoRegularIt, SourceHanMonoRegularIt_size },
 	{" Courier Prime Bold Italic", SourceHanMonoBoldIt, SourceHanMonoBoldIt_size }
 };
+#else
+// Empty builtin fonts array for non-Japanese builds
+static builtin_font_t builtin_fontspecs[] = {};
+#endif
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)
 
