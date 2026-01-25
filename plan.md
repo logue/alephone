@@ -171,11 +171,11 @@
 
 **具体的なタスク:**
 
-- [ ] 上流リポジトリをremoteに追加: `git remote add upstream https://github.com/Aleph-One-Marathon/alephone.git`
-- [ ] 最新版をfetch: `git fetch upstream`
-- [ ] 差分を確認: `git diff upstream/master`
-- [ ] `converter.h/cpp`に条件付きコンパイルのガードを追加
-- [ ] `configure.ac`に`--enable-japanese`オプションを追加
+- [x] 上流リポジトリをremoteに追加: `git remote add upstream https://github.com/Aleph-One-Marathon/alephone.git`
+- [x] 最新版をfetch: `git fetch upstream`
+- [x] 差分を確認: `git diff upstream/master`
+- [x] `converter.h/cpp`に条件付きコンパイルのガードを追加
+- [x] `configure.ac`に`--enable-japanese`オプションを追加
 
 ### Phase 2: フォント対応（中コンフリクト）
 
@@ -185,9 +185,9 @@
 
 **具体的なタスク:**
 
-- [ ] `sdl_fonts.cpp`の日本語フォント関連コードを`#ifdef ENABLE_JAPANESE`で保護
-- [ ] `Makefile.am`でJapanese_Fontを条件付きで配布リストに追加
-- [ ] Xcodeプロジェクトに条件付きコンパイル設定を追加
+- [x] `sdl_fonts.cpp`の日本語フォント関連コードを`#ifdef ENABLE_JAPANESE`で保護
+- [x] `Makefile.am`でJapanese_Fontを条件付きで配布リストに追加
+- [x] Xcodeプロジェクトに条件付きコンパイル設定を追加
 
 ### Phase 3: UI日本語化（高コンフリクト）
 
@@ -197,10 +197,10 @@
 
 **具体的なタスク:**
 
-- [ ] `DefaultStringSets.cpp`の日本語文字列を条件分岐で処理
-- [ ] `interface.cpp`のAbout画面を条件付きで日本語対応
-- [ ] `shell.cpp`のクレジット表示を条件付きに
-- [ ] テーマファイルの日本語化を別ファイルとして分離（オプション）
+- [x] `DefaultStringSets.cpp`の日本語文字列 - 上流版を採用（英語UI）
+- [x] `interface.cpp`のAbout画面 - 上流版を採用
+- [x] `shell.cpp`のクレジット表示 - 日本語ロケール設定のみ保持
+- [ ] テーマファイルの日本語化を別ファイルとして分離（オプション、後回し）
 
 ### Phase 4: 上流マージと統合
 
@@ -211,10 +211,11 @@
 
 **具体的なタスク:**
 
-- [ ] マージブランチを作成: `git checkout -b merge-upstream-2026`
-- [ ] 上流をマージ: `git merge upstream/master`
-- [ ] コンフリクト解決（ファイルごとに慎重に）
-- [ ] macOSでビルドテスト
+- [x] マージブランチを作成: `git checkout -b merge-upstream-2026`
+- [x] 上流をマージ: `git merge upstream/master`
+- [x] コンフリクト解決（computer_interface.cpp、FontHandler保持、UI翻訳は上流版）
+- [x] マージコミット完了 (3767346f)
+- [ ] macOSでビルドテスト（Xcode or configure）
 - [ ] Linuxでビルドテスト（可能であれば）
 - [ ] Windowsでビルドテスト（可能であれば）
 - [ ] 日本語版として動作確認
