@@ -2678,6 +2678,7 @@
 		AEC3C86609AD68AC003258E4 /* MessageInflater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DC152490711123200836977 /* MessageInflater.cpp */; };
 		AEC3C86709AD68AC003258E4 /* network_messages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DF154D6080376E100BC3C09 /* network_messages.cpp */; };
 		AEC3C86809AD68AC003258E4 /* csstrings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F522114C0136A66601000001 /* csstrings.cpp */; };
+		C0FFEE0000000000000000B1 /* converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* converter.cpp */; };
 		AEC3C86909AD68AC003258E4 /* SdlMetaserverClientUi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 088809F3084C1A5500DC9E4D /* SdlMetaserverClientUi.cpp */; };
 		AEC3C86A09AD68AC003258E4 /* network_capabilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE5604DD086F6DF100D9797C /* network_capabilities.cpp */; };
 		AEC3C86B09AD68AC003258E4 /* shared_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE437C8E08779BE500038E30 /* shared_widgets.cpp */; };
@@ -3402,6 +3403,8 @@
 		F52211450136A66601000001 /* cscluts_sdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cscluts_sdl.cpp; path = ../Source_Files/CSeries/cscluts_sdl.cpp; sourceTree = SOURCE_ROOT; };
 		F522114B0136A66601000001 /* csmisc_sdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = csmisc_sdl.cpp; path = ../Source_Files/CSeries/csmisc_sdl.cpp; sourceTree = SOURCE_ROOT; };
 		F522114C0136A66601000001 /* csstrings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = csstrings.cpp; path = ../Source_Files/CSeries/csstrings.cpp; sourceTree = SOURCE_ROOT; };
+		C0FFEE0000000000000000A1 /* converter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = converter.cpp; path = ../Source_Files/CSeries/converter.cpp; sourceTree = SOURCE_ROOT; };
+		C0FFEE0000000000000000A2 /* converter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = converter.h; path = ../Source_Files/CSeries/converter.h; sourceTree = SOURCE_ROOT; };
 		F52211970136A6FD01000001 /* game_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = game_errors.cpp; path = ../Source_Files/Misc/game_errors.cpp; sourceTree = SOURCE_ROOT; };
 		F52211AE0136A6FD01000001 /* game_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = game_errors.h; path = ../Source_Files/Misc/game_errors.h; sourceTree = SOURCE_ROOT; };
 		F52211C20136A6FD01000001 /* interface_menus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interface_menus.h; path = ../Source_Files/Misc/interface_menus.h; sourceTree = SOURCE_ROOT; };
@@ -4081,6 +4084,8 @@
 				F52211450136A66601000001 /* cscluts_sdl.cpp */,
 				F522114B0136A66601000001 /* csmisc_sdl.cpp */,
 				F522114C0136A66601000001 /* csstrings.cpp */,
+				C0FFEE0000000000000000A1 /* converter.cpp */,
+				C0FFEE0000000000000000A2 /* converter.h */,
 				F5574EEE01F4EB1E01FEABBD /* csdialogs_sdl.cpp */,
 				F5574EEF01F4EB1E01FEABBD /* mytm_sdl.cpp */,
 			);
@@ -7852,6 +7857,7 @@
 				AEC3C86609AD68AC003258E4 /* MessageInflater.cpp in Sources */,
 				AEC3C86709AD68AC003258E4 /* network_messages.cpp in Sources */,
 				AEC3C86809AD68AC003258E4 /* csstrings.cpp in Sources */,
+				C0FFEE0000000000000000B1 /* converter.cpp in Sources */,
 				AEC3C86909AD68AC003258E4 /* SdlMetaserverClientUi.cpp in Sources */,
 				AEC3C86A09AD68AC003258E4 /* network_capabilities.cpp in Sources */,
 				AEC3C86B09AD68AC003258E4 /* shared_widgets.cpp in Sources */,
@@ -8303,7 +8309,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -8311,7 +8317,10 @@
 					SDL,
 					HAVE_BUNDLE_NAME,
 					HAVE_CONFIG_H,
+					"ENABLE_JAPANESE=1",
 				);
+				"HEADER_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/../vcpkg/installed-arm64-osx/arm64-osx/include $(SRCROOT)/../vcpkg/installed-arm64-osx/arm64-osx/include/SDL2";
+				"HEADER_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/../vcpkg/installed-x64-osx/x64-osx/include $(SRCROOT)/../vcpkg/installed-x64-osx/x64-osx/include/SDL2";
 				INFOPLIST_FILE = "Info-AlephOneJP-Xcode4.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOneJP;
 				PRODUCT_NAME = "Aleph One";
@@ -8393,6 +8402,7 @@
 					"-lSDL2_ttf",
 					"-lfreetype",
 					"-lboost_filesystem",
+					"-lboost_locale",
 					"-lbz2",
 					"-lbrotlicommon",
 					"-lbrotlienc",
@@ -8448,7 +8458,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Aleph One.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J9GG5YQQ39;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -8456,7 +8466,10 @@
 					SDL,
 					HAVE_BUNDLE_NAME,
 					HAVE_CONFIG_H,
+					"ENABLE_JAPANESE=1",
 				);
+				"HEADER_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/../vcpkg/installed-arm64-osx/arm64-osx/include $(SRCROOT)/../vcpkg/installed-arm64-osx/arm64-osx/include/SDL2";
+				"HEADER_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/../vcpkg/installed-x64-osx/x64-osx/include $(SRCROOT)/../vcpkg/installed-x64-osx/x64-osx/include/SDL2";
 				INFOPLIST_FILE = "Info-AlephOneJP-Xcode4.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.logue.AlephOneJP;
 				PRODUCT_NAME = "Aleph One";
@@ -8537,6 +8550,7 @@
 					"-lSDL2_ttf",
 					"-lfreetype",
 					"-lboost_filesystem",
+					"-lboost_locale",
 					"-lbz2",
 					"-lbrotlicommon",
 					"-lbrotlienc",

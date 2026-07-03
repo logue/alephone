@@ -1,6 +1,9 @@
 .deps/
 .DS_Store
 build/
+vcpkg_installed/
+/vcpkg/installed-*/
+/vcpkg/vcpkg/
 xcuserdata/
 project.xcworkspace/
 Makefile
