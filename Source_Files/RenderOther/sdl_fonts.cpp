@@ -54,6 +54,14 @@ using std::map;
 #include "jp-fonts/SourceHanMono-RegularIt.h"
 #include "jp-fonts/SourceHanMono-Bold.h"
 #include "jp-fonts/SourceHanMono-BoldIt.h"
+#else
+#include "AlephSansMono-Bold.h"
+#include "ProFontAO.h"
+
+#include "CourierPrime.h"
+#include "CourierPrimeBold.h"
+#include "CourierPrimeItalic.h"
+#include "CourierPrimeBoldItalic.h"
 #endif
 
 // Global variables
@@ -90,8 +98,14 @@ static builtin_font_t builtin_fontspecs[] = {
 	{" Courier Prime Bold Italic", SourceHanMonoBoldIt, SourceHanMonoBoldIt_size }
 };
 #else
-// Empty builtin fonts array for non-Japanese builds
-static builtin_font_t builtin_fontspecs[] = {};
+static builtin_font_t builtin_fontspecs[] = {
+	{ "mono", aleph_sans_mono_bold, sizeof(aleph_sans_mono_bold) },
+	{ "Monaco", pro_font_ao, sizeof(pro_font_ao) },
+	{ "Courier Prime", courier_prime, sizeof(courier_prime) },
+	{ "Courier Prime Bold", courier_prime_bold, sizeof(courier_prime_bold) },
+	{ "Courier Prime Italic", courier_prime_italic, sizeof(courier_prime_italic) },
+	{" Courier Prime Bold Italic", courier_prime_bold_italic, sizeof(courier_prime_bold_italic) }
+};
 #endif
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)
@@ -325,8 +339,11 @@ font_info *load_font(const TextSpec &spec) {
 
 			// SDL_TTF doesn't do a great job determining the height of fonts...
 			int height;
-			// TTF_SizeText(font, "Ag", nullptr, &height);
+#ifdef ENABLE_JAPANESE
 			TTF_SizeUTF8(font, "あAg", nullptr, &height);
+#else
+			TTF_SizeText(font, "Ag", nullptr, &height);
+#endif
 			
 			info->m_line_height = std::max({
 					TTF_FontLineSkip(font),
@@ -526,8 +543,11 @@ int sdl_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 int8 ttf_font_info::char_width(uint8 c, uint16 style) const
 {
 	int advance;
-	// TTF_GlyphMetrics(get_ttf(style), mac_roman_to_unicode(static_cast<char>(c)), 0, 0, 0, 0, &advance);
+#ifdef ENABLE_JAPANESE
 	TTF_GlyphMetrics(get_ttf(style), static_cast<char>(c), 0, 0, 0, 0, &advance);
+#else
+	TTF_GlyphMetrics(get_ttf(style), mac_roman_to_unicode(static_cast<char>(c)), 0, 0, 0, 0, &advance);
+#endif
 
 	return advance;
 }
@@ -539,24 +559,25 @@ uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) con
 uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style, bool utf8) const
 {
 	int width = 0;
-	/*
+#ifdef ENABLE_JAPANESE
+	// AlephOne JPは常にUTF-8で処理をする。
+	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
+#else
 	if (utf8)
 	{
 		char *temp = process_printable(text, length);
 		TTF_SizeUTF8(get_ttf(style), temp, &width, 0);
-		
 	}
 	else
 	{
 		uint16 *temp = process_macroman(text, length);
 		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	}
-	*/
-	// AlephOne JPは常にUTF-8で処理をする。
-	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
+#endif
 	return width;
 }
 
+#ifdef ENABLE_JAPANESE
 int get_utf8char_byte(const char* p )
 {
 	int byte = 0;		// バイト数
@@ -593,23 +614,10 @@ int get_utf8char_byte(const char* p )
 int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
 {
 	int width;
-	// static uint16 temp[1024];
-	// mac_roman_to_unicode(text, temp, 1024);
-	// TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
 	TTF_SizeUTF8(get_ttf(style), text, &width, 0);
 
 	if (width < max_width) return strlen(text);
 
-	/*
-	int num = strlen(text) - 1;
-
-	while (num > 0 && width > max_width)
-	{
-		num--;
-		temp[num] = 0x0;
-		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
-	}
-	*/
 	int num = 0;
 
 	while( *text ){
@@ -635,6 +643,27 @@ int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 
 	return num;
 }
+#else
+int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) const
+{
+	int width;
+	static uint16 temp[1024];
+	mac_roman_to_unicode(text, temp, 1024);
+	TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	if (width < max_width) return strlen(text);
+
+	int num = strlen(text) - 1;
+
+	while (num > 0 && width > max_width)
+	{
+		num--;
+		temp[num] = 0x0;
+		TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
+	}
+
+	return num;
+}
+#endif
 
 // ttf_font_info::_draw_text is in screen_drawing.cpp
 
@@ -653,9 +682,11 @@ char *ttf_font_info::process_printable(const char *src, int len) const
 	return dst;
 }
 
-uint16 *ttf_font_info::process_macroman(const char *src, int len) const 
+uint16 *ttf_font_info::process_macroman(const char *src, int len) const
 {
-	/*
+#ifdef ENABLE_JAPANESE
+	return reinterpret_cast<uint16*>((char*)src);
+#else
 	static uint16 dst[1024];
 	if (len > 1023) len = 1023;
 	uint16 *p = dst;
@@ -664,14 +695,13 @@ uint16 *ttf_font_info::process_macroman(const char *src, int len) const
 		if ((unsigned char) *src >= ' ') *p++ = mac_roman_to_unicode(*src);
 		else if ((unsigned char) *src == '\t')
 			*p++ = ' ';
-		
+
 		if (len > 0) src++;
 	}
 
 	*p = 0x0;
 	return dst;
-	*/
-	return reinterpret_cast<uint16*>((char*)src);
+#endif
 }
 
 uint16 font_info::text_width(const char *text, uint16 style, bool utf8) const
