@@ -215,11 +215,11 @@
 - [x] 上流をマージ: `git merge upstream/master`
 - [x] コンフリクト解決（computer_interface.cpp、FontHandler保持、UI翻訳は上流版）
 - [x] マージコミット完了 (3767346f)
-- [ ] macOSでビルドテスト（Xcode or configure）
+- [x] macOSでビルドテスト（Xcode / arm64 Release ビルド成功 2026-07-03）
 - [ ] Linuxでビルドテスト（可能であれば）
 - [ ] Windowsでビルドテスト（可能であれば）
-- [ ] 日本語版として動作確認
-- [ ] 英語版（`--disable-japanese`）として動作確認
+- [ ] 日本語版として動作確認（--help起動確認済み、ゲーム内表示は未確認）
+- [ ] 英語版（ENABLE_JAPANESE未定義）として動作確認
 
 ---
 
@@ -542,6 +542,52 @@ while (*start) {
 | macOSビルド | autotools | **Xcode推奨** |
 | 依存管理 | Homebrew | vcpkg（静的リンク） |
 
+### 2026年7月3日 - macOS Xcodeビルド成功
+
+前回（2026年1月）のマージで `--ours` を採用したファイルの一部が2019年ベースのままで、
+上流の新APIと不整合を起こしていたため、上流版をベースに日本語対応差分を再適用した。
+
+#### 修正内容
+
+1. **shell.cpp** (Commit: `81e396c9`)
+   - 上流版に置き換え（main()はmain.cppに分離済み、initialize_application公開化などに追従）
+   - 日本語固有の変更は `setlocale(LC_ALL, "")` のみ再適用（`#ifdef ENABLE_JAPANESE`）
+
+2. **computer_interface.cpp** (Commit: `9f3e5a08`)
+   - 上流版に置き換え、JP対応を `#ifdef ENABLE_JAPANESE` で再適用
+   - calculate_line: Shift_JIS 1文字単位で送り、TTF_SizeUTF8で計測（スタイル変化対応）
+   - draw_line: 描画前に sjis2utf8 変換
+   - ワードラップ: 2バイト文字の直後で改行可能（isJChar）
+   - calculate_line / count_total_lines / calculate_maximum_lines_for_groups に
+     terminal_text_t* 引数を追加
+
+3. **FontHandler** (Commit: `dcc56026`)
+   - 上流の lua_hud_objects.cpp が参照する `FontSpecifier::NearFilter` を復活
+   - JP版の文字列単位テクスチャキャッシュでフィルタ設定を反映
+
+4. **sdl_fonts.cpp** (Commit: `3b797b03`)
+   - 無条件だったJP変更（組み込みフォント、高さ計測、char_width、_text_width、
+     _trunc_text、process_macroman）を `#ifdef ENABLE_JAPANESE` で保護
+   - 非日本語ビルドは上流の MacRoman 処理・フォントセットに復帰
+
+5. **Xcodeプロジェクト** (Commit: `3a90fb71`)
+   - Aleph One JP ターゲットに `ENABLE_JAPANESE=1` を定義
+   - converter.cpp をターゲットに追加、`-lboost_locale` をリンク
+   - ヘッダー検索パスの再帰グロブ（include/**）を廃止
+     （FLACの assert.h がシステムの <assert.h> を隠す問題の修正）
+   - include と include/SDL2 のみを明示指定
+
+#### ビルド結果
+
+- **Xcode arm64 Release: ビルド成功**（Aleph One.app 生成、--help 起動確認済み）
+- 上流ベースバージョン: Aleph One 1.11 (2025-08-29)
+
+#### 残タスク
+
+- ゲームデータを使った日本語表示の動作確認（ターミナル画面など）
+- 英語版（ENABLE_JAPANESE未定義）のビルド確認
+- Linux/Windowsビルド確認
+
 ---
 
-_最終更新: 2026年1月25日_
+_最終更新: 2026年7月3日_
